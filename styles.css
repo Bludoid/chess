@@ -1,0 +1,31 @@
+body {
+  height: 100vh;
+  background-image: linear-gradient(DarkGoldenrod, gold);
+}
+
+#board>div {
+    height: 60px;
+    width: 60px;
+    display: inline-block;
+    border-radius: 4px;
+    vertical-align: top;
+  }
+  
+  .whiteSquare {
+    background: chocolate;
+  }
+  
+  .blackSquare {
+    background: #444;
+  }
+    
+  #board {
+    margin: 50px 0 0 100px;
+    width: 480px;
+    border: solid brown 20px;
+    background-color: grey;
+    padding: 5px;
+    border-radius: 8px;
+  }
+  
+ 
