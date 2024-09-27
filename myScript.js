@@ -1,3 +1,8 @@
+// todo:  switch between black and white player
+//        be able to take any opponent's piece (update board and array)
+//        move a pawn properly
+
+
 let colorCounter = 1;
 let board = document.getElementById("board");
 let whiteMove = true;         // true => white's move, false => black's move
@@ -54,15 +59,27 @@ for(let i = 0; i<64; i++) {
 }
 
 // place a piece on the board given square ID (1 to 64) and shortcut of the piece ("bp" - black pawn)
-function placePiece(squareID, pieceName) {
-  let desiredSquare = document.getElementById(squareID);
+function placePiece(square, pieceName) {
+  //let desiredSquare = document.getElementById(squareID);
   let newPiece = document.createElement("img");
   let pathString = "img/" + pieceName + ".png";
   newPiece.src = pathString;
   newPiece.className = pieceName;
-  desiredSquare.appendChild(newPiece);
+  square.appendChild(newPiece);
 }
 
+function removePiece(square) {
+  square.innerHTML = "";
+
+}
+
+function highlightSquare(square) {
+  square.classList.add("highlighted");
+}
+
+function unhighlightSquare(square) {
+  square.classList.remove("highlighted");
+}
 // return a string with colour and piece ("white rook")
 function recognizePiece(pieceShortcut) {
   let recognizedPiece = "";
@@ -107,11 +124,11 @@ function recognizePiece(pieceShortcut) {
 function setUpBoard() {
   for (let i = 1; i<17; i++) {
     let pieceName = boardSituation[i-1][0] + boardSituation[i-1][1];
-    placePiece(i, pieceName);
+    placePiece(document.getElementById(i), pieceName);
   }
   for (let i = 49; i<65; i++) {
     let pieceName = boardSituation[i-1][0] + boardSituation[i-1][1];
-    placePiece(i, pieceName);
+    placePiece(document.getElementById(i), pieceName);
   }
 }
 
@@ -123,6 +140,7 @@ function possibleMove(square) {
   console.log(recognizePiece(square.firstChild.className));
   moveInProgress = true;
   chosenSquare = square;
+  highlightSquare(square);
 }
 
 function executeMove(oldSquare, newSquare) {
@@ -134,13 +152,15 @@ function executeMove(oldSquare, newSquare) {
   boardSituation[oldSquare.id-1][0] = "e";
   boardSituation[newSquare.id-1][1] = boardSituation[oldSquare.id-1][1]; 
   boardSituation[oldSquare.id-1][1] = "e";
-  placePiece(newSquare.id, oldSquare.firstChild.className);
+  placePiece(newSquare, oldSquare.firstChild.className);
+  removePiece(oldSquare);
+  moveInProgress = false;
+  chosenSquare = null;
+  whiteMove = !whiteMove;  // toggling white/black player move
+  unhighlightSquare(oldSquare);
   // calls updateBoard()
 }
 
-// function updateBoard(oldSquare, newSquare) {
-//   move the piece on the board
-//   update the boardSituation array
-// }
+
 
 setUpBoard();
