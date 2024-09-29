@@ -1,6 +1,6 @@
 // todo:  switch between black and white player
 //        be able to take any opponent's piece (update board and array)
-//        move a pawn properly
+//  move a pawn properly
 
 
 let colorCounter = 1;
@@ -27,18 +27,18 @@ for(let i = 0; i<64; i++) {
   thisSquare.id = i+1;
   thisSquare.addEventListener("click", function() {
     console.log("this is a square number: " + thisSquare.id);
-    // if moveInProgress
-    // if (boardSituation[i+1][0] == "e") {
-    //   console.log("This sqaure is empty.");
-    // }
-    // else if (whiteInCheck || blackInCheck) {
-    //   console.log("check is happening");  
-    //   // has to get out of check
-    // }
-    if (!moveInProgress) {
+    if (!moveInProgress && isPlayersTurn(thisSquare)) {
+      // user clicked the first square
       possibleMove(thisSquare); 
     }
+    else if (thisSquare == chosenSquare) {
+      // move is not happening, because same square was chosen twice
+      unhighlightSquare(thisSquare);
+      chosenSquare = null;
+      moveInProgress = false;
+    }
     else {
+      // user clicked a second square (after one was already highlighted/clicked before)
       executeMove(chosenSquare, thisSquare);
     }
   })
@@ -80,6 +80,23 @@ function highlightSquare(square) {
 function unhighlightSquare(square) {
   square.classList.remove("highlighted");
 }
+
+function isPlayersTurn(square) {
+  if (boardSituation[square.id-1][1] == "w" && whiteMove == true) {
+    return true;
+  }
+  else if (boardSituation[square.id-1][1] == "b" && whiteMove == false) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+
+
+
+
 // return a string with colour and piece ("white rook")
 function recognizePiece(pieceShortcut) {
   let recognizedPiece = "";
@@ -156,8 +173,8 @@ function executeMove(oldSquare, newSquare) {
   removePiece(oldSquare);
   moveInProgress = false;
   chosenSquare = null;
-  whiteMove = !whiteMove;  // toggling white/black player move
   unhighlightSquare(oldSquare);
+  whiteMove = !whiteMove;  // toggling white/black player move
   // calls updateBoard()
 }
 
