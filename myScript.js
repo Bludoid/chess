@@ -11,6 +11,7 @@ let blackInCheck = false;
 let moveInProgress = false;
 let chosenSquare = null;
 let boardSituation = [
+                      [],
                       ["r", "b"], ["n", "b"], ["b", "b"], ["q", "b"], ["k", "b"], ["b", "b"], ["n", "b"], ["r", "b"], 
                       ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"],
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], 
@@ -30,6 +31,9 @@ for(let i = 0; i<64; i++) {
     if (!moveInProgress && isPlayersTurn(thisSquare)) {
       // user clicked the first square
       possibleMove(thisSquare); 
+    }
+    else if (!moveInProgress && !isPlayersTurn(thisSquare)) {
+      console.log("not your turn or empty square");
     }
     else if (thisSquare == chosenSquare) {
       // move is not happening, because same square was chosen twice
@@ -82,10 +86,10 @@ function unhighlightSquare(square) {
 }
 
 function isPlayersTurn(square) {
-  if (boardSituation[square.id-1][1] == "w" && whiteMove == true) {
+  if (boardSituation[square.id][1] == "w" && whiteMove) {
     return true;
   }
-  else if (boardSituation[square.id-1][1] == "b" && whiteMove == false) {
+  else if (boardSituation[square.id][1] == "b" && !whiteMove) {
     return true;
   }
   else {
@@ -140,11 +144,11 @@ function recognizePiece(pieceShortcut) {
 
 function setUpBoard() {
   for (let i = 1; i<17; i++) {
-    let pieceName = boardSituation[i-1][0] + boardSituation[i-1][1];
+    let pieceName = boardSituation[i][0] + boardSituation[i][1];
     placePiece(document.getElementById(i), pieceName);
   }
   for (let i = 49; i<65; i++) {
-    let pieceName = boardSituation[i-1][0] + boardSituation[i-1][1];
+    let pieceName = boardSituation[i][0] + boardSituation[i][1];
     placePiece(document.getElementById(i), pieceName);
   }
 }
@@ -165,16 +169,17 @@ function executeMove(oldSquare, newSquare) {
   console.log("executing move");
   //console.log("There is this piece on the square: " + square.firstChild.className);
   //console.log(recognizePiece(square.firstChild.className));
-  boardSituation[newSquare.id-1][0] = boardSituation[oldSquare.id-1][0]; 
-  boardSituation[oldSquare.id-1][0] = "e";
-  boardSituation[newSquare.id-1][1] = boardSituation[oldSquare.id-1][1]; 
-  boardSituation[oldSquare.id-1][1] = "e";
+  boardSituation[newSquare.id][0] = boardSituation[oldSquare.id][0]; 
+  boardSituation[oldSquare.id][0] = "e";
+  boardSituation[newSquare.id][1] = boardSituation[oldSquare.id][1]; 
+  boardSituation[oldSquare.id][1] = "e";
   placePiece(newSquare, oldSquare.firstChild.className);
   removePiece(oldSquare);
   moveInProgress = false;
   chosenSquare = null;
   unhighlightSquare(oldSquare);
   whiteMove = !whiteMove;  // toggling white/black player move
+  console.log(boardSituation);
   // calls updateBoard()
 }
 
