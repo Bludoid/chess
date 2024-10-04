@@ -20,7 +20,7 @@ body {
   }
     
   #board {
-    margin: 50px 0 0 100px;
+    margin: 0 0 0 100px;
     width: 480px;
     border: solid brown 20px;
     background-color: grey;
@@ -31,4 +31,26 @@ body {
   .highlighted {
     background-color: yellow;
   }
- 
+
+    #blackBanner, #whiteBanner {
+      margin-left: 100px;
+      width: 530px;
+      height: 30px;
+      border-radius: 10px;
+    }
+  
+    .hideBanner {
+      background-color: transparent !important;
+    }
+
+    #blackBanner {
+      margin-top: 50px;
+      margin-bottom: 20px;
+      background-color: black;
+    }
+
+    #whiteBanner {
+      margin-top: 20px;
+      background-color: white;
+    }
+

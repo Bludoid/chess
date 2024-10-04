@@ -245,6 +245,12 @@ function executeMove(oldSquare, newSquare) {
   clearSquare(oldSquare);
   removePiece(oldSquare);
   whiteMove = !whiteMove;  // toggling white/black player move
+  
+  // switch the colour banners for making the players know who's move it is
+  let wBanner = document.getElementById("whiteBanner");
+  let bBanner = document.getElementById("blackBanner");
+  bBanner.classList.toggle("hideBanner");
+  wBanner.classList.toggle("hideBanner");
 }
 
 // call the function to initially set up the board
