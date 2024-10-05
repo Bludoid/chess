@@ -2,7 +2,6 @@
 //   chess board in HTML/CSS/JavaScript  //
 ///////////////////////////////////////////
 
-
 //        to do:  
 //        move a pawn properly
 //        move counter or even notation (also show next to the board)
@@ -12,6 +11,8 @@ let colorCounter = 1;
 let board = document.getElementById("board");
 let whiteMove = true;         // true => white's move, false => black's move
 
+let infobox = document.getElementById("infobox");
+
 // not used yet:
 // let whiteInCheck = false;    // if true => check or checkmate happening
 // let blackInCheck = false;
@@ -19,7 +20,8 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let moveInProgress = false;
 let chosenSquare = null;
-let boardSituation = [[],     // index 0 is empty to have same numbers as ID's and in this array
+let boardSituation = [
+                      [],     // index 0 is empty to have same numbers as ID's and in this array
                       ["r", "b"], ["n", "b"], ["b", "b"], ["q", "b"], ["k", "b"], ["b", "b"], ["n", "b"], ["r", "b"], 
                       ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"],
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], 
@@ -27,12 +29,23 @@ let boardSituation = [[],     // index 0 is empty to have same numbers as ID's a
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
                       ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], 
-                      ["r", "w"], ["n", "w"], ["b", "w"], ["q", "w"], ["k", "w"], ["b", "w"], ["n", "w"], ["r", "w"]]
+                      ["r", "w"], ["n", "w"], ["b", "w"], ["q", "w"], ["k", "w"], ["b", "w"], ["n", "w"], ["r", "w"]
+                    ]
 
 
+const boardCoordinates = [
+  "", 
+  "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+  "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+  "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+  "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+  "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+  "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+  "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+  "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
+];
 
-
-// create the board and add clickability to the squares
+// create the board and add click ability to the squares
 for(let i = 0; i<64; i++) {
   let thisSquare = document.createElement("div");
   thisSquare.id = i+1;
@@ -60,20 +73,22 @@ for(let i = 0; i<64; i++) {
       // player clicked an opponent's piece instead of his piece
       console.log("It is not this colour's move!");
     }
-    // not player's square (taken care of before) or not empty square ==> opponent's piece
     else if (isOpponentsPiece(thisSquare)) {
+      // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
       // if (validSquares.includes(thisSquare))  {
       takePiece(chosenSquare, thisSquare);
       console.log("Taking opponent's piece.");
       // }
     }
     else if (isEmptySquare(thisSquare)) {
+      // a square is hightlighted and player clicked empty square ==> if valid, a move happening
       // if (validSquares.includes(thisSquare))  {
       executeMove(chosenSquare, thisSquare);
       console.log("moving to an empty square");
       // }
     }
   })
+  // appending squares to board and giving them class names
   board.appendChild(thisSquare)
   if(colorCounter%2 == 1){
     thisSquare.className = "whiteSquare";
@@ -81,6 +96,7 @@ for(let i = 0; i<64; i++) {
   else{
     thisSquare.className = "blackSquare"; 
   }
+  // new row of squares (adding <br>)
   if((i+1)%8 === 0) {
     let breakLine = document.createElement("br");
     board.appendChild(breakLine);
@@ -156,6 +172,16 @@ function takePiece(takingPieceSquare, takenPieceSquare) {
 //   return validMoves;
 // }
 
+// converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
+function squareToCoordinates(squareID) {
+  return boardCoordinates[squareID];
+}
+
+// outputs message for players to the infobox
+function outputToInfobox(infoMessage) {
+  infobox.innerHTML = infoMessage;
+}
+
 
 
 
@@ -163,7 +189,7 @@ function takePiece(takingPieceSquare, takenPieceSquare) {
 
 
 // return a string with colour and piece ("white rook")
-function recognizePiece(pieceShortcut) {
+function pieceToString(pieceShortcut) {
   let recognizedPiece = "";
   
   // is piece black or white?
@@ -218,7 +244,7 @@ function setUpBoard() {
 // starts the move by setting moveInProgress to true, highlights the given square and saves the square as chosenSquare 
 function markPossibleMove(square) {
   console.log("There is this piece on the square: " + square.firstChild.className);
-  console.log(recognizePiece(square.firstChild.className));
+  console.log(pieceToString(square.firstChild.className));
   moveInProgress = true;
   highlightSquare(square);
   chosenSquare = square;
@@ -247,6 +273,10 @@ function executeMove(oldSquare, newSquare) {
   let bBanner = document.getElementById("blackBanner");
   bBanner.classList.toggle("hideBanner");
   wBanner.classList.toggle("hideBanner");
+  console.log(pieceToString(newSquare.firstChild.className));
+  console.log(squareToCoordinates(newSquare.firstChild.className));
+
+  outputToInfobox(pieceToString(newSquare.firstChild.className) + " moved to " + squareToCoordinates(newSquare.id))
 }
 
 // call the function to initially set up the board

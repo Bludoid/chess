@@ -35,7 +35,7 @@ body {
     #blackBanner, #whiteBanner {
       margin-left: 100px;
       width: 530px;
-      height: 30px;
+      height: 20px;
       border-radius: 10px;
     }
   
@@ -44,13 +44,26 @@ body {
     }
 
     #blackBanner {
-      margin-top: 50px;
-      margin-bottom: 20px;
+      margin-top: 20px;
+      margin-bottom: 15px;
       background-color: black;
     }
 
     #whiteBanner {
-      margin-top: 20px;
+      margin-top: 15px;
       background-color: white;
+    }
+
+    #infobox {
+      margin-left: 100px;
+      margin-top: 20px;
+      padding-top: 30px;
+      padding-left: 20px;
+      width: 500px;
+      height: 80px;
+      border: grey solid 5px;
+      border-radius: 10px;
+      background-color: yellowgreen;
+      font-size: 40px;
     }
 
