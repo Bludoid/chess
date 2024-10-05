@@ -4,12 +4,10 @@
 
 
 //        to do:  
-//        be able to take any opponent's piece (update board and array)
 //        move a pawn properly
 //        move counter or even notation (also show next to the board)
-//        visual representation of who's move it is (next to the board as a square or strip in the right colour)
 
-// for creating the board (and its white/black pieces)
+
 let colorCounter = 1;
 let board = document.getElementById("board");
 let whiteMove = true;         // true => white's move, false => black's move
@@ -21,8 +19,7 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let moveInProgress = false;
 let chosenSquare = null;
-let boardSituation = [
-                      [],
+let boardSituation = [[],     // index 0 is empty to have same numbers as ID's and in this array
                       ["r", "b"], ["n", "b"], ["b", "b"], ["q", "b"], ["k", "b"], ["b", "b"], ["n", "b"], ["r", "b"], 
                       ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"],
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], 
@@ -30,38 +27,37 @@ let boardSituation = [
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
                       ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], 
-                      ["r", "w"], ["n", "w"], ["b", "w"], ["q", "w"], ["k", "w"], ["b", "w"], ["n", "w"], ["r", "w"]
-                    ]
+                      ["r", "w"], ["n", "w"], ["b", "w"], ["q", "w"], ["k", "w"], ["b", "w"], ["n", "w"], ["r", "w"]]
 
 
 
 
-// create the board
+// create the board and add clickability to the squares
 for(let i = 0; i<64; i++) {
   let thisSquare = document.createElement("div");
   thisSquare.id = i+1;
   thisSquare.addEventListener("click", function() {
 
-    isOpponentsPiece(thisSquare);  
-
     //console.log("this is a square number: " + thisSquare.id);
     if (!moveInProgress && isPlayersTurnAndPiece(thisSquare)) {
-      // user selected a piece to move (while there was no other piece selected before)
+      // user selected a piece to move (there was no other piece selected before)
       markPossibleMove(thisSquare); 
     }
     else if (moveInProgress && thisSquare == chosenSquare) {
-      // same piece clicked twice ==> highlight/unhighlight 
+      // same piece clicked twice ==> highlight/unhighlight ==> move in progress canceled 
       clearSquare(chosenSquare);
     }
     else if (isPlayersTurnAndPiece(thisSquare)) {
-      // player clicked another of his pieces (switching between selecting his own pieces)
+      // player clicked another of his pieces (player selected a different piece to move)
       clearSquare(chosenSquare);
       markPossibleMove(thisSquare);
     }
     else if (!moveInProgress && isEmptySquare(thisSquare)) {
+      // player clicked an empty square instead of his piece
       console.log("This is an empty square!");
     }
     else if (!moveInProgress && isOpponentsPiece(thisSquare)) {
+      // player clicked an opponent's piece instead of his piece
       console.log("It is not this colour's move!");
     }
     // not player's square (taken care of before) or not empty square ==> opponent's piece
