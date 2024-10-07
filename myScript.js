@@ -30,20 +30,20 @@ let boardSituation = [
                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
                       ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], 
                       ["r", "w"], ["n", "w"], ["b", "w"], ["q", "w"], ["k", "w"], ["b", "w"], ["n", "w"], ["r", "w"]
-                    ]
+                    ];
 
 
 const boardCoordinates = [
-  "", 
-  "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
-  "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-  "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
-  "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
-  "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
-  "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
-  "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
-  "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
-];
+  [],   // zero member is not used
+  ["a", 8], ["b", 8], ["c", 8], ["d", 8], ["e", 8], ["f", 8], ["g", 8], ["h", 8],
+  ["a", 7], ["b", 7], ["c", 7], ["d", 7], ["e", 7], ["f", 7], ["g", 7], ["h", 7],
+  ["a", 6], ["b", 6], ["c", 6], ["d", 6], ["e", 6], ["f", 6], ["g", 6], ["h", 6],
+  ["a", 5], ["b", 5], ["c", 5], ["d", 5], ["e", 5], ["f", 5], ["g", 5], ["h", 5],
+  ["a", 4], ["b", 4], ["c", 4], ["d", 4], ["e", 4], ["f", 4], ["g", 4], ["h", 4],
+  ["a", 3], ["b", 3], ["c", 3], ["d", 3], ["e", 3], ["f", 3], ["g", 3], ["h", 3],
+  ["a", 2], ["b", 2], ["c", 2], ["d", 2], ["e", 2], ["f", 2], ["g", 2], ["h", 2],
+  ["a", 1], ["b", 1], ["c", 1], ["d", 1], ["e", 1], ["f", 1], ["g", 1], ["h", 1]
+  ];
 
 // create the board and add click ability to the squares
 for(let i = 0; i<64; i++) {
@@ -82,10 +82,10 @@ for(let i = 0; i<64; i++) {
     }
     else if (isEmptySquare(thisSquare)) {
       // a square is hightlighted and player clicked empty square ==> if valid, a move happening
-      // if (validSquares.includes(thisSquare))  {
+        if (isValidMove(thisSquare))  {
       executeMove(chosenSquare, thisSquare);
       console.log("moving to an empty square");
-      // }
+      }
     }
   })
   // appending squares to board and giving them class names
@@ -173,8 +173,8 @@ function takePiece(takingPieceSquare, takenPieceSquare) {
 // }
 
 // converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
-function squareToCoordinates(squareID) {
-  return boardCoordinates[squareID];
+function coordinatesOfSquare(squareID) {
+  return (boardCoordinates[squareID][0] + boardCoordinates[squareID][1]);
 }
 
 // outputs message for players to the infobox
@@ -182,10 +182,64 @@ function outputToInfobox(infoMessage) {
   infobox.innerHTML = infoMessage;
 }
 
+function isValidMove(square) {
+  let pieceSchortcut = boardSituation[chosenSquare.id][0];
+  console.log(pieceSchortcut);
+  switch (pieceSchortcut) {
+    case "p": 
+      return isPawnMove(square);
+    case "r":
+      return isRookMove(square); 
+    case "n": 
+      return isKnightMove(square);
+    case "b": 
+      return isBishopMove(square);
+    case "q": 
+      return isQueenMove(square);
+    case "k": 
+      return isKingMove(square);  
+  }
+}
+
+function isPawnMove(square) {
+  console.log("hi for now");
+  return true;
+}
+
+function isPawnMove(square) {
+  console.log("hi for now");
+  return true;
+}
+
+function isRookMove(square) {
+  console.log("hi for now");
+  return true;
+}
+
+function isKnightMove(square) {
+  console.log("hi for now");
+  return true;
+}
+
+function isBishopMove(square) {
+  console.log("hi for now");
+  return true;
+}
+
+function isQueenMove(square) {
+  console.log("hi for now");
+  return true;
+}
+
+function isKingMove(square) {
+  console.log("hi for now");
+  return true;
+}
 
 
 
 
+/////////////////////////////////////////////////////////////////////////////////////
 
 
 // return a string with colour and piece ("white rook")
@@ -218,7 +272,7 @@ function pieceToString(pieceShortcut) {
       recognizedPiece += "bishop";
       break;
     case "q": 
-      recognizedPiece += "QUEEN";
+      recognizedPiece += "queen";
       break;
     case "k": 
       recognizedPiece += "King";
@@ -274,9 +328,9 @@ function executeMove(oldSquare, newSquare) {
   bBanner.classList.toggle("hideBanner");
   wBanner.classList.toggle("hideBanner");
   console.log(pieceToString(newSquare.firstChild.className));
-  console.log(squareToCoordinates(newSquare.firstChild.className));
+  console.log(coordinatesOfSquare(newSquare.id));
 
-  outputToInfobox(pieceToString(newSquare.firstChild.className) + " moved to " + squareToCoordinates(newSquare.id))
+  outputToInfobox(pieceToString(newSquare.firstChild.className) + " moved to " + coordinatesOfSquare(newSquare.id))
 }
 
 // call the function to initially set up the board
