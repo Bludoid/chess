@@ -110,7 +110,7 @@ function placePiece(square, pieceName) {
   let newPiece = document.createElement("img");
   let pathString = "img/" + pieceName + ".png";   // puts together the name of the image
   newPiece.src = pathString;
-  newPiece.className = pieceName;
+  //newPiece.className = pieceName;
   square.appendChild(newPiece);
 }
 
@@ -301,7 +301,7 @@ function setUpBoard() {
 
 // starts the move by setting moveInProgress to true, highlights the given square and saves the square as chosenSquare 
 function markPossibleMove(square) {
-  console.log("There is this piece on the square: " + square.firstChild.className);
+  //console.log("There is this piece on the square: " + square.firstChild.className);
   console.log(pieceToString(square));
   moveInProgress = true;
   highlightSquare(square);
@@ -314,13 +314,18 @@ function markPossibleMove(square) {
 function executeMove(oldSquare, newSquare) {
   // updates boardSituation array
   console.log("executing move");
+  
+  // moves the piece to the new square
+  placePiece(newSquare, (boardSituation[oldSquare.id][0] +  boardSituation[oldSquare.id][1]));
+
   // make an updateBoardSituation function?????? : 
+  // updates the boardSituation array
   boardSituation[newSquare.id][0] = boardSituation[oldSquare.id][0]; 
   boardSituation[oldSquare.id][0] = "e";
   boardSituation[newSquare.id][1] = boardSituation[oldSquare.id][1]; 
   boardSituation[oldSquare.id][1] = "e";
-  // moves the square
-  placePiece(newSquare, oldSquare.firstChild.className);
+  
+  
   
   // cleans up after the move
   clearSquare(oldSquare);
