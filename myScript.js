@@ -187,7 +187,8 @@ function isValidMove(square) {
   console.log(pieceSchortcut);
   switch (pieceSchortcut) {
     case "p": 
-      return isPawnMove(square);
+        if (boardSituation[chosenSquare.id][1] == "w") {return isWhitePawnMove(square)}
+        else {return isBlackPawnMove(square)}
     case "r":
       return isRookMove(square); 
     case "n": 
@@ -201,38 +202,38 @@ function isValidMove(square) {
   }
 }
 
-function isPawnMove(square) {
-  console.log("hi for now");
+function isWhitePawnMove(square) {
+  console.log("hi from white pawn move logic");
   return true;
 }
 
-function isPawnMove(square) {
-  console.log("hi for now");
+function isBlackPawnMove(square) {
+  console.log("hi from black pawn move logic");
   return true;
 }
 
 function isRookMove(square) {
-  console.log("hi for now");
+  console.log("hi from rook move logic");
   return true;
 }
 
 function isKnightMove(square) {
-  console.log("hi for now");
+  console.log("hi from knight move logic");
   return true;
 }
 
 function isBishopMove(square) {
-  console.log("hi for now");
+  console.log("hi from bishop move logic");
   return true;
 }
 
 function isQueenMove(square) {
-  console.log("hi for now");
+  console.log("hi from queen move logic");
   return true;
 }
 
 function isKingMove(square) {
-  console.log("hi for now");
+  console.log("hi from king move logic");
   return true;
 }
 
@@ -243,11 +244,14 @@ function isKingMove(square) {
 
 
 // return a string with colour and piece ("white rook")
-function pieceToString(pieceShortcut) {
+function pieceToString(square) {
   let recognizedPiece = "";
+  let pieceColor = boardSituation[square.id][1];
+  let pieceSchortcut = boardSituation[square.id][0];
+  
   
   // is piece black or white?
-  switch (pieceShortcut.charAt(1)) {
+  switch (pieceColor) {
     case "w": 
       recognizedPiece = "white ";
       break;
@@ -258,7 +262,7 @@ function pieceToString(pieceShortcut) {
   }
   
   // figure out what piece it is
-  switch (pieceShortcut.charAt(0)) {
+  switch (pieceSchortcut) {
     case "p": 
       recognizedPiece += "pawn";
       break;
@@ -298,7 +302,7 @@ function setUpBoard() {
 // starts the move by setting moveInProgress to true, highlights the given square and saves the square as chosenSquare 
 function markPossibleMove(square) {
   console.log("There is this piece on the square: " + square.firstChild.className);
-  console.log(pieceToString(square.firstChild.className));
+  console.log(pieceToString(square));
   moveInProgress = true;
   highlightSquare(square);
   chosenSquare = square;
@@ -310,6 +314,7 @@ function markPossibleMove(square) {
 function executeMove(oldSquare, newSquare) {
   // updates boardSituation array
   console.log("executing move");
+  // make an updateBoardSituation function?????? : 
   boardSituation[newSquare.id][0] = boardSituation[oldSquare.id][0]; 
   boardSituation[oldSquare.id][0] = "e";
   boardSituation[newSquare.id][1] = boardSituation[oldSquare.id][1]; 
@@ -327,10 +332,10 @@ function executeMove(oldSquare, newSquare) {
   let bBanner = document.getElementById("blackBanner");
   bBanner.classList.toggle("hideBanner");
   wBanner.classList.toggle("hideBanner");
-  console.log(pieceToString(newSquare.firstChild.className));
+  console.log(pieceToString(newSquare));
   console.log(coordinatesOfSquare(newSquare.id));
 
-  outputToInfobox(pieceToString(newSquare.firstChild.className) + " moved to " + coordinatesOfSquare(newSquare.id))
+  outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
 }
 
 // call the function to initially set up the board
