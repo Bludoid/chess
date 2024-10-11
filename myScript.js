@@ -49,7 +49,7 @@ let chosenSquare = null;
 
 
 // array or arrays with empty member on index 0
-// 64 squares represented as ['r', 'b', 'a', 8] (piece, color, row, column), indexes 0 and 1 possibly "e" for empty square
+// 64 squares represented as ['r', 'b', 'a', 8] (piece, color, rank, file), indexes 0 and 1 possibly "e" for empty square
 let boardRepresentation = [
   [],
   ['r', 'b', 'a', 8], ['n', 'b', 'b', 8], ['b', 'b', 'c', 8], ['q', 'b', 'd', 8], ['k', 'b', 'e', 8], ['b', 'b', 'f', 8], ['n', 'b', 'g', 8], ['r', 'b', 'h', 8],
@@ -82,7 +82,7 @@ for(let i = 0; i<64; i++) {
       clearSquare(chosenSquare);
       markPossibleMove(thisSquare);
     }
-    else if (!moveInProgress && isEmptySquare(thisSquare)) {
+    else if (!moveInProgress && isEmptySquare(thisSquare.id)) {
       // player clicked an empty square instead of his piece
       console.log("This is an empty square!");
     }
@@ -93,11 +93,14 @@ for(let i = 0; i<64; i++) {
     else if (isOpponentsPiece(thisSquare)) {
       // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
       // if (validSquares.includes(thisSquare))  {
-      takePiece(chosenSquare, thisSquare);
+      
+      if (isValidMove(thisSquare)) {
+        takePiece(chosenSquare, thisSquare);
+      }
       console.log("Taking opponent's piece.");
       // }
     }
-    else if (isEmptySquare(thisSquare)) {
+    else if (isEmptySquare(thisSquare.id)) {
       // a square is hightlighted and player clicked empty square ==> if valid, a move happening
       if (isValidMove(thisSquare))  {
         executeMove(chosenSquare, thisSquare);
@@ -113,7 +116,7 @@ for(let i = 0; i<64; i++) {
   else{
     thisSquare.className = "blackSquare"; 
   }
-  // new row of squares (adding <br>)
+  // new rank of squares (adding <br>)
   if((i+1)%8 === 0) {
     let breakLine = document.createElement("br");
     board.appendChild(breakLine);
@@ -161,8 +164,8 @@ function isPlayersTurnAndPiece(square) {
   }
 }
 
-function isEmptySquare(square) {
-  if (boardRepresentation[square.id][0] == "e") {
+function isEmptySquare(squareID) {
+  if (boardRepresentation[squareID][0] == "e") {
     return true;
   }
 }
@@ -221,7 +224,18 @@ function isValidMove(square) {
 
 function isWhitePawnMove(square) {
   console.log("hi from white pawn move logic");
-  return true;
+
+  if (!isSameColumn(square) && (isDiagonal(square, 0) || isDiagonal(square, 1)) && isOpponentsPiece(square)) {
+    return true;
+  } 
+  // initial 2 square move of a pawn
+  else if ((boardRepresentation[chosenSquare.id][3] == 2) && (boardRepresentation[square.id][3] == 4) && 
+    isEmptySquare(chosenSquare.id - 8) && isEmptySquare(chosenSquare.id - 16)) {
+    return true;
+  }
+  else if ((boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 ))) {
+    return true;
+  }
 }
 
 function isBlackPawnMove(square) {
@@ -256,6 +270,41 @@ function isKingMove(square) {
 
 
 
+function isSameColumn(square) {
+  return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[square.id][2]); 
+}
+
+function isAColumn() {
+  return (boardRepresentation[chosenSquare.id][2] == "a"); 
+}
+
+function isHColumn() {
+  return (boardRepresentation[chosenSquare.id][2] == "h"); 
+}
+
+// direction: 0 => top/left, 1 => top/right, 2 => bottom/right, 3 => bottom/left
+function isDiagonal(square, direction) {
+  switch(direction) {
+    // top/left
+    case 0:
+      if (isAColumn()) {return false};
+      return (square.id == chosenSquare.id - 9);
+    // top/right
+    case 1:
+      if (isHColumn()) {return false};
+      return (square.id == chosenSquare.id - 7);
+    // bottom/right
+    case 2:
+      if (isHColumn(square)) {return false};
+      return (square.id == chosenSquare.id + 9);
+    // bottom/left
+    case 3:
+      if (isAColumn(square)) {return false};
+      return (square.id == chosenSquare.id + 7);
+    default:
+      console.log("error");
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 
