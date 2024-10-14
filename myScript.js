@@ -102,9 +102,10 @@ for(let i = 0; i<64; i++) {
     }
     else if (isEmptySquare(thisSquare.id)) {
       // a square is hightlighted and player clicked empty square ==> if valid, a move happening
+      console.log(thisSquare.id);
       if (isValidMove(thisSquare))  {
-        executeMove(chosenSquare, thisSquare);
         console.log("moving to an empty square");
+        executeMove(chosenSquare, thisSquare);
       }
     }
   })
@@ -165,6 +166,9 @@ function isPlayersTurnAndPiece(square) {
 }
 
 function isEmptySquare(squareID) {
+  console.log("checking for empty square");
+  console.log(squareID);
+  console.log(boardRepresentation[squareID][0]);
   if (boardRepresentation[squareID][0] == "e") {
     return true;
   }
@@ -207,8 +211,9 @@ function isValidMove(square) {
   console.log(pieceSchortcut);
   switch (pieceSchortcut) {
     case "p": 
-        if (boardRepresentation[chosenSquare.id][1] == "w") {return isWhitePawnMove(square)}
-        else {return isBlackPawnMove(square)}
+        if (boardRepresentation[chosenSquare.id][1] == "w") 
+          {return isWhitePawnMove(square);}
+        else {return isBlackPawnMove(square);}
     case "r":
       return isRookMove(square); 
     case "n": 
@@ -224,23 +229,42 @@ function isValidMove(square) {
 
 function isWhitePawnMove(square) {
   console.log("hi from white pawn move logic");
-
-  if (!isSameColumn(square) && (isDiagonal(square, 0) || isDiagonal(square, 1)) && isOpponentsPiece(square)) {
+  if (!isSameColumn(square)) {
+    if ((isDiagonal(square, 0) || isDiagonal(square, 1)) && isOpponentsPiece(square)) {
     return true;
-  } 
-  // initial 2 square move of a pawn
-  else if ((boardRepresentation[chosenSquare.id][3] == 2) && (boardRepresentation[square.id][3] == 4) && 
-    isEmptySquare(chosenSquare.id - 8) && isEmptySquare(chosenSquare.id - 16)) {
-    return true;
+    } 
   }
-  else if ((boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 ))) {
-    return true;
+  // initial 2 square move of a pawn
+  else {
+    if ((boardRepresentation[chosenSquare.id][3] == 2) && 
+    (boardRepresentation[square.id][3] == 4) && isEmptySquare(chosenSquare.id - 8) && 
+    isEmptySquare(square.id)) {
+      return true;
+    }
+    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 )) {
+      return true;
+    }
   }
 }
 
 function isBlackPawnMove(square) {
   console.log("hi from black pawn move logic");
-  return true;
+  if (!isSameColumn(square)) {
+    if ((isDiagonal(square, 2) || isDiagonal(square, 3)) && isOpponentsPiece(square)) {
+    return true;
+    } 
+  }
+  // initial 2 square move of a pawn
+  else {
+    if ((boardRepresentation[chosenSquare.id][3] == 7) && 
+    (boardRepresentation[square.id][3] == 5) && isEmptySquare(chosenSquare.id + 8) && 
+    isEmptySquare(square.id)) {
+      return true;
+    }
+    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] - 1 )) {
+      return true;
+    }
+  }
 }
 
 function isRookMove(square) {
@@ -296,10 +320,12 @@ function isDiagonal(square, direction) {
     // bottom/right
     case 2:
       if (isHColumn(square)) {return false};
+      console.log("checking for bottom/right diagonal direction");
       return (square.id == chosenSquare.id + 9);
     // bottom/left
     case 3:
       if (isAColumn(square)) {return false};
+      console.log("checking for bottom/left diagonal direction");
       return (square.id == chosenSquare.id + 7);
     default:
       console.log("error");
