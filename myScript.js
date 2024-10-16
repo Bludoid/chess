@@ -102,7 +102,7 @@ for(let i = 0; i<64; i++) {
     }
     else if (isEmptySquare(thisSquare.id)) {
       // a square is hightlighted and player clicked empty square ==> if valid, a move happening
-      console.log(thisSquare.id);
+      //console.log(thisSquare.id);
       if (isValidMove(thisSquare))  {
         console.log("moving to an empty square");
         executeMove(chosenSquare, thisSquare);
@@ -235,6 +235,7 @@ function isWhitePawnMove(square) {
     } 
   }
   // initial 2 square move of a pawn
+  //let blaSquare = document.getElementById(chosenSquare.id -8);
   else {
     if ((boardRepresentation[chosenSquare.id][3] == 2) && 
     (boardRepresentation[square.id][3] == 4) && isEmptySquare(chosenSquare.id - 8) && 
@@ -255,9 +256,10 @@ function isBlackPawnMove(square) {
     } 
   }
   // initial 2 square move of a pawn
+  
   else {
     if ((boardRepresentation[chosenSquare.id][3] == 7) && 
-    (boardRepresentation[square.id][3] == 5) && isEmptySquare(chosenSquare.id + 8) && 
+    (boardRepresentation[square.id][3] == 5) && isEmptySquare(Number(chosenSquare.id) + 8) && 
     isEmptySquare(square.id)) {
       return true;
     }
@@ -321,12 +323,12 @@ function isDiagonal(square, direction) {
     case 2:
       if (isHColumn(square)) {return false};
       console.log("checking for bottom/right diagonal direction");
-      return (square.id == chosenSquare.id + 9);
+      return (square.id == Number(chosenSquare.id) + 9);
     // bottom/left
     case 3:
       if (isAColumn(square)) {return false};
       console.log("checking for bottom/left diagonal direction");
-      return (square.id == chosenSquare.id + 7);
+      return (square.id == Number(chosenSquare.id) + 7);
     default:
       console.log("error");
   }
