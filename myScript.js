@@ -97,7 +97,9 @@ for(let i = 0; i<64; i++) {
       if (isValidMove(thisSquare)) {
         takePiece(chosenSquare, thisSquare);
       }
-      console.log("Taking opponent's piece.");
+      else {
+        clearSquare(chosenSquare);
+      }
       // }
     }
     else if (isEmptySquare(thisSquare.id)) {
@@ -106,6 +108,9 @@ for(let i = 0; i<64; i++) {
       if (isValidMove(thisSquare))  {
         console.log("moving to an empty square");
         executeMove(chosenSquare, thisSquare);
+      }
+      else {
+        clearSquare(chosenSquare);
       }
     }
   })
