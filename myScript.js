@@ -13,6 +13,8 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
 
+
+
 // not used yet:
 // let whiteInCheck = false;    // if true => check or checkmate happening
 // let blackInCheck = false;
@@ -49,7 +51,7 @@ let chosenSquare = null;
 
 
 // array or arrays with empty member on index 0
-// 64 squares represented as ['r', 'b', 'a', 8] (piece, color, rank, file), indexes 0 and 1 possibly "e" for empty square
+// 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
 let boardRepresentation = [
   [],
   ['r', 'b', 'a', 8], ['n', 'b', 'b', 8], ['b', 'b', 'c', 8], ['q', 'b', 'd', 8], ['k', 'b', 'e', 8], ['b', 'b', 'f', 8], ['n', 'b', 'g', 8], ['r', 'b', 'h', 8],
@@ -100,7 +102,6 @@ for(let i = 0; i<64; i++) {
       else {
         clearSquare(chosenSquare);
       }
-      // }
     }
     else if (isEmptySquare(thisSquare.id)) {
       // a square is hightlighted and player clicked empty square ==> if valid, a move happening
@@ -122,7 +123,7 @@ for(let i = 0; i<64; i++) {
   else{
     thisSquare.className = "blackSquare"; 
   }
-  // new rank of squares (adding <br>)
+  // new File of squares (adding <br>)
   if((i+1)%8 === 0) {
     let breakLine = document.createElement("br");
     board.appendChild(breakLine);
@@ -164,25 +165,16 @@ function isPlayersTurnAndPiece(square) {
   else if (boardRepresentation[square.id][1] == "b" && !whiteMove) {
     return true;
   }
-  else {
+  else {return false}
     // returns false if it's not player's move or if the clicked square is empty
-    return false;
-  }
 }
 
 function isEmptySquare(squareID) {
-  console.log("checking for empty square");
-  console.log(squareID);
-  console.log(boardRepresentation[squareID][0]);
-  if (boardRepresentation[squareID][0] == "e") {
-    return true;
-  }
+  return (boardRepresentation[squareID][0] == "e");
 }
 
 function isOpponentsPiece(square) {
-  if ((!whiteMove && boardRepresentation[square.id][1] == "w") || (whiteMove && boardRepresentation[square.id][1] == "b")) {
-    return true;  
-  }
+  return ((!whiteMove && boardRepresentation[square.id][1] == "w") || (whiteMove && boardRepresentation[square.id][1] == "b"));
 }
 
 function clearSquare(square) {
@@ -217,8 +209,8 @@ function isValidMove(square) {
   switch (pieceSchortcut) {
     case "p": 
         if (boardRepresentation[chosenSquare.id][1] == "w") 
-          {return isWhitePawnMove(square);}
-        else {return isBlackPawnMove(square);}
+          {return isWhitePawnMove(square)}
+        else {return isBlackPawnMove(square)}
     case "r":
       return isRookMove(square); 
     case "n": 
@@ -234,8 +226,8 @@ function isValidMove(square) {
 
 function isWhitePawnMove(square) {
   console.log("hi from white pawn move logic");
-  if (!isSameColumn(square)) {
-    if ((isDiagonal(square, 0) || isDiagonal(square, 1)) && isOpponentsPiece(square)) {
+  if (!isSameFile(square)) {
+    if ((isDiagonalNeighbour(square, 0) || isDiagonalNeighbour(square, 1)) && isOpponentsPiece(square)) {
     return true;
     } 
   }
@@ -255,8 +247,8 @@ function isWhitePawnMove(square) {
 
 function isBlackPawnMove(square) {
   console.log("hi from black pawn move logic");
-  if (!isSameColumn(square)) {
-    if ((isDiagonal(square, 2) || isDiagonal(square, 3)) && isOpponentsPiece(square)) {
+  if (!isSameFile(square)) {
+    if ((isDiagonalNeighbour(square, 2) || isDiagonalNeighbour(square, 3)) && isOpponentsPiece(square)) {
     return true;
     } 
   }
@@ -276,7 +268,12 @@ function isBlackPawnMove(square) {
 
 function isRookMove(square) {
   console.log("hi from rook move logic");
-  return true;
+  if ((!isSameFile(square)) && (!isSameRank(square))) {
+    return false;
+  }
+  else {
+    return true;
+  }  
 }
 
 function isKnightMove(square) {
@@ -286,7 +283,12 @@ function isKnightMove(square) {
 
 function isBishopMove(square) {
   console.log("hi from bishop move logic");
-  return true;
+  if (!isDiagonal(square)) {
+    return false;
+  }
+  else {
+    return true;
+  } 
 }
 
 function isQueenMove(square) {
@@ -299,39 +301,62 @@ function isKingMove(square) {
   return true;
 }
 
+/////////////////////////////////////////////////
 
+function isSameRank(square) {
+  console.log("checking rank");
+  console.log(boardRepresentation[chosenSquare.id][3]);
+  console.log(boardRepresentation[square.id][3]);
+  return (boardRepresentation[chosenSquare.id][3] == boardRepresentation[square.id][3]); 
+}
 
-function isSameColumn(square) {
+function isSameFile(square) {
   return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[square.id][2]); 
 }
 
-function isAColumn() {
+function isAFile() {
   return (boardRepresentation[chosenSquare.id][2] == "a"); 
 }
 
-function isHColumn() {
+function isHFile() {
   return (boardRepresentation[chosenSquare.id][2] == "h"); 
 }
 
+function isFirstRank() {
+  return (boardRepresentation[chosenSquare.id][3] == 1); 
+}
+
+function isEighthRank() {
+  return (boardRepresentation[chosenSquare.id][3] == 8); 
+}
+
+function isDiagonal(square) {
+  let differenceOfSquareID = square.id - chosenSquare.id;
+  console.log(differenceOfSquareID);
+  if (differenceOfSquareID % 9 == 0 || differenceOfSquareID % 7 == 0) {
+    return true;
+  }
+}
+
 // direction: 0 => top/left, 1 => top/right, 2 => bottom/right, 3 => bottom/left
-function isDiagonal(square, direction) {
+function isDiagonalNeighbour(square, direction) {
   switch(direction) {
     // top/left
     case 0:
-      if (isAColumn()) {return false};
+      if (isAFile()) {return false};
       return (square.id == chosenSquare.id - 9);
     // top/right
     case 1:
-      if (isHColumn()) {return false};
+      if (isHFile()) {return false};
       return (square.id == chosenSquare.id - 7);
     // bottom/right
     case 2:
-      if (isHColumn(square)) {return false};
+      if (isHFile(square)) {return false};
       console.log("checking for bottom/right diagonal direction");
       return (square.id == Number(chosenSquare.id) + 9);
     // bottom/left
     case 3:
-      if (isAColumn(square)) {return false};
+      if (isAFile(square)) {return false};
       console.log("checking for bottom/left diagonal direction");
       return (square.id == Number(chosenSquare.id) + 7);
     default:
