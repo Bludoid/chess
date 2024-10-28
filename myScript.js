@@ -24,31 +24,6 @@ let moveInProgress = false;
 let chosenSquare = null;
 
 
-// let boardSituation = [
-//                       [],     // index 0 is empty to have same numbers as ID's and in this array
-//                       ["r", "b"], ["n", "b"], ["b", "b"], ["q", "b"], ["k", "b"], ["b", "b"], ["n", "b"], ["r", "b"], 
-//                       ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"], ["p", "b"],
-//                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], 
-//                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
-//                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
-//                       ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"], ["e", "e"],
-//                       ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], ["p", "w"], 
-//                       ["r", "w"], ["n", "w"], ["b", "w"], ["q", "w"], ["k", "w"], ["b", "w"], ["n", "w"], ["r", "w"]
-//                     ];
-
-
-// const boardCoordinates = [
-//                           [],   // zero member is not used
-//                           ["a", 8], ["b", 8], ["c", 8], ["d", 8], ["e", 8], ["f", 8], ["g", 8], ["h", 8],
-//                           ["a", 7], ["b", 7], ["c", 7], ["d", 7], ["e", 7], ["f", 7], ["g", 7], ["h", 7],
-//                           ["a", 6], ["b", 6], ["c", 6], ["d", 6], ["e", 6], ["f", 6], ["g", 6], ["h", 6],
-//                           ["a", 5], ["b", 5], ["c", 5], ["d", 5], ["e", 5], ["f", 5], ["g", 5], ["h", 5],
-//                           ["a", 4], ["b", 4], ["c", 4], ["d", 4], ["e", 4], ["f", 4], ["g", 4], ["h", 4],
-//                           ["a", 3], ["b", 3], ["c", 3], ["d", 3], ["e", 3], ["f", 3], ["g", 3], ["h", 3],
-//                           ["a", 2], ["b", 2], ["c", 2], ["d", 2], ["e", 2], ["f", 2], ["g", 2], ["h", 2],
-//                           ["a", 1], ["b", 1], ["c", 1], ["d", 1], ["e", 1], ["f", 1], ["g", 1], ["h", 1]
-//                           ];
-
 
 // array or arrays with empty member on index 0
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
@@ -281,14 +256,11 @@ function isKnightMove(square) {
   return true;
 }
 
+
+// Object.is(0, -0) will give false, but 0==-0 will give true
+
 function isBishopMove(square) {
-  console.log("hi from bishop move logic");
-  if (!isDiagonal(square)) {
-    return false;
-  }
-  else {
-    return true;
-  } 
+  return isDiagonalPath(square.id, getDiagonalDirection(square.id));
 }
 
 function isQueenMove(square) {
@@ -359,6 +331,53 @@ function isDiagonalNeighbour(square, direction) {
       if (isAFile(square)) {return false};
       console.log("checking for bottom/left diagonal direction");
       return (square.id == Number(chosenSquare.id) + 7);
+    default:
+      console.log("error");
+  }
+}
+
+function getDiagonalDirection(squareID) {
+  let directionHelper = squareID - chosenSquare.id;
+  switch(true) {
+    // top/left
+    case (Object.is(directionHelper % 9, -0)):
+      return 0;
+    // top/right:
+    case (Object.is(directionHelper % 7, -0)):
+      return 1;
+    // bottom/right:
+    case (!directionHelper % 9):
+      return 2;
+    // bottom/left:
+    case (!directionHelper % 7):
+      return 3;
+    default:
+      console.log("error");
+  }
+}
+
+function isDiagonalPath(endSquareID, direction) {
+  let currentID = chosenSquare.id; 
+  switch(direction) {
+    // top/left
+    case 0:
+      currentID -= 9
+      while (currentID > endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID -= 9;
+      }
+      return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+    // top/right
+    case 1:
+      return false;
+    // bottom/right
+    case 2:
+      return false;
+    // bottom/left
+    case 3:
+      return false;
     default:
       console.log("error");
   }
