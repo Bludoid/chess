@@ -63,11 +63,11 @@ for(let i = 0; i<64; i++) {
       // player clicked an empty square instead of his piece
       console.log("This is an empty square!");
     }
-    else if (!moveInProgress && isOpponentsPiece(thisSquare)) {
+    else if (!moveInProgress && isOpponentsPiece(thisSquare.id)) {
       // player clicked an opponent's piece instead of his piece
       console.log("It is not this colour's move!");
     }
-    else if (isOpponentsPiece(thisSquare)) {
+    else if (isOpponentsPiece(thisSquare.id)) {
       // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
       // if (validSquares.includes(thisSquare))  {
       
@@ -148,8 +148,8 @@ function isEmptySquare(squareID) {
   return (boardRepresentation[squareID][0] == "e");
 }
 
-function isOpponentsPiece(square) {
-  return ((!whiteMove && boardRepresentation[square.id][1] == "w") || (whiteMove && boardRepresentation[square.id][1] == "b"));
+function isOpponentsPiece(squareID) {
+  return ((!whiteMove && boardRepresentation[squareID][1] == "w") || (whiteMove && boardRepresentation[squareID][1] == "b"));
 }
 
 function clearSquare(square) {
@@ -201,8 +201,8 @@ function isValidMove(square) {
 
 function isWhitePawnMove(square) {
   console.log("hi from white pawn move logic");
-  if (!isSameFile(square)) {
-    if ((isDiagonalNeighbour(square, 0) || isDiagonalNeighbour(square, 1)) && isOpponentsPiece(square)) {
+  if (!isSameFile(square.id)) {
+    if ((isDiagonalNeighbour(square, 0) || isDiagonalNeighbour(square, 1)) && isOpponentsPiece(square.id)) {
     return true;
     } 
   }
@@ -222,8 +222,8 @@ function isWhitePawnMove(square) {
 
 function isBlackPawnMove(square) {
   console.log("hi from black pawn move logic");
-  if (!isSameFile(square)) {
-    if ((isDiagonalNeighbour(square, 2) || isDiagonalNeighbour(square, 3)) && isOpponentsPiece(square)) {
+  if (!isSameFile(square.id)) {
+    if ((isDiagonalNeighbour(square, 2) || isDiagonalNeighbour(square, 3)) && isOpponentsPiece(square.id)) {
     return true;
     } 
   }
@@ -243,7 +243,7 @@ function isBlackPawnMove(square) {
 
 function isRookMove(square) {
   console.log("hi from rook move logic");
-  if ((!isSameFile(square)) && (!isSameRank(square))) {
+  if ((!isSameFile(square.id)) && (!isSameRank(square.id))) {
     return false;
   }
   else {
@@ -260,6 +260,7 @@ function isKnightMove(square) {
 // Object.is(0, -0) will give false, but 0==-0 will give true
 
 function isBishopMove(square) {
+  console.log("isBishopMove, direction is: " + getDiagonalDirection(square.id) );
   return isDiagonalPath(square.id, getDiagonalDirection(square.id));
 }
 
@@ -275,15 +276,12 @@ function isKingMove(square) {
 
 /////////////////////////////////////////////////
 
-function isSameRank(square) {
-  console.log("checking rank");
-  console.log(boardRepresentation[chosenSquare.id][3]);
-  console.log(boardRepresentation[square.id][3]);
-  return (boardRepresentation[chosenSquare.id][3] == boardRepresentation[square.id][3]); 
+function isSameRank(squareID) {
+  return (boardRepresentation[chosenSquare.id][3] == boardRepresentation[squareID][3]); 
 }
 
-function isSameFile(square) {
-  return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[square.id][2]); 
+function isSameFile(squareID) {
+  return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[squareID][2]); 
 }
 
 function isAFile() {
@@ -346,10 +344,10 @@ function getDiagonalDirection(squareID) {
     case (Object.is(directionHelper % 7, -0)):
       return 1;
     // bottom/right:
-    case (!directionHelper % 9):
+    case (directionHelper % 9 == 0):
       return 2;
     // bottom/left:
-    case (!directionHelper % 7):
+    case (directionHelper % 7 == 0):
       return 3;
     default:
       console.log("error");
@@ -357,29 +355,63 @@ function getDiagonalDirection(squareID) {
 }
 
 function isDiagonalPath(endSquareID, direction) {
-  let currentID = chosenSquare.id; 
+  // checking for same file or rank
+  // for situation where %7 allows to move horizontally or vertically from rim to rim
+  if (isSameRank(endSquareID) || isSameFile(endSquareID)) {
+    return false;
+  }
+  let currentID = Number(chosenSquare.id); 
   switch(direction) {
-    // top/left
+    // top/left:
     case 0:
-      currentID -= 9
+      currentID -= 9;
       while (currentID > endSquareID) {
         if (!isEmptySquare(currentID)) {
           return false;
         }
         currentID -= 9;
       }
-      return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-    // top/right
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    // top/right:
     case 1:
-      return false;
-    // bottom/right
+      currentID -= 7;
+      while (currentID > endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID -= 7;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    // bottom/right:
     case 2:
-      return false;
-    // bottom/left
+      currentID += 9;
+      while (currentID < endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID += 9;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    // bottom/left:
     case 3:
-      return false;
+      currentID += 7;
+      while (currentID < endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID += 7;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
     default:
-      console.log("error");
+      console.log("error in handling diagonal path move");
   }
 }
 
