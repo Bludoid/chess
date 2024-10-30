@@ -261,7 +261,7 @@ function isKnightMove(square) {
 
 function isBishopMove(square) {
   console.log("isBishopMove, direction is: " + getDiagonalDirection(square.id) );
-  return isDiagonalPath(square.id, getDiagonalDirection(square.id));
+  return isDiagonalPath(square, getDiagonalDirection(square.id));
 }
 
 function isQueenMove(square) {
@@ -284,6 +284,11 @@ function isSameFile(squareID) {
   return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[squareID][2]); 
 }
 
+function isSameSquareColor(square) {
+  return (square.classList.contains("blackSquare") && chosenSquare.classList.contains("blackSquare"))
+  || (square.classList.contains("whiteSquare") && chosenSquare.classList.contains("whiteSquare")); 
+}
+
 function isAFile() {
   return (boardRepresentation[chosenSquare.id][2] == "a"); 
 }
@@ -300,6 +305,7 @@ function isEighthRank() {
   return (boardRepresentation[chosenSquare.id][3] == 8); 
 }
 
+// not used???
 function isDiagonal(square) {
   let differenceOfSquareID = square.id - chosenSquare.id;
   console.log(differenceOfSquareID);
@@ -354,12 +360,15 @@ function getDiagonalDirection(squareID) {
   }
 }
 
-function isDiagonalPath(endSquareID, direction) {
-  // checking for same file or rank
-  // for situation where %7 allows to move horizontally or vertically from rim to rim
-  if (isSameRank(endSquareID) || isSameFile(endSquareID)) {
+function isDiagonalPath(endSquare, direction) {
+  
+  // checking for same color of start and ending square
+  // for situation where %7 allows to move to wrong placec (they are of different square color)
+  if (!isSameSquareColor(endSquare)) {
     return false;
   }
+  
+  let endSquareID = Number(endSquare.id);
   let currentID = Number(chosenSquare.id); 
   switch(direction) {
     // top/left:
