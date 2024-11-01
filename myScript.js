@@ -247,7 +247,7 @@ function isRookMove(square) {
     return false;
   }
   else {
-    return true;
+    return isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id));
   }  
 }
 
@@ -260,7 +260,6 @@ function isKnightMove(square) {
 // Object.is(0, -0) will give false, but 0==-0 will give true
 
 function isBishopMove(square) {
-  console.log("isBishopMove, direction is: " + getDiagonalDirection(square.id) );
   return isDiagonalPath(square, getDiagonalDirection(square.id));
 }
 
@@ -423,6 +422,35 @@ function isDiagonalPath(endSquare, direction) {
       console.log("error in handling diagonal path move");
   }
 }
+
+function getHorizontalOrVerticalDirection(squareID) {
+  let directionHelper = squareID - chosenSquare.id;
+  switch(true) {
+    // up
+    case ([-8, -16, -24, -32, -40, -48, -56].includes(directionHelper)):
+      console.log("top");
+      return 0;
+    // right:
+    case ([1, 2, 3, 4, 5, 6, 7].includes(directionHelper)):
+      console.log("right");
+      return 1;
+    // down:
+    case ([8, 16, 24, 32, 40, 48, 56].includes(directionHelper)):
+      console.log("bottom");
+      return 2;
+    // left:
+    case ([-1, -2, -3, -4, -5, -6, -7].includes(directionHelper)):
+      console.log("left");
+      return 3;
+    default:
+      console.log("error");
+  }
+}
+
+function isHorizontalOrVerticalPath(square, direction) {
+  console.log("hi from path vertical or horizontal");
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 
