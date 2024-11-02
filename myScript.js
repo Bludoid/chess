@@ -447,8 +447,62 @@ function getHorizontalOrVerticalDirection(squareID) {
   }
 }
 
-function isHorizontalOrVerticalPath(square, direction) {
+function isHorizontalOrVerticalPath(endSquare, direction) {
   console.log("hi from path vertical or horizontal");
+  let endSquareID = Number(endSquare.id);
+  let currentID = Number(chosenSquare.id); 
+  switch(direction) {
+    // up:
+    case 0:
+      currentID -= 8;
+      while (currentID > endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID -= 8;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    // right:
+    case 1:
+      currentID += 1;
+      while (currentID > endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID += 1;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    // down:
+    case 2:
+      currentID += 8;
+      while (currentID < endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID += 8;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    // left:
+    case 3:
+      currentID -=1;
+      while (currentID > endSquareID) {
+        if (!isEmptySquare(currentID)) {
+          return false;
+        }
+        currentID -=1;
+      }
+      if (currentID == endSquareID) {
+        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
+      }
+    default:
+      console.log("error in horizontal or vertical path move");
+  }
 }
 
 
