@@ -467,7 +467,7 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
     // right:
     case 1:
       currentID += 1;
-      while (currentID > endSquareID) {
+      while (currentID < endSquareID) {
         if (!isEmptySquare(currentID)) {
           return false;
         }
