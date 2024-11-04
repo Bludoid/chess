@@ -379,9 +379,7 @@ function isDiagonalPath(endSquare, direction) {
         }
         currentID -= 9;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
     // top/right:
     case 1:
       currentID -= 7;
@@ -391,9 +389,8 @@ function isDiagonalPath(endSquare, direction) {
         }
         currentID -= 7;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     // bottom/right:
     case 2:
       currentID += 9;
@@ -403,9 +400,8 @@ function isDiagonalPath(endSquare, direction) {
         }
         currentID += 9;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     // bottom/left:
     case 3:
       currentID += 7;
@@ -415,9 +411,8 @@ function isDiagonalPath(endSquare, direction) {
         }
         currentID += 7;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     default:
       console.log("error in handling diagonal path move");
   }
@@ -461,9 +456,8 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
         }
         currentID -= 8;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     // right:
     case 1:
       currentID += 1;
@@ -473,9 +467,8 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
         }
         currentID += 1;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     // down:
     case 2:
       currentID += 8;
@@ -485,9 +478,8 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
         }
         currentID += 8;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     // left:
     case 3:
       currentID -=1;
@@ -497,9 +489,8 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
         }
         currentID -=1;
       }
-      if (currentID == endSquareID) {
-        return (isEmptySquare(currentID) || isOpponentsPiece(currentID));
-      }
+      return true;
+
     default:
       console.log("error in horizontal or vertical path move");
   }
