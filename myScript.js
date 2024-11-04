@@ -199,6 +199,8 @@ function isValidMove(square) {
   }
 }
 
+//////////////////////////////////////
+
 function isWhitePawnMove(square) {
   console.log("hi from white pawn move logic");
   if (!isSameFile(square.id)) {
@@ -242,13 +244,7 @@ function isBlackPawnMove(square) {
 }
 
 function isRookMove(square) {
-  console.log("hi from rook move logic");
-  if ((!isSameFile(square.id)) && (!isSameRank(square.id))) {
-    return false;
-  }
-  else {
-    return isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id));
-  }  
+  return isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id));  
 }
 
 // checks if id's of start and end square corespond to a knight move
@@ -267,8 +263,8 @@ function isBishopMove(square) {
 }
 
 function isQueenMove(square) {
-  console.log("hi from queen move logic");
-  return true;
+  return (isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id)) ||
+    isDiagonalPath(square, getDiagonalDirection(square.id)));
 }
 
 function isKingMove(square) {
@@ -446,7 +442,11 @@ function getHorizontalOrVerticalDirection(squareID) {
 }
 
 function isHorizontalOrVerticalPath(endSquare, direction) {
-  console.log("hi from path vertical or horizontal");
+  // taking care of rim of the board positioning
+  if ((!isSameFile(endSquare.id)) && (!isSameRank(endSquare.id))) {
+    return false;
+  }
+
   let endSquareID = Number(endSquare.id);
   let currentID = Number(chosenSquare.id); 
   switch(direction) {
