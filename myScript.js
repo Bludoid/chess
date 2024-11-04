@@ -251,9 +251,12 @@ function isRookMove(square) {
   }  
 }
 
+// checks if id's of start and end square corespond to a knight move
+// also checks for squares not having the same color (takes care of knight being close to the board rim)
 function isKnightMove(square) {
-  console.log("hi from knight move logic");
-  return true;
+  if (([-17, 17, -15, 15, -10, 10, -6, 6].includes(square.id-chosenSquare.id)) && !isSameSquareColor(square)) {
+    return true;
+  }
 }
 
 
