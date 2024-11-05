@@ -13,7 +13,8 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
 
-
+let pawnsAbleToEnPassant = "";
+let pawnInEnPassant = "";
 
 // not used yet:
 // let whiteInCheck = false;    // if true => check or checkmate happening
@@ -208,16 +209,30 @@ function isWhitePawnMove(square) {
     return true;
     } 
   }
-  // initial 2 square move of a pawn
-  //let blaSquare = document.getElementById(chosenSquare.id -8);
   else {
+    // initial 2 square move of a pawn
     if ((boardRepresentation[chosenSquare.id][3] == 2) && 
     (boardRepresentation[square.id][3] == 4) && isEmptySquare(chosenSquare.id - 8) && 
     isEmptySquare(square.id)) {
+      let possibleAttackingPawn = document.getElementById(square.id-1);
+      let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
+      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn)) {
+        pawnsAbleToEnPassantAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];    // storing file of pawn that can take en passant
+        pawnInEnPassant = boardRepresentation[square.id][2];  
+      }
+      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn2)) {
+        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn2.id][2];
+        pawnInEnPassant = boardRepresentation[square.id][2]; 
+      }     
       return true;
     }
     else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 )) {
       return true;
+    }
+    else if (blackEnPassant) {
+      if (boardRepresentation[chosenSquare.id][3] == 5 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2])) {
+        return true;
+      }
     }
   }
 }
@@ -235,13 +250,29 @@ function isBlackPawnMove(square) {
     if ((boardRepresentation[chosenSquare.id][3] == 7) && 
     (boardRepresentation[square.id][3] == 5) && isEmptySquare(Number(chosenSquare.id) + 8) && 
     isEmptySquare(square.id)) {
+      let possibleAttackingPawn = document.getElementById(square.id-1);
+      let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
+      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn)) {
+        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];  // storing file of pawn that can take en passant
+        pawnInEnPassant = boardRepresentation[square.id][2];                       // storing file of a pawn that can be taken en passant
+      }
+      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn2)) {
+        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn2.id][2];
+        pawnInEnPassant = boardRepresentation[square.id][2]; 
+      } 
       return true;
     }
     else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] - 1 )) {
       return true;
     }
+    else if (whiteEnPassant) {
+      if (boardRepresentation[chosenSquare.id][3] == 4 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2])) {
+        return true;
+      }
+    }
   }
 }
+
 
 function isRookMove(square) {
   return isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id));  
