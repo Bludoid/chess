@@ -268,8 +268,11 @@ function isQueenMove(square) {
 }
 
 function isKingMove(square) {
-  console.log("hi from king move logic");
-  return true;
+  let idDifference = square.id - chosenSquare.id;
+  if (([-9, 9, -7, 7].includes(idDifference) && isSameSquareColor(square)) || 
+      ([-8, 8, -1, 1].includes(idDifference) && !isSameSquareColor(square))) {
+      return true;
+    }
 }
 
 /////////////////////////////////////////////////
