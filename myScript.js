@@ -234,7 +234,7 @@ function isWhitePawnMove(square) {
       }     
       return true;
     }
-    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 )) {
+    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 ) && isEmptySquare(square.id)) {
       return true;
     }
   }
@@ -275,7 +275,7 @@ function isBlackPawnMove(square) {
       } 
       return true;
     }
-    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] - 1 )) {
+    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] - 1 ) && isEmptySquare(square.id)) {
       return true;
     }
   }
