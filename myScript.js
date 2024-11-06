@@ -2,9 +2,6 @@
 //   chess board in HTML/CSS/JavaScript  //
 ///////////////////////////////////////////
 
-//        to do:  
-//        move a pawn properly
-//        move counter or even notation (also show next to the board)
 
 
 let colorCounter = 1;
@@ -13,6 +10,7 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
 
+let enPassantInProgress = false;
 let pawnsAbleToEnPassant = "";
 let pawnInEnPassant = "";
 
@@ -208,7 +206,15 @@ function isWhitePawnMove(square) {
     if ((isDiagonalNeighbour(square, 0) || isDiagonalNeighbour(square, 1)) && isOpponentsPiece(square.id)) {
     return true;
     } 
+    if (enPassantInProgress) {
+      if (boardRepresentation[chosenSquare.id][3] == 5 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2]) &&
+          boardRepresentation[square.id][2] == pawnInEnPassant && boardRepresentation[square.id][3] == 6) {
+          removePiece(document.getElementById(Number(square.id) + 8));  
+          return true;
+      }
+    }
   }
+  
   else {
     // initial 2 square move of a pawn
     if ((boardRepresentation[chosenSquare.id][3] == 2) && 
@@ -216,11 +222,13 @@ function isWhitePawnMove(square) {
     isEmptySquare(square.id)) {
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
-      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn)) {
-        pawnsAbleToEnPassantAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];    // storing file of pawn that can take en passant
+      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
+        !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
+        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];    // storing file of pawn that can take en passant
         pawnInEnPassant = boardRepresentation[square.id][2];  
       }
-      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn2)) {
+      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
+        !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
         pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn2.id][2];
         pawnInEnPassant = boardRepresentation[square.id][2]; 
       }     
@@ -229,11 +237,6 @@ function isWhitePawnMove(square) {
     else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 )) {
       return true;
     }
-    else if (blackEnPassant) {
-      if (boardRepresentation[chosenSquare.id][3] == 5 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2])) {
-        return true;
-      }
-    }
   }
 }
 
@@ -241,9 +244,16 @@ function isBlackPawnMove(square) {
   console.log("hi from black pawn move logic");
   if (!isSameFile(square.id)) {
     if ((isDiagonalNeighbour(square, 2) || isDiagonalNeighbour(square, 3)) && isOpponentsPiece(square.id)) {
-    return true;
+      return true;
     } 
+    if (enPassantInProgress) {
+      if (boardRepresentation[chosenSquare.id][3] == 4 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2])) {
+        removePiece(document.getElementById(square.id - 8));
+        return true;
+      }
+    }
   }
+  
   // initial 2 square move of a pawn
   
   else {
@@ -252,11 +262,13 @@ function isBlackPawnMove(square) {
     isEmptySquare(square.id)) {
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
-      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn)) {
+      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
+        !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
         pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];  // storing file of pawn that can take en passant
         pawnInEnPassant = boardRepresentation[square.id][2];                       // storing file of a pawn that can be taken en passant
       }
-      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && !isSameSquareColor(possibleAttackingPawn2)) {
+      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
+        !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
         pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn2.id][2];
         pawnInEnPassant = boardRepresentation[square.id][2]; 
       } 
@@ -264,11 +276,6 @@ function isBlackPawnMove(square) {
     }
     else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] - 1 )) {
       return true;
-    }
-    else if (whiteEnPassant) {
-      if (boardRepresentation[chosenSquare.id][3] == 4 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2])) {
-        return true;
-      }
     }
   }
 }
@@ -635,6 +642,16 @@ function executeMove(oldSquare, newSquare) {
   console.log(coordinatesOfSquare(newSquare.id));
 
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
+
+  if (pawnInEnPassant && !enPassantInProgress) {
+    enPassantInProgress = true;
+  }
+  else if (enPassantInProgress) {
+    enPassantInProgress = false;
+    pawnInEnPassant = "";
+    pawnsAbleToEnPassant = "";
+    console.log("blablebli from enpassant reset");
+  }
 }
 
 // call the function to initially set up the board
