@@ -247,7 +247,8 @@ function isBlackPawnMove(square) {
       return true;
     } 
     if (enPassantInProgress) {
-      if (boardRepresentation[chosenSquare.id][3] == 4 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2])) {
+      if (boardRepresentation[chosenSquare.id][3] == 4 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2]) &&
+        boardRepresentation[square.id][2] == pawnInEnPassant && boardRepresentation[square.id][3] == 3) {
         removePiece(document.getElementById(square.id - 8));
         return true;
       }
