@@ -11,8 +11,8 @@ let whiteMove = true;         // true => white's move, false => black's move
 let infobox = document.getElementById("infobox");
 
 let enPassantInProgress = false;
-let pawnsAbleToEnPassant = "";
-let pawnInEnPassant = "";
+let pawnsAbleToEnPassant = [];
+let pawnInEnPassant = [];
 
 // not used yet:
 // let whiteInCheck = false;    // if true => check or checkmate happening
@@ -203,34 +203,34 @@ function isValidMove(square) {
 function isWhitePawnMove(square) {
   console.log("hi from white pawn move logic");
   if (!isSameFile(square.id)) {
-    if ((isDiagonalNeighbour(square, 0) || isDiagonalNeighbour(square, 1)) && isOpponentsPiece(square.id)) {
-    return true;
-    } 
     if (enPassantInProgress) {
-      if (boardRepresentation[chosenSquare.id][3] == 5 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2]) &&
-          boardRepresentation[square.id][2] == pawnInEnPassant && boardRepresentation[square.id][3] == 6) {
-          removePiece(document.getElementById(Number(square.id) + 8));  
+      if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == pawnInEnPassant[0] - 8) {
+          removePiece(document.getElementById(Number(square.id) + 8)); 
+          // update board array 
           return true;
       }
     }
+    else {
+      return ([-9, -7].includes(square.id-chosenSquare.id) && isSameSquareColor(square) && isOpponentsPiece(square.id));
+    }    
   }
   
   else {
     // initial 2 square move of a pawn
     if ((boardRepresentation[chosenSquare.id][3] == 2) && 
-    (boardRepresentation[square.id][3] == 4) && isEmptySquare(chosenSquare.id - 8) && 
+        (boardRepresentation[square.id][3] == 4) && isEmptySquare(chosenSquare.id - 8) && 
     isEmptySquare(square.id)) {
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
       if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
-        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];    // storing file of pawn that can take en passant
-        pawnInEnPassant = boardRepresentation[square.id][2];  
+        pawnsAbleToEnPassant.push(possibleAttackingPawn.id);    // storing file of pawn that can take en passant
+        pawnInEnPassant.push(square.id);  
       }
       if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
-        !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
-        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn2.id][2];
-        pawnInEnPassant = boardRepresentation[square.id][2]; 
+          !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
+        pawnsAbleToEnPassant.push(possibleAttackingPawn2.id);
+        pawnInEnPassant.push(square.id); 
       }     
       return true;
     }
@@ -243,35 +243,34 @@ function isWhitePawnMove(square) {
 function isBlackPawnMove(square) {
   console.log("hi from black pawn move logic");
   if (!isSameFile(square.id)) {
-    if ((isDiagonalNeighbour(square, 2) || isDiagonalNeighbour(square, 3)) && isOpponentsPiece(square.id)) {
-      return true;
-    } 
     if (enPassantInProgress) {
-      if (boardRepresentation[chosenSquare.id][3] == 4 && pawnsAbleToEnPassant.includes(boardRepresentation[chosenSquare.id][2]) &&
-        boardRepresentation[square.id][2] == pawnInEnPassant && boardRepresentation[square.id][3] == 3) {
-        removePiece(document.getElementById(square.id - 8));
-        return true;
+      if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == Number(pawnInEnPassant[0]) + 8) {
+          removePiece(document.getElementById(pawnInEnPassant[0])); 
+          // update board array 
+          return true;
       }
     }
+    else {
+      return ([9, 7].includes(square.id-chosenSquare.id) && isSameSquareColor(square) && isOpponentsPiece(square.id));
+    }    
   }
-  
-  // initial 2 square move of a pawn
-  
+ 
+  // initial 2 square move of a pawn 
   else {
     if ((boardRepresentation[chosenSquare.id][3] == 7) && 
     (boardRepresentation[square.id][3] == 5) && isEmptySquare(Number(chosenSquare.id) + 8) && 
-    isEmptySquare(square.id)) {
+      isEmptySquare(square.id)) {
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
       if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
-        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn.id][2];  // storing file of pawn that can take en passant
-        pawnInEnPassant = boardRepresentation[square.id][2];                       // storing file of a pawn that can be taken en passant
+        pawnsAbleToEnPassant.push(possibleAttackingPawn.id);  // storing file of pawn that can take en passant
+        pawnInEnPassant.push(square.id);                       // storing file of a pawn that can be taken en passant
       }
       if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
-        pawnsAbleToEnPassant += boardRepresentation[possibleAttackingPawn2.id][2];
-        pawnInEnPassant = boardRepresentation[square.id][2]; 
+        pawnsAbleToEnPassant.push(possibleAttackingPawn2.id);
+        pawnInEnPassant.push(square.id); 
       } 
       return true;
     }
@@ -644,13 +643,13 @@ function executeMove(oldSquare, newSquare) {
 
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
 
-  if (pawnInEnPassant && !enPassantInProgress) {
+  if (pawnInEnPassant.length != 0 && !enPassantInProgress) {
     enPassantInProgress = true;
   }
   else if (enPassantInProgress) {
     enPassantInProgress = false;
-    pawnInEnPassant = "";
-    pawnsAbleToEnPassant = "";
+    pawnInEnPassant = [];
+    pawnsAbleToEnPassant = [];
     console.log("blablebli from enpassant reset");
   }
 }
