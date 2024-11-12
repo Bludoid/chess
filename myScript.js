@@ -10,9 +10,11 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
 
+let activateEnPassant = false;
 let enPassantInProgress = false;
 let pawnsAbleToEnPassant = [];
 let pawnInEnPassant = [];
+
 
 // not used yet:
 // let whiteInCheck = false;    // if true => check or checkmate happening
@@ -205,8 +207,11 @@ function isWhitePawnMove(square) {
   if (!isSameFile(square.id)) {
     if (enPassantInProgress) {
       if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == pawnInEnPassant[0] - 8) {
+          // remove pawn taken by en passant:
           removePiece(document.getElementById(Number(square.id) + 8)); 
-          // update board array 
+          // update board array: 
+          boardRepresentation[Number(square.id) + 8][0] = "e";
+          boardRepresentation[Number(square.id) + 8][1] = "e";
           return true;
       }
     }
@@ -222,15 +227,21 @@ function isWhitePawnMove(square) {
       // en passant logic:
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
+      if (enPassantInProgress) {
+        pawnInEnPassant = [];
+        pawnsAbleToEnPassant = [];
+      }
       if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn.id);    // storing file of pawn that can take en passant
-        pawnInEnPassant.push(square.id);  
+        pawnInEnPassant.push(square.id); 
+        activateEnPassant = true; 
       }
       if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
           !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn2.id);
-        pawnInEnPassant.push(square.id); 
+        pawnInEnPassant.push(square.id);
+        activateEnPassant = true;  
       }     
       return true;
     }
@@ -243,8 +254,11 @@ function isBlackPawnMove(square) {
   if (!isSameFile(square.id)) {
     if (enPassantInProgress) {
       if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == Number(pawnInEnPassant[0]) + 8) {
+          // remove pawn taken by en passant:
           removePiece(document.getElementById(pawnInEnPassant[0])); 
-          // update board array 
+          // update board array:
+          boardRepresentation[square.id - 8][0] = "e";
+          boardRepresentation[square.id - 8][1] = "e";
           return true;
       }
     }
@@ -260,15 +274,21 @@ function isBlackPawnMove(square) {
       // en passant logic:    
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
+      if (enPassantInProgress) {
+        pawnInEnPassant = [];
+        pawnsAbleToEnPassant = [];
+      }
       if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn.id);  // storing file of pawn that can take en passant
-        pawnInEnPassant.push(square.id);                       // storing file of a pawn that can be taken en passant
+        pawnInEnPassant.push(square.id);                      // storing file of a pawn that can be taken en passant
+        activateEnPassant = true;                    
       }
       if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn2.id);
         pawnInEnPassant.push(square.id); 
+        activateEnPassant = true; 
       } 
       return true;
     }
@@ -639,10 +659,13 @@ function executeMove(oldSquare, newSquare) {
 
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
 
-  if (pawnInEnPassant.length != 0 && !enPassantInProgress) {
+  if (activateEnPassant) {
     enPassantInProgress = true;
+    activateEnPassant = false;
+    console.log(pawnInEnPassant + ", " + pawnsAbleToEnPassant);
+    console.log("enPassantInProgress=true, activateEnPassant=false");
   }
-  else if (enPassantInProgress) {
+  else {
     enPassantInProgress = false;
     pawnInEnPassant = [];
     pawnsAbleToEnPassant = [];
