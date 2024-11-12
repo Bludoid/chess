@@ -217,9 +217,9 @@ function isWhitePawnMove(square) {
   
   else {
     // initial 2 square move of a pawn
-    if ((boardRepresentation[chosenSquare.id][3] == 2) && 
-        (boardRepresentation[square.id][3] == 4) && isEmptySquare(chosenSquare.id - 8) && 
-    isEmptySquare(square.id)) {
+    if ((boardRepresentation[chosenSquare.id][3] == 2) && (boardRepresentation[square.id][3] == 4) && 
+        isEmptySquare(chosenSquare.id - 8) && isEmptySquare(square.id)) {
+      // en passant logic:
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
       if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
@@ -234,9 +234,7 @@ function isWhitePawnMove(square) {
       }     
       return true;
     }
-    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] + 1 ) && isEmptySquare(square.id)) {
-      return true;
-    }
+    else {return ((square.id == chosenSquare.id - 8) && isEmptySquare(square.id));}
   }
 }
 
@@ -257,9 +255,9 @@ function isBlackPawnMove(square) {
  
   // initial 2 square move of a pawn 
   else {
-    if ((boardRepresentation[chosenSquare.id][3] == 7) && 
-    (boardRepresentation[square.id][3] == 5) && isEmptySquare(Number(chosenSquare.id) + 8) && 
-      isEmptySquare(square.id)) {
+    if ((boardRepresentation[chosenSquare.id][3] == 7) && (boardRepresentation[square.id][3] == 5) && 
+        isEmptySquare(Number(chosenSquare.id) + 8) && isEmptySquare(square.id)) {
+      // en passant logic:    
       let possibleAttackingPawn = document.getElementById(square.id-1);
       let possibleAttackingPawn2 = document.getElementById(Number(square.id)+1);
       if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
@@ -274,9 +272,7 @@ function isBlackPawnMove(square) {
       } 
       return true;
     }
-    else if (boardRepresentation[square.id][3] == (boardRepresentation[chosenSquare.id][3] - 1 ) && isEmptySquare(square.id)) {
-      return true;
-    }
+    else {return ((square.id == Number(chosenSquare.id) + 8)) && isEmptySquare(square.id);}
   }
 }
 
