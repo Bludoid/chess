@@ -665,7 +665,7 @@ function executeMove(oldSquare, newSquare) {
     console.log(pawnInEnPassant + ", " + pawnsAbleToEnPassant);
     console.log("enPassantInProgress=true, activateEnPassant=false");
   }
-  else {
+  else if (enPassantInProgress) {
     enPassantInProgress = false;
     pawnInEnPassant = [];
     pawnsAbleToEnPassant = [];
