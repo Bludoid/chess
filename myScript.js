@@ -15,6 +15,7 @@ let enPassantInProgress = false;
 let pawnsAbleToEnPassant = [];
 let pawnInEnPassant = [];
 
+let whitePromotion = false;
 
 // not used yet:
 // let whiteInCheck = false;    // if true => check or checkmate happening
@@ -165,10 +166,6 @@ function takePiece(takingPieceSquare, takenPieceSquare) {
   executeMove(takingPieceSquare, takenPieceSquare);
 }
 
-// function findValidMoves(square) {
-//   return validMoves;
-// }
-
 // converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
 function coordinatesOfSquare(squareID) {
   return (boardRepresentation[squareID][2] + boardRepresentation[squareID][3]);
@@ -185,8 +182,8 @@ function isValidMove(square) {
   switch (pieceSchortcut) {
     case "p": 
         if (boardRepresentation[chosenSquare.id][1] == "w") 
-          {return isWhitePawnMove(square)}
-        else {return isBlackPawnMove(square)}
+          {return isWhitePawnMove(square);}
+        else {return isBlackPawnMove(square);}
     case "r":
       return isRookMove(square); 
     case "n": 
@@ -556,6 +553,19 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////
+
+/// pawn promotion helper functions:
+
+function isPawnPromotion(square) {
+  console.log("checking promotion of the pawn");
+  return ((whiteMove && boardRepresentation[square.id][0] == "p" && boardRepresentation[square.id][3] == 8) ||
+  (!whiteMove && boardRepresentation[square.id][0] == "p" && boardRepresentation[square.id][3] == 1));
+}
+
+function promotePawn(square) {
+  console.log("promoting a pawn on square " + square.id);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -647,6 +657,11 @@ function executeMove(oldSquare, newSquare) {
   // cleans up after the move
   clearSquare(oldSquare);
   removePiece(oldSquare);
+  
+  // pawn promotion logic:
+  if (isPawnPromotion(newSquare)) {promotePawn(newSquare);}
+  
+  
   whiteMove = !whiteMove;  // toggling white/black player move
   
   // switch the colour banners for making the players know who's move it is
