@@ -32,38 +32,61 @@ body {
     background-color: yellow;
   }
 
-    #blackBanner, #whiteBanner {
-      margin-left: 100px;
-      width: 530px;
-      height: 20px;
-      border-radius: 10px;
-    }
-  
-    .hideBanner {
-      background-color: transparent !important;
-    }
+#blackBanner, #whiteBanner {
+  margin-left: 100px;
+  width: 530px;
+  height: 20px;
+  border-radius: 10px;
+}
 
-    #blackBanner {
-      margin-top: 20px;
-      margin-bottom: 15px;
-      background-color: black;
-    }
+.hideBanner {
+  background-color: transparent !important;
+}
 
-    #whiteBanner {
-      margin-top: 15px;
-      background-color: white;
-    }
+#blackBanner {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  background-color: black;
+}
 
-    #infobox {
-      margin-left: 100px;
-      margin-top: 20px;
-      padding-top: 30px;
-      padding-left: 20px;
-      width: 500px;
-      height: 80px;
-      border: grey solid 5px;
-      border-radius: 10px;
-      background-color: yellow;
-      font-size: 40px;
-    }
+#whiteBanner {
+  margin-top: 15px;
+  background-color: white;
+}
+
+.infoboxTemplate {
+  margin-left: 100px;
+  margin-top: 20px;
+  padding-top: 30px;
+  padding-left: 20px;
+  width: 500px;
+  height: 80px;
+  border: grey solid 5px;
+  border-radius: 10px;
+}
+
+#infobox {
+  /* margin-left: 100px;
+  margin-top: 20px;
+  padding-top: 30px;
+  padding-left: 20px;
+  width: 500px;
+  height: 80px;
+  border: grey solid 5px;
+  border-radius: 10px; */
+  background-color: yellow;
+  font-size: 40px;
+}
+
+#promotionInfo {
+  background-color: orangered;
+  font-size: 30px;
+  vertical-align: text-bottom;
+}
+
+.hideInfo {
+  /* does not take take any space: */
+  display: none;
+  /* does keep its space: visibility: hidden */
+}
 
