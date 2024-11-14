@@ -565,6 +565,43 @@ function isPawnPromotion(square) {
 
 function promotePawn(square) {
   console.log("promoting a pawn on square " + square.id);
+  let promotionInfobox = document.getElementById("promotionInfo");
+  promotionInfobox.classList.toggle("hideInfo"); 
+  
+  // Backticks (`) are a type of quotation mark used in JavaScript for creating template literals.
+  // Template literals in JavaScript are strings enclosed with backticks (`) that allow for more flexibility 
+  // than regular strings created with single (') or double (") quotes.
+  // The ${} syntax inside the backticks allows us to insert the value of variables directly into the string.
+
+  if (whiteMove) {
+    promotionInfobox.innerHTML = `
+      PROMOTE TO:
+      <img src="img/qw.png" onclick="(() => choosePromotion('qw', '${square.id}'))()">
+      <img src="img/rw.png" onclick="(() => choosePromotion('rw', '${square.id}'))()">
+      <img src="img/bw.png" onclick="(() => choosePromotion('bw', '${square.id}'))()">
+      <img src="img/nw.png" onclick="(() => choosePromotion('nw', '${square.id}'))()">
+    `; 
+  } else {
+    promotionInfobox.innerHTML = `
+      PROMOTE TO:
+      <img src="img/qb.png" onclick="(() => choosePromotion('qb', '${square.id}'))()">
+      <img src="img/rb.png" onclick="(() => choosePromotion('rb', '${square.id}'))()">
+      <img src="img/bb.png" onclick="(() => choosePromotion('bb', '${square.id}'))()">
+      <img src="img/nb.png" onclick="(() => choosePromotion('nb', '${square.id}'))()">
+    `; 
+  }
+}
+
+function choosePromotion(chosenPiece, squareID) {
+  console.log("Clicked image ID:", chosenPiece);
+  console.log("destination of the desired piece is: " + squareID);
+  boardRepresentation[squareID][0] = chosenPiece[0];
+  let promotionSquare = document.getElementById(squareID);
+  promotionSquare.innerHTML = "";
+  placePiece(promotionSquare, chosenPiece);
+  let promotionInfobox = document.getElementById("promotionInfo");
+  promotionInfobox.innerHTML = "";
+  promotionInfobox.classList.toggle("hideInfo");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
