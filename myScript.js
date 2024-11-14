@@ -567,6 +567,7 @@ function promotePawn(square) {
   console.log("promoting a pawn on square " + square.id);
   let promotionInfobox = document.getElementById("promotionInfo");
   promotionInfobox.classList.toggle("hideInfo"); 
+  promotionInfobox.classList.toggle("displayFlex");
   
   // Backticks (`) are a type of quotation mark used in JavaScript for creating template literals.
   // Template literals in JavaScript are strings enclosed with backticks (`) that allow for more flexibility 
@@ -575,7 +576,7 @@ function promotePawn(square) {
 
   if (whiteMove) {
     promotionInfobox.innerHTML = `
-      PROMOTE TO:
+      <span> PROMOTE TO: </span>
       <img src="img/qw.png" onclick="(() => choosePromotion('qw', '${square.id}'))()">
       <img src="img/rw.png" onclick="(() => choosePromotion('rw', '${square.id}'))()">
       <img src="img/bw.png" onclick="(() => choosePromotion('bw', '${square.id}'))()">
@@ -602,6 +603,7 @@ function choosePromotion(chosenPiece, squareID) {
   let promotionInfobox = document.getElementById("promotionInfo");
   promotionInfobox.innerHTML = "";
   promotionInfobox.classList.toggle("hideInfo");
+  promotionInfobox.classList.toggle("displayFlex");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -727,3 +729,9 @@ function executeMove(oldSquare, newSquare) {
 
 // call the function to initially set up the board
 setUpBoard();
+
+
+// // todo:
+// click flash for the chosen piece in promotionInfobox
+// highlight square (pink/red) with promoting pawn
+// disable the whole board while the promotion choosing is happening

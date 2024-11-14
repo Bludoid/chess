@@ -81,7 +81,11 @@ body {
 #promotionInfo {
   background-color: orangered;
   font-size: 30px;
-  vertical-align: text-bottom;
+   
+}
+
+#promotionInfo>span {
+  margin-right: 20px;
 }
 
 .hideInfo {
@@ -90,3 +94,8 @@ body {
   /* does keep its space: visibility: hidden */
 }
 
+.displayFlex {
+  display: flex;
+  align-items: center; 
+  padding-bottom: 30px;
+}
