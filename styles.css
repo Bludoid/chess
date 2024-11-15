@@ -32,6 +32,10 @@ body {
     background-color: yellow;
   }
 
+  .promotionFocus {
+    background-color: blueviolet;
+  }
+
 #blackBanner, #whiteBanner {
   margin-left: 100px;
   width: 530px;
@@ -86,6 +90,12 @@ body {
 
 #promotionInfo>span {
   margin-right: 20px;
+}
+
+#promotionInfo>img {
+ border: 2px solid blue;
+ border-radius: 4px; 
+ margin-right: 5px;
 }
 
 .hideInfo {

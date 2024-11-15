@@ -564,6 +564,7 @@ function isPawnPromotion(square) {
 }
 
 function promotePawn(square) {
+  square.classList.toggle("promotionFocus");
   console.log("promoting a pawn on square " + square.id);
   let promotionInfobox = document.getElementById("promotionInfo");
   promotionInfobox.classList.toggle("hideInfo"); 
@@ -604,6 +605,8 @@ function choosePromotion(chosenPiece, squareID) {
   promotionInfobox.innerHTML = "";
   promotionInfobox.classList.toggle("hideInfo");
   promotionInfobox.classList.toggle("displayFlex");
+  promotionSquare.classList.toggle("promotionFocus");
+  switchMove(); 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -697,20 +700,6 @@ function executeMove(oldSquare, newSquare) {
   clearSquare(oldSquare);
   removePiece(oldSquare);
   
-  // pawn promotion logic:
-  if (isPawnPromotion(newSquare)) {promotePawn(newSquare);}
-  
-  
-  whiteMove = !whiteMove;  // toggling white/black player move
-  
-  // switch the colour banners for making the players know who's move it is
-  let wBanner = document.getElementById("whiteBanner");
-  let bBanner = document.getElementById("blackBanner");
-  bBanner.classList.toggle("hideBanner");
-  wBanner.classList.toggle("hideBanner");
-  console.log(pieceToString(newSquare));
-  console.log(coordinatesOfSquare(newSquare.id));
-
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
 
   if (activateEnPassant) {
@@ -725,7 +714,33 @@ function executeMove(oldSquare, newSquare) {
     pawnsAbleToEnPassant = [];
     console.log("blablebli from enpassant reset");
   }
+  console.log(pieceToString(newSquare));
+  console.log(coordinatesOfSquare(newSquare.id));
+
+  // pawn promotion logic:
+  if (isPawnPromotion(newSquare)) {
+    promotePawn(newSquare);
+  }
+  else {
+    switchMove();
+  }
+  
+  
+
+  
 }
+
+function switchMove() {
+  // toggling white/black player move
+  whiteMove = !whiteMove;  
+  
+  // switch the colour banners for making the players know who's move it is
+  let wBanner = document.getElementById("whiteBanner");
+  let bBanner = document.getElementById("blackBanner");
+  bBanner.classList.toggle("hideBanner");
+  wBanner.classList.toggle("hideBanner");
+}
+
 
 // call the function to initially set up the board
 setUpBoard();
