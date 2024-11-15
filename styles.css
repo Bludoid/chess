@@ -36,8 +36,8 @@ body {
     background-color: blueviolet;
   }
 
-  .disableClicking img {
-    pointer-events: none; /* Disable click events for all images */
+  .disableClicks>div {
+    pointer-events: none; /* Disable click events for all divs */
 }
 
 #blackBanner, #whiteBanner {

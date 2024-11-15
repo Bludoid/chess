@@ -617,7 +617,8 @@ function choosePromotion(chosenPiece, squareID) {
 }
 
 function toggleClicking() {
-  document.getElementById("board").classList.toggle("disableClicks");
+  let chessBoard = document.getElementById("board");
+  chessBoard.classList.toggle("disableClicks");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -758,5 +759,4 @@ setUpBoard();
 
 
 // // todo:
-// click flash for the chosen piece in promotionInfobox
-// disable the whole board while the promotion choosing is happening
+
