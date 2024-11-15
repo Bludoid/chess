@@ -565,6 +565,7 @@ function isPawnPromotion(square) {
 
 function promotePawn(square) {
   square.classList.toggle("promotionFocus");
+  toggleClicking();
   console.log("promoting a pawn on square " + square.id);
   let promotionInfobox = document.getElementById("promotionInfo");
   promotionInfobox.classList.toggle("hideInfo"); 
@@ -585,7 +586,7 @@ function promotePawn(square) {
     `; 
   } else {
     promotionInfobox.innerHTML = `
-      PROMOTE TO:
+      <span> PROMOTE TO: </span>
       <img src="img/qb.png" onclick="(() => choosePromotion('qb', '${square.id}'))()">
       <img src="img/rb.png" onclick="(() => choosePromotion('rb', '${square.id}'))()">
       <img src="img/bb.png" onclick="(() => choosePromotion('bb', '${square.id}'))()">
@@ -602,11 +603,21 @@ function choosePromotion(chosenPiece, squareID) {
   promotionSquare.innerHTML = "";
   placePiece(promotionSquare, chosenPiece);
   let promotionInfobox = document.getElementById("promotionInfo");
-  promotionInfobox.innerHTML = "";
-  promotionInfobox.classList.toggle("hideInfo");
-  promotionInfobox.classList.toggle("displayFlex");
+  
+  // time delay before the promotion infobox is hidden
+  const myTimeout = setTimeout(() => {
+    promotionInfobox.innerHTML = "";
+    promotionInfobox.classList.toggle("displayFlex");
+    promotionInfobox.classList.toggle("hideInfo");
+  }, 500);
+  
   promotionSquare.classList.toggle("promotionFocus");
-  switchMove(); 
+  switchMove();
+  toggleClicking(); 
+}
+
+function toggleClicking() {
+  document.getElementById("board").classList.toggle("disableClicks");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -748,5 +759,4 @@ setUpBoard();
 
 // // todo:
 // click flash for the chosen piece in promotionInfobox
-// highlight square (pink/red) with promoting pawn
 // disable the whole board while the promotion choosing is happening

@@ -36,6 +36,10 @@ body {
     background-color: blueviolet;
   }
 
+  .disableClicking img {
+    pointer-events: none; /* Disable click events for all images */
+}
+
 #blackBanner, #whiteBanner {
   margin-left: 100px;
   width: 530px;
@@ -97,6 +101,17 @@ body {
  border-radius: 4px; 
  margin-right: 5px;
 }
+
+#promotionInfo>img:hover{
+  background-color: lightgreen;
+  vertical-align: middle;
+}
+
+#promotionInfo>img:active {
+  background-color: red;
+  border-style: inset;
+}
+
 
 .hideInfo {
   /* does not take take any space: */
