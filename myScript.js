@@ -328,17 +328,17 @@ function isKingMove(square) {
 
 /////////////////////////////////////////////////
 
-function isSameRank(squareID) {
-  return (boardRepresentation[chosenSquare.id][3] == boardRepresentation[squareID][3]); 
+function isSameRank(squareID, otherSquare = chosenSquare) {
+  return (boardRepresentation[squareID][3] == boardRepresentation[otherSquare.id][3]); 
 }
 
 function isSameFile(squareID) {
   return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[squareID][2]); 
 }
 
-function isSameSquareColor(square) {
-  return (square.classList.contains("blackSquare") && chosenSquare.classList.contains("blackSquare"))
-  || (square.classList.contains("whiteSquare") && chosenSquare.classList.contains("whiteSquare")); 
+function isSameSquareColor(square, otherSquare = chosenSquare) {
+  return (square.classList.contains("blackSquare") && otherSquare.classList.contains("blackSquare"))
+  || (square.classList.contains("whiteSquare") && otherSquare.classList.contains("whiteSquare")); 
 }
 
 function isAFile() {
@@ -623,6 +623,53 @@ function toggleClicking() {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+// checking king or empty piece
+
+function isSquareChecked(square) {
+  let squareID = square.id;
+  
+  // checking check from above
+  let exploredSquare = squareID - 8;
+  while (exploredSquare > 0) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare -= 8;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      return ["q", "r"].includes(boardRepresentation[exploredSquare][0]);
+    }
+  }
+  // checking check from above/right
+  exploredSquare = squareID - 7;
+  while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare -= 7;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      return ["q", "b"].includes(boardRepresentation[exploredSquare][0]);
+    }
+  }
+  // checking check from right
+  exploredSquare = Number(squareID) + 1;
+  while (isSameRank(exploredSquare, square)) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare += 1;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      return ["q", "r"].includes(boardRepresentation[exploredSquare][0]);
+    }
+  }
+  return false;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
 
 // return a string with colour and piece ("white rook")
 function pieceToString(square) {
@@ -729,6 +776,9 @@ function executeMove(oldSquare, newSquare) {
   console.log(pieceToString(newSquare));
   console.log(coordinatesOfSquare(newSquare.id));
 
+ 
+
+
   // pawn promotion logic:
   if (isPawnPromotion(newSquare)) {
     promotePawn(newSquare);
@@ -743,6 +793,8 @@ function executeMove(oldSquare, newSquare) {
 }
 
 function switchMove() {
+  
+
   // toggling white/black player move
   whiteMove = !whiteMove;  
   
@@ -751,6 +803,17 @@ function switchMove() {
   let bBanner = document.getElementById("blackBanner");
   bBanner.classList.toggle("hideBanner");
   wBanner.classList.toggle("hideBanner");
+
+
+  // after a move was switched
+  let attackerColor = whiteMove ? "Black" : "White";
+  let squareOfInterest = 36;
+  if (isSquareChecked(document.getElementById(squareOfInterest))) {
+    console.log(attackerColor + " is checking square number: " + squareOfInterest);
+  }
+  else {
+    console.log(attackerColor + " is NOT checking square number: " + squareOfInterest);
+  }
 }
 
 
