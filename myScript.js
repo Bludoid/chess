@@ -637,7 +637,8 @@ function isSquareChecked(square) {
     }
     else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
     else if (isOpponentsPiece(exploredSquare)) {
-      return ["q", "r"].includes(boardRepresentation[exploredSquare][0]);
+      if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return true;}
+      else {break;}
     }
   }
   // checking check from above/right
@@ -649,7 +650,8 @@ function isSquareChecked(square) {
     }
     else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
     else if (isOpponentsPiece(exploredSquare)) {
-      return ["q", "b"].includes(boardRepresentation[exploredSquare][0]);
+      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return true;}
+      else {break;}
     }
   }
   // checking check from right
@@ -661,7 +663,8 @@ function isSquareChecked(square) {
     }
     else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
     else if (isOpponentsPiece(exploredSquare)) {
-      return ["q", "r"].includes(boardRepresentation[exploredSquare][0]);
+      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return true;}
+      else {break;}
     }
   }
   return false;
