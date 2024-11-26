@@ -637,7 +637,7 @@ function isSquareChecked(square) {
     }
     else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
     else if (isOpponentsPiece(exploredSquare)) {
-      if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return true;}
+      if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
       else {break;}
     }
   }
@@ -650,10 +650,11 @@ function isSquareChecked(square) {
     }
     else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
     else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return true;}
+      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
       else {break;}
     }
   }
+  
   // checking check from right
   exploredSquare = Number(squareID) + 1;
   while (isSameRank(exploredSquare, square)) {
@@ -663,7 +664,77 @@ function isSquareChecked(square) {
     }
     else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
     else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return true;}
+      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+      else {break;}
+    }
+  }
+
+  // checking check bottom/right
+  exploredSquare = Number(squareID) + 9;
+  while (exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare += 9;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+      else {break;}
+    }
+  }
+
+  // checking check from bottom
+  exploredSquare = Number(squareID) + 8;
+  while (exploredSquare < 65) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare += 8;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+      else {break;}
+    }
+  }  
+
+  // checking check from bottom/left
+  exploredSquare = Number(squareID) + 7;
+  while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare += 7;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+      else {break;}
+    }
+  }
+
+  // checking check from left
+  exploredSquare = squareID - 1;
+  while (isSameRank(exploredSquare, square)) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare -= 1;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+      else {break;}
+    }
+  }
+
+  // checking check from above/right
+  exploredSquare = squareID - 9;
+  while (exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    if (isEmptySquare(exploredSquare)) {
+      exploredSquare -= 9;
+      continue;
+    }
+    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+    else if (isOpponentsPiece(exploredSquare)) {
+      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
       else {break;}
     }
   }
@@ -811,8 +882,9 @@ function switchMove() {
   // after a move was switched
   let attackerColor = whiteMove ? "Black" : "White";
   let squareOfInterest = 36;
-  if (isSquareChecked(document.getElementById(squareOfInterest))) {
-    console.log(attackerColor + " is checking square number: " + squareOfInterest);
+  let squareChecked = isSquareChecked(document.getElementById(squareOfInterest));
+  if (squareChecked) {
+    console.log(attackerColor + " is checking square number: " + squareOfInterest + " from square number: " + squareChecked);
   }
   else {
     console.log(attackerColor + " is NOT checking square number: " + squareOfInterest);
