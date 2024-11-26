@@ -725,9 +725,9 @@ function isSquareChecked(square) {
     }
   }
 
-  // checking check from above/right
+  // checking check from above/left
   exploredSquare = squareID - 9;
-  while (exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+  while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
     if (isEmptySquare(exploredSquare)) {
       exploredSquare -= 9;
       continue;
