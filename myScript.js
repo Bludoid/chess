@@ -738,6 +738,15 @@ function isSquareChecked(square) {
       else {break;}
     }
   }
+
+  for (explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
+    exploredSquare = squareID - explored;
+    if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "n" && 
+    !isSameSquareColor(document.getElementById(exploredSquare), square)) {
+      return exploredSquare;
+    }
+    else {continue;}
+  }
   return false;
 }
 
