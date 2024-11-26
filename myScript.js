@@ -747,6 +747,28 @@ function isSquareChecked(square) {
     }
     else {continue;}
   }
+
+  if (!whiteMove) {
+    for (explored of [-9, -7]) {
+      exploredSquare = squareID - explored;
+      if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
+      isSameSquareColor(document.getElementById(exploredSquare), square)) {
+        return exploredSquare;
+      }
+      else {continue;}
+    }
+  }
+  else {
+    for (explored of [9, 7]) {
+      exploredSquare = squareID - explored;
+      if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
+      isSameSquareColor(document.getElementById(exploredSquare), square)) {
+        return exploredSquare;
+      }
+      else {continue;}
+    }
+  }
+
   return false;
 }
 
