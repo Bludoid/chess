@@ -26,7 +26,6 @@ let moveInProgress = false;
 let chosenSquare = null;
 
 
-
 // array or arrays with empty member on index 0
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
 let boardRepresentation = [
@@ -628,8 +627,7 @@ function toggleClicking() {
 function isSquareChecked(square) {
   let squareID = square.id;
   
-// directions for up, down, right, left for rook and queen
-
+  // checking directions up, down, right, left for checks from  rook and queen
   for (direction of [-8, 8, -1, 1]) {
     let exploredSquare = Number(squareID) - direction;
     while ((exploredSquare > 0 && exploredSquare < 65) || isSameRank(exploredSquare, square))  {
@@ -645,65 +643,23 @@ function isSquareChecked(square) {
     }
   }
 
-  // checking check from above/right
-  exploredSquare = squareID - 7;
-  while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare -= 7;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
-    }
-  }
-  
-  
-  // checking check bottom/right
-  exploredSquare = Number(squareID) + 9;
-  while (exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare += 9;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
+  // checking diagonal directions for check from queen and bishop
+  for (direction of [-7, 7, -9, 9]) {
+    exploredSquare = Number(squareID) - direction;
+    while (exploredSquare > 0 && exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+      if (isEmptySquare(exploredSquare)) {
+        exploredSquare -= direction;
+        continue;
+      }
+      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+      else if (isOpponentsPiece(exploredSquare)) {
+        if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+        else {break;}
+      }
     }
   }
 
-  
-  // checking check from bottom/left
-  exploredSquare = Number(squareID) + 7;
-  while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare += 7;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
-    }
-  }
-
-
-  // checking check from above/left
-  exploredSquare = squareID - 9;
-  while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare -= 9;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
-    }
-  }
-
+  // checking for checks from knights
   for (explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
     exploredSquare = squareID - explored;
     if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "n" && 
@@ -713,27 +669,17 @@ function isSquareChecked(square) {
     else {continue;}
   }
 
-  if (!whiteMove) {
-    for (explored of [-9, -7]) {
-      exploredSquare = squareID - explored;
-      if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
-      isSameSquareColor(document.getElementById(exploredSquare), square)) {
-        return exploredSquare;
-      }
-      else {continue;}
+  // checknig for checks from pawns
+  let pawnDirections = whiteMove? [9,7] : [-9, -7];
+  for (direction of pawnDirections) {
+    exploredSquare = squareID - direction;
+    if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
+    isSameSquareColor(document.getElementById(exploredSquare), square)) {
+      return exploredSquare;
     }
+    else {continue;}
   }
-  else {
-    for (explored of [9, 7]) {
-      exploredSquare = squareID - explored;
-      if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
-      isSameSquareColor(document.getElementById(exploredSquare), square)) {
-        return exploredSquare;
-      }
-      else {continue;}
-    }
-  }
-
+  
   return false;
 }
 
