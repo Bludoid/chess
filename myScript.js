@@ -628,19 +628,23 @@ function toggleClicking() {
 function isSquareChecked(square) {
   let squareID = square.id;
   
-  // checking check from above
-  let exploredSquare = squareID - 8;
-  while (exploredSquare > 0) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare -= 8;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
+// directions for up, down, right, left for rook and queen
+
+  for (direction of [-8, 8, -1, 1]) {
+    let exploredSquare = Number(squareID) - direction;
+    while ((exploredSquare > 0 && exploredSquare < 65) || isSameRank(exploredSquare, square))  {
+      if (isEmptySquare(exploredSquare)) {
+        exploredSquare -= direction;
+        continue;
+      }
+      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+      else if (isOpponentsPiece(exploredSquare)) {
+        if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+        else {break;}
+      }
     }
   }
+
   // checking check from above/right
   exploredSquare = squareID - 7;
   while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
@@ -655,20 +659,7 @@ function isSquareChecked(square) {
     }
   }
   
-  // checking check from right
-  exploredSquare = Number(squareID) + 1;
-  while (isSameRank(exploredSquare, square)) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare += 1;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
-    }
-  }
-
+  
   // checking check bottom/right
   exploredSquare = Number(squareID) + 9;
   while (exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
@@ -683,20 +674,7 @@ function isSquareChecked(square) {
     }
   }
 
-  // checking check from bottom
-  exploredSquare = Number(squareID) + 8;
-  while (exploredSquare < 65) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare += 8;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
-    }
-  }  
-
+  
   // checking check from bottom/left
   exploredSquare = Number(squareID) + 7;
   while (exploredSquare > 0 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
@@ -711,19 +689,6 @@ function isSquareChecked(square) {
     }
   }
 
-  // checking check from left
-  exploredSquare = squareID - 1;
-  while (isSameRank(exploredSquare, square)) {
-    if (isEmptySquare(exploredSquare)) {
-      exploredSquare -= 1;
-      continue;
-    }
-    else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-    else if (isOpponentsPiece(exploredSquare)) {
-      if(["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
-      else {break;}
-    }
-  }
 
   // checking check from above/left
   exploredSquare = squareID - 9;
