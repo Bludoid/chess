@@ -25,6 +25,8 @@ let whitePromotion = false;
 let moveInProgress = false;
 let chosenSquare = null;
 
+// 1 for long, 8 for short castling
+let abilityToCastle = { white1: true, white8: true, black1: true, black8: true };
 
 // array or arrays with empty member on index 0
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
@@ -319,10 +321,31 @@ function isQueenMove(square) {
 
 function isKingMove(square) {
   let idDifference = square.id - chosenSquare.id;
+  console.log("validation of king move to square: " + square.id);
   if (([-9, 9, -7, 7].includes(idDifference) && isSameSquareColor(square)) || 
       ([-8, 8, -1, 1].includes(idDifference) && !isSameSquareColor(square))) {
       return true;
     }
+  if (whiteMove) {
+    if (square.id == 59 && abilityToCastle.white1) {
+    console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    return true;
+    }
+    else if (square.id == 63 && abilityToCastle.white8) {
+      console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      return true;
+    }
+  }
+  else {
+    if (square.id == 3 && abilityToCastle.black1) {
+      console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      return true;
+      }
+    else if (square.id == 7 && abilityToCastle.black8) {
+      console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      return true;
+    }    
+  }
 }
 
 /////////////////////////////////////////////////
@@ -627,10 +650,26 @@ function toggleClicking() {
 function isSquareChecked(square) {
   let squareID = square.id;
   
-  // checking directions up, down, right, left for checks from  rook and queen
-  for (direction of [-8, 8, -1, 1]) {
+  // checking vertical directions for checks from  rook and queen
+  for (direction of [-8, 8]) {
     let exploredSquare = Number(squareID) - direction;
-    while ((exploredSquare > 0 && exploredSquare < 65) || isSameRank(exploredSquare, square))  {
+    while (exploredSquare > 0 && exploredSquare < 65) {
+      if (isEmptySquare(exploredSquare)) {
+        exploredSquare -= direction;
+        continue;
+      }
+      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+      else if (isOpponentsPiece(exploredSquare)) {
+        if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+        else {break;}
+      }
+    }
+  }
+
+  // checking horizontal directions for checks from  rook and queen
+  for (direction of [-1, 1]) {
+    exploredSquare = Number(squareID) - direction;
+    while (isSameRank(exploredSquare, square))  {
       if (isEmptySquare(exploredSquare)) {
         exploredSquare -= direction;
         continue;
