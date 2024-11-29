@@ -25,8 +25,8 @@ let whitePromotion = false;
 let moveInProgress = false;
 let chosenSquare = null;
 
-// 1 for long, 8 for short castling
-let abilityToCastle = { white1: true, white8: true, black1: true, black8: true };
+// A for long, H for short castling
+let abilityToCastle = { whiteA: true, whiteH: true, blackA: true, blackH: true };
 
 // array or arrays with empty member on index 0
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
@@ -296,7 +296,21 @@ function isBlackPawnMove(square) {
 
 
 function isRookMove(square) {
-  return isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id));  
+  if (isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id))) {
+    if (whiteMove) {
+      if (abilityToCastle.whiteA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 1) 
+        {abilityToCastle.whiteA = false;}
+      else if (abilityToCastle.whiteH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 1) 
+        {abilityToCastle.whiteH = false;}
+    }
+      else {
+      if (abilityToCastle.blackA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 8) 
+        {abilityToCastle.blackA = false;}
+      else if (abilityToCastle.blackH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 8) 
+        {abilityToCastle.blackH = false;}
+    }
+    return true    
+  } 
 }
 
 // checks if id's of start and end square corespond to a knight move
@@ -324,29 +338,71 @@ function isKingMove(square) {
   console.log("validation of king move to square: " + square.id);
   if (([-9, 9, -7, 7].includes(idDifference) && isSameSquareColor(square)) || 
       ([-8, 8, -1, 1].includes(idDifference) && !isSameSquareColor(square))) {
+      // update castling ability to false when it moves
+      if (whiteMove) {
+        abilityToCastle.whiteA = false;
+        abilityToCastle.whiteH = false;
+      }
+      else {
+        abilityToCastle.blackA = false;
+        abilityToCastle.blackH = false;
+      }
       return true;
     }
   if (whiteMove) {
-    if (square.id == 59 && abilityToCastle.white1) {
-    console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    return true;
+    // update rook boolean to false when it moves
+    if (square.id == 59 && abilityToCastle.whiteA) {
+      console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      if ([58, 59, 60].every(isEmptySquare)) {
+        // rookCastling(60);
+        disableCastlingWhite()
+        return true;
+      }
     }
-    else if (square.id == 63 && abilityToCastle.white8) {
+    else if (square.id == 63 && abilityToCastle.whiteH) {
       console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      return true;
+      if ([62, 63].every(isEmptySquare)) {
+        // rookCastling(62)
+        disableCastlingWhite()
+        return true;
+      }
     }
   }
   else {
-    if (square.id == 3 && abilityToCastle.black1) {
+    if (square.id == 3 && abilityToCastle.blackA) {
       console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      return true;
+      if ([2, 3, 4].every(isEmptySquare)) {
+        // rookCastling(4)
+        disableCastlingBlack()
+        return true;
       }
-    else if (square.id == 7 && abilityToCastle.black8) {
+    }
+    else if (square.id == 7 && abilityToCastle.blackH) {
       console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      return true;
+      if ([6, 7].every(isEmptySquare)) {
+        // rookCastling(6)
+        disableCastlingBlack()
+        return true;
+      }
     }    
   }
 }
+
+function rookCastling(rookPosition) {
+  
+}
+
+function disableCastlingWhite() {
+  abilityToCastle.whiteA = false;
+  abilityToCastle.whiteH = false;
+}
+
+function disableCastlingBlack() {
+  abilityToCastle.blackA = false;
+  abilityToCastle.blackH = false;
+}
+
+
 
 /////////////////////////////////////////////////
 
@@ -388,6 +444,7 @@ function isDiagonal(square) {
   }
 }
 
+// not used????????????????????????????
 // direction: 0 => top/left, 1 => top/right, 2 => bottom/right, 3 => bottom/left
 function isDiagonalNeighbour(square, direction) {
   switch(direction) {
