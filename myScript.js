@@ -351,7 +351,8 @@ function isKingMove(square) {
     // update rook boolean to false when it moves
     if (square.id == 59 && abilityToCastle.whiteA) {
       console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([58, 59, 60].every(isEmptySquare) && [59, 60].every(isSquareChecked)) {
+      // using arrow function and "num" to get around !isSquareCheck (would try to negate the function reference itself)
+      if ([58, 59, 60].every(isEmptySquare) && [59, 60].every(num => !isSquareChecked(num))) {
         rookCastling(57, 60, "rw");
         disableCastlingWhite()
         return true;
@@ -359,7 +360,7 @@ function isKingMove(square) {
     }
     else if (square.id == 63 && abilityToCastle.whiteH) {
       console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([62, 63].every(isEmptySquare) && [62, 63].every(isSquareChecked)) {
+      if ([62, 63].every(isEmptySquare) && [62, 63].every(num => !isSquareChecked(num))) {
         rookCastling(64, 62, "rw");
         disableCastlingWhite()
         return true;
@@ -369,7 +370,7 @@ function isKingMove(square) {
   else {
     if (square.id == 3 && abilityToCastle.blackA) {
       console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([2, 3, 4].every(isEmptySquare) && [3, 4].every(isSquareChecked)) {
+      if ([2, 3, 4].every(isEmptySquare) && [3, 4].every(num => !isSquareChecked(num))) {
         rookCastling(1, 4, "rb");
         disableCastlingBlack()
         return true;
@@ -377,7 +378,7 @@ function isKingMove(square) {
     }
     else if (square.id == 7 && abilityToCastle.blackH) {
       console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([6, 7].every(isEmptySquare) && [6, 7].every(isSquareChecked)) {
+      if ([6, 7].every(isEmptySquare) && [6, 7].every(num => !isSquareChecked(num))) {
         rookCastling(8, 6, "rb");
         disableCastlingBlack()
         return true;
@@ -409,8 +410,8 @@ function disableCastlingBlack() {
 
 /////////////////////////////////////////////////
 
-function isSameRank(squareID, otherSquare = chosenSquare) {
-  return (boardRepresentation[squareID][3] == boardRepresentation[otherSquare.id][3]); 
+function isSameRank(squareID, otherSquareID = chosenSquare.id) {
+  return (boardRepresentation[squareID][3] == boardRepresentation[otherSquareID][3]); 
 }
 
 function isSameFile(squareID) {
@@ -707,9 +708,8 @@ function toggleClicking() {
 
 // checking king or empty piece
 
-function isSquareChecked(square) {
-  let squareID = square.id;
-  
+function isSquareChecked(squareID) {
+    
   // checking vertical directions for checks from  rook and queen
   for (direction of [-8, 8]) {
     let exploredSquare = Number(squareID) - direction;
@@ -729,7 +729,7 @@ function isSquareChecked(square) {
   // checking horizontal directions for checks from  rook and queen
   for (direction of [-1, 1]) {
     exploredSquare = Number(squareID) - direction;
-    while (isSameRank(exploredSquare, square))  {
+    while (isSameRank(exploredSquare, squareID))  {
       if (isEmptySquare(exploredSquare)) {
         exploredSquare -= direction;
         continue;
@@ -745,7 +745,7 @@ function isSquareChecked(square) {
   // checking diagonal directions for check from queen and bishop
   for (direction of [-7, 7, -9, 9]) {
     exploredSquare = Number(squareID) - direction;
-    while (exploredSquare > 0 && exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    while (exploredSquare > 0 && exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID))) {
       if (isEmptySquare(exploredSquare)) {
         exploredSquare -= direction;
         continue;
@@ -762,7 +762,7 @@ function isSquareChecked(square) {
   for (explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
     exploredSquare = squareID - explored;
     if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "n" && 
-    !isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    !isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID))) {
       return exploredSquare;
     }
     else {continue;}
@@ -773,7 +773,7 @@ function isSquareChecked(square) {
   for (direction of pawnDirections) {
     exploredSquare = squareID - direction;
     if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
-    isSameSquareColor(document.getElementById(exploredSquare), square)) {
+    isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID))) {
       return exploredSquare;
     }
     else {continue;}
@@ -923,7 +923,7 @@ function switchMove() {
   // after a move was switched
   let attackerColor = whiteMove ? "Black" : "White";
   let squareOfInterest = 36;
-  let squareChecked = isSquareChecked(document.getElementById(squareOfInterest));
+  let squareChecked = isSquareChecked(squareOfInterest);
   if (squareChecked) {
     console.log(attackerColor + " is checking square number: " + squareOfInterest + " from square number: " + squareChecked);
   }
