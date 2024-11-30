@@ -340,12 +340,10 @@ function isKingMove(square) {
       ([-8, 8, -1, 1].includes(idDifference) && !isSameSquareColor(square))) {
       // update castling ability to false when it moves
       if (whiteMove) {
-        abilityToCastle.whiteA = false;
-        abilityToCastle.whiteH = false;
+        disableCastlingWhite();
       }
       else {
-        abilityToCastle.blackA = false;
-        abilityToCastle.blackH = false;
+        disableCastlingBlack();
       }
       return true;
     }
@@ -353,16 +351,16 @@ function isKingMove(square) {
     // update rook boolean to false when it moves
     if (square.id == 59 && abilityToCastle.whiteA) {
       console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([58, 59, 60].every(isEmptySquare)) {
-        // rookCastling(60);
+      if ([58, 59, 60].every(isEmptySquare) && [59, 60].every(isSquareChecked)) {
+        rookCastling(57, 60, "rw");
         disableCastlingWhite()
         return true;
       }
     }
     else if (square.id == 63 && abilityToCastle.whiteH) {
       console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([62, 63].every(isEmptySquare)) {
-        // rookCastling(62)
+      if ([62, 63].every(isEmptySquare) && [62, 63].every(isSquareChecked)) {
+        rookCastling(64, 62, "rw");
         disableCastlingWhite()
         return true;
       }
@@ -371,16 +369,16 @@ function isKingMove(square) {
   else {
     if (square.id == 3 && abilityToCastle.blackA) {
       console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([2, 3, 4].every(isEmptySquare)) {
-        // rookCastling(4)
+      if ([2, 3, 4].every(isEmptySquare) && [3, 4].every(isSquareChecked)) {
+        rookCastling(1, 4, "rb");
         disableCastlingBlack()
         return true;
       }
     }
     else if (square.id == 7 && abilityToCastle.blackH) {
       console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([6, 7].every(isEmptySquare)) {
-        // rookCastling(6)
+      if ([6, 7].every(isEmptySquare) && [6, 7].every(isSquareChecked)) {
+        rookCastling(8, 6, "rb");
         disableCastlingBlack()
         return true;
       }
@@ -388,8 +386,13 @@ function isKingMove(square) {
   }
 }
 
-function rookCastling(rookPosition) {
-  
+function rookCastling(rookPosition, newRookPosition, rookName) {
+  boardRepresentation[newRookPosition][0] = "r"; 
+  boardRepresentation[rookPosition][0] = "e";
+  boardRepresentation[newRookPosition][1] = rookName[1]; 
+  boardRepresentation[rookPosition][1] = "e";
+  removePiece(document.getElementById(rookPosition));
+  placePiece(document.getElementById(newRookPosition), rookName);
 }
 
 function disableCastlingWhite() {
