@@ -352,7 +352,7 @@ function isKingMove(square) {
     if (square.id == 59 && abilityToCastle.whiteA) {
       console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       // using arrow function and "num" to get around !isSquareCheck (would try to negate the function reference itself)
-      if ([58, 59, 60].every(isEmptySquare) && [59, 60].every(num => !isSquareChecked(num))) {
+      if ([58, 59, 60].every(isEmptySquare) && !isPathChecked([58, 59, 60])) {
         rookCastling(57, 60, "rw");
         disableCastlingWhite()
         return true;
@@ -360,7 +360,7 @@ function isKingMove(square) {
     }
     else if (square.id == 63 && abilityToCastle.whiteH) {
       console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([62, 63].every(isEmptySquare) && [62, 63].every(num => !isSquareChecked(num))) {
+      if ([62, 63].every(isEmptySquare) && !isPathChecked([62, 63])) {
         rookCastling(64, 62, "rw");
         disableCastlingWhite()
         return true;
@@ -370,7 +370,7 @@ function isKingMove(square) {
   else {
     if (square.id == 3 && abilityToCastle.blackA) {
       console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([2, 3, 4].every(isEmptySquare) && [3, 4].every(num => !isSquareChecked(num))) {
+      if ([2, 3, 4].every(isEmptySquare) && !isPathChecked([2, 3, 4])) {
         rookCastling(1, 4, "rb");
         disableCastlingBlack()
         return true;
@@ -378,7 +378,7 @@ function isKingMove(square) {
     }
     else if (square.id == 7 && abilityToCastle.blackH) {
       console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      if ([6, 7].every(isEmptySquare) && [6, 7].every(num => !isSquareChecked(num))) {
+      if ([6, 7].every(isEmptySquare) && !isPathChecked([6, 7])) {
         rookCastling(8, 6, "rb");
         disableCastlingBlack()
         return true;
@@ -386,6 +386,18 @@ function isKingMove(square) {
     }    
   }
 }
+
+// helper function for evaluating checks in the castling area
+function isPathChecked(arrayOfSquareIDs) {
+  let attackersArray;
+  for (square of arrayOfSquareIDs) {
+    attackersArray = isSquareChecked(square);
+    if (attackersArray.length > 0) {
+      return true;
+    }
+  }
+}
+
 
 function rookCastling(rookPosition, newRookPosition, rookName) {
   boardRepresentation[newRookPosition][0] = "r"; 
