@@ -710,6 +710,7 @@ function toggleClicking() {
 
 function isSquareChecked(squareID) {
     
+  let attackers = [];
   // checking vertical directions for checks from  rook and queen
   for (direction of [-8, 8]) {
     let exploredSquareID = Number(squareID) - direction;
@@ -720,8 +721,8 @@ function isSquareChecked(squareID) {
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {return exploredSquareID;}
-        else {break;}
+        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {attackers.push(exploredSquareID);}
+        break;
       }
     }
   }
@@ -736,8 +737,8 @@ function isSquareChecked(squareID) {
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {return exploredSquareID;}
-        else {break;}
+        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {attackers.push(exploredSquareID);}
+        break;
       }
     }
   }
@@ -752,8 +753,8 @@ function isSquareChecked(squareID) {
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if(["q", "b"].includes(boardRepresentation[exploredSquareID][0])) {return exploredSquareID;}
-        else {break;}
+        if(["q", "b"].includes(boardRepresentation[exploredSquareID][0])) {attackers.push(exploredSquareID);}
+        break;
       }
     }
   }
@@ -764,9 +765,8 @@ function isSquareChecked(squareID) {
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
       isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "n") {
-      return exploredSquareID;
+        attackers.push(exploredSquareID);
     }
-    else {continue;}
   }
 
   // checknig for checks from pawns
@@ -776,12 +776,11 @@ function isSquareChecked(squareID) {
     if (isSquareOnBoard(exploredSquareID)  &&
       isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "p" && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID))) {
-      return exploredSquareID;
+        attackers.push(exploredSquareID);;
     }
-    else {continue;}
   }
   
-  return false;
+  return attackers;
 }
 
 function isSquareOnBoard(squareID) {
@@ -928,9 +927,9 @@ function switchMove() {
   // after a move was switched
   let attackerColor = whiteMove ? "Black" : "White";
   let squareOfInterest = 36;
-  let squareChecked = isSquareChecked(squareOfInterest);
-  if (squareChecked) {
-    console.log(attackerColor + " is checking square number: " + squareOfInterest + " from square number: " + squareChecked);
+  let attackerSquares = isSquareChecked(squareOfInterest);
+  if (attackerSquares.length > 0) {
+    console.log(attackerColor + " is checking square number: " + squareOfInterest + " from square number: " + attackerSquares);
   }
   else {
     console.log(attackerColor + " is NOT checking square number: " + squareOfInterest);
