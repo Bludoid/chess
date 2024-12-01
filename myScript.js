@@ -719,7 +719,7 @@ function isSquareChecked(squareID) {
         continue;
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-      else if (isOpponentsPiece(exploredSquare)) {
+      else {
         if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
         else {break;}
       }
@@ -735,7 +735,7 @@ function isSquareChecked(squareID) {
         continue;
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-      else if (isOpponentsPiece(exploredSquare)) {
+      else {
         if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
         else {break;}
       }
@@ -751,7 +751,7 @@ function isSquareChecked(squareID) {
         continue;
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
-      else if (isOpponentsPiece(exploredSquare)) {
+      else {
         if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
         else {break;}
       }
@@ -760,9 +760,10 @@ function isSquareChecked(squareID) {
 
   // checking for checks from knights
   for (explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
-    exploredSquare = squareID - explored;
-    if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "n" && 
-    !isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID))) {
+    exploredSquare = Number(squareID) - explored;
+    if (exploredSquare > 0 && exploredSquare < 65 && 
+      !isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID)) &&
+      isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "n") {
       return exploredSquare;
     }
     else {continue;}
