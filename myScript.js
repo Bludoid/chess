@@ -712,15 +712,15 @@ function isSquareChecked(squareID) {
     
   // checking vertical directions for checks from  rook and queen
   for (direction of [-8, 8]) {
-    let exploredSquare = Number(squareID) - direction;
-    while (exploredSquare > 0 && exploredSquare < 65) {
-      if (isEmptySquare(exploredSquare)) {
-        exploredSquare -= direction;
+    let exploredSquareID = Number(squareID) - direction;
+    while (isSquareOnBoard(exploredSquareID)) {
+      if (isEmptySquare(exploredSquareID)) {
+        exploredSquareID -= direction;
         continue;
       }
-      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {return exploredSquareID;}
         else {break;}
       }
     }
@@ -728,15 +728,15 @@ function isSquareChecked(squareID) {
 
   // checking horizontal directions for checks from  rook and queen
   for (direction of [-1, 1]) {
-    exploredSquare = Number(squareID) - direction;
-    while (isSameRank(exploredSquare, squareID))  {
-      if (isEmptySquare(exploredSquare)) {
-        exploredSquare -= direction;
+    exploredSquareID = Number(squareID) - direction;
+    while (isSquareOnBoard(exploredSquareID) && isSameRank(exploredSquareID, squareID))  {
+      if (isEmptySquare(exploredSquareID)) {
+        exploredSquareID -= direction;
         continue;
       }
-      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if (["q", "r"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {return exploredSquareID;}
         else {break;}
       }
     }
@@ -744,15 +744,15 @@ function isSquareChecked(squareID) {
 
   // checking diagonal directions for check from queen and bishop
   for (direction of [-7, 7, -9, 9]) {
-    exploredSquare = Number(squareID) - direction;
-    while (exploredSquare > 0 && exploredSquare < 65 && isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID))) {
-      if (isEmptySquare(exploredSquare)) {
-        exploredSquare -= direction;
+    exploredSquareID = Number(squareID) - direction;
+    while (isSquareOnBoard(exploredSquareID) && isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID))) {
+      if (isEmptySquare(exploredSquareID)) {
+        exploredSquareID -= direction;
         continue;
       }
-      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquare))) {break;}
+      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if(["q", "b"].includes(boardRepresentation[exploredSquare][0])) {return exploredSquare;}
+        if(["q", "b"].includes(boardRepresentation[exploredSquareID][0])) {return exploredSquareID;}
         else {break;}
       }
     }
@@ -760,11 +760,11 @@ function isSquareChecked(squareID) {
 
   // checking for checks from knights
   for (explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
-    exploredSquare = Number(squareID) - explored;
-    if (exploredSquare > 0 && exploredSquare < 65 && 
-      !isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID)) &&
-      isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "n") {
-      return exploredSquare;
+    exploredSquareID = Number(squareID) - explored;
+    if (isSquareOnBoard(exploredSquareID) && 
+      !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
+      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "n") {
+      return exploredSquareID;
     }
     else {continue;}
   }
@@ -772,10 +772,11 @@ function isSquareChecked(squareID) {
   // checknig for checks from pawns
   let pawnDirections = whiteMove? [9,7] : [-9, -7];
   for (direction of pawnDirections) {
-    exploredSquare = squareID - direction;
-    if (isOpponentsPiece(exploredSquare) && boardRepresentation[exploredSquare][0] == "p" && 
-    isSameSquareColor(document.getElementById(exploredSquare), document.getElementById(squareID))) {
-      return exploredSquare;
+    exploredSquareID = squareID - direction;
+    if (isSquareOnBoard(exploredSquareID)  &&
+      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "p" && 
+      isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID))) {
+      return exploredSquareID;
     }
     else {continue;}
   }
@@ -783,6 +784,9 @@ function isSquareChecked(squareID) {
   return false;
 }
 
+function isSquareOnBoard(squareID) {
+  return (squareID > 0 && squareID < 65)
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 
