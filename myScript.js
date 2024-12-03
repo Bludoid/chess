@@ -18,8 +18,12 @@ let pawnInEnPassant = [];
 let whitePromotion = false;
 
 // not used yet:
-// let whiteInCheck = false;    // if true => check or checkmate happening
-// let blackInCheck = false;
+let whiteInCheck = false;    // if true => check or checkmate happening
+let blackInCheck = false;
+
+let whiteKingID = 61;
+let blackKingID = 5;
+
 // validMoves = [];
 
 let moveInProgress = false;
@@ -937,14 +941,15 @@ function switchMove() {
 
 
   // after a move was switched
-  let attackerColor = whiteMove ? "Black" : "White";
-  let squareOfInterest = 36;
+  let kingsColor = whiteMove ? "White" : "Black";
+  let squareOfInterest = whiteMove? whiteKingID : blackKingID;
+  //let squareOfInterest = 36;
   let attackerSquares = isSquareChecked(squareOfInterest);
   if (attackerSquares.length > 0) {
-    console.log(attackerColor + " is checking square number: " + squareOfInterest + " from square number: " + attackerSquares);
+    console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square(s): " + attackerSquares);
   }
   else {
-    console.log(attackerColor + " is NOT checking square number: " + squareOfInterest);
+    console.log(kingsColor + " king is NOT in check");
   }
 }
 
