@@ -24,6 +24,8 @@ let blackInCheck = false;
 let whiteKingID = 61;
 let blackKingID = 5;
 
+let arrayBackup;
+
 // validMoves = [];
 
 let moveInProgress = false;
@@ -183,22 +185,51 @@ function outputToInfobox(infoMessage) {
 
 function isValidMove(square) {
   let pieceSchortcut = boardRepresentation[chosenSquare.id][0];
+  arrayBackup = structuredClone(boardRepresentation);
   console.log(pieceSchortcut);
+  let returnValue = false;
+  let kingBackupID;
   switch (pieceSchortcut) {
     case "p": 
-        if (boardRepresentation[chosenSquare.id][1] == "w") 
-          {return isWhitePawnMove(square);}
-        else {return isBlackPawnMove(square);}
+        if (boardRepresentation[chosenSquare.id][1] == "w") {
+          if (isWhitePawnMove(square)) returnValue = true;
+        }
+        else {
+          if (isBlackPawnMove(square)) returnValue = true;
+        }
+      break;
     case "r":
-      return isRookMove(square); 
+      if (isRookMove(square)) returnValue = true;
+       break;
     case "n": 
-      return isKnightMove(square);
+      if (isKnightMove(square)) returnValue = true;
+      break;
     case "b": 
-      return isBishopMove(square);
+      if (isBishopMove(square)) returnValue = true;
+      break;
     case "q": 
-      return isQueenMove(square);
+      if (isQueenMove(square)) returnValue = true;
+      break;
     case "k": 
-      return isKingMove(square);  
+      if (isKingMove(square)) {
+        returnValue = true;
+        kingBackupID = whiteMove? whiteKingID : blackKingID;
+        whiteMove? whiteKingID = square.id : blackKingID = square.id;
+      }
+      break;
+  }
+  if (returnValue) {
+    boardRepresentation[square.id][0] = boardRepresentation[chosenSquare.id][0]; 
+    boardRepresentation[chosenSquare.id][0] = "e";
+    boardRepresentation[square.id][1] = boardRepresentation[chosenSquare.id][1]; 
+    boardRepresentation[chosenSquare.id][1] = "e";
+    let kingAttackers = isSquareChecked(whiteMove? whiteKingID : blackKingID); 
+    if (kingAttackers.length > 0) {
+      boardRepresentation = structuredClone(arrayBackup);
+      whiteMove? whiteKingID = kingBackupID : blackKingID = kingBackupID;
+      return false;
+    }
+    else {return true;}
   }
 }
 
@@ -722,10 +753,12 @@ function toggleClicking() {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-// checking king or empty piece
+// checking king or empty square for checks
+
 
 function isSquareChecked(squareID) {
-    
+// when whiteMove is true, looks for a check from black,
+// when whiteMove is false, looks for a check from white      
   let attackers = [];
   // checking vertical directions for checks from  rook and queen
   for (direction of [-8, 8]) {
@@ -788,10 +821,10 @@ function isSquareChecked(squareID) {
   // checknig for checks from pawns
   let pawnDirections = whiteMove? [9,7] : [-9, -7];
   for (direction of pawnDirections) {
-    exploredSquareID = squareID - direction;
-    if (isSquareOnBoard(exploredSquareID)  &&
-      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "p" && 
-      isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID))) {
+    exploredSquareID = Number(squareID) - direction;
+    if (isSquareOnBoard(exploredSquareID)  && 
+      isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
+      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "p") {
         attackers.push(exploredSquareID);;
     }
   }
@@ -879,14 +912,14 @@ function executeMove(oldSquare, newSquare) {
   console.log("executing move");
   
   // moves the piece to the new square
-  placePiece(newSquare, (boardRepresentation[oldSquare.id][0] +  boardRepresentation[oldSquare.id][1]));
+  placePiece(newSquare, (boardRepresentation[newSquare.id][0] +  boardRepresentation[newSquare.id][1]));
 
   // make an updateboardRepresentation function?????? : 
   // updates the boardRepresentation array
-  boardRepresentation[newSquare.id][0] = boardRepresentation[oldSquare.id][0]; 
-  boardRepresentation[oldSquare.id][0] = "e";
-  boardRepresentation[newSquare.id][1] = boardRepresentation[oldSquare.id][1]; 
-  boardRepresentation[oldSquare.id][1] = "e";
+  // boardRepresentation[newSquare.id][0] = boardRepresentation[oldSquare.id][0]; 
+  // boardRepresentation[oldSquare.id][0] = "e";
+  // boardRepresentation[newSquare.id][1] = boardRepresentation[oldSquare.id][1]; 
+  // boardRepresentation[oldSquare.id][1] = "e";
   
   
   // cleans up after the move
