@@ -889,7 +889,6 @@ function executeMove(oldSquare, newSquare) {
   boardRepresentation[oldSquare.id][1] = "e";
   
   
-  
   // cleans up after the move
   clearSquare(oldSquare);
   removePiece(oldSquare);
@@ -911,8 +910,6 @@ function executeMove(oldSquare, newSquare) {
   console.log(pieceToString(newSquare));
   console.log(coordinatesOfSquare(newSquare.id));
 
- 
-
 
   // pawn promotion logic:
   if (isPawnPromotion(newSquare)) {
@@ -921,10 +918,6 @@ function executeMove(oldSquare, newSquare) {
   else {
     switchMove();
   }
-  
-  
-
-  
 }
 
 function switchMove() {
@@ -947,6 +940,7 @@ function switchMove() {
   let attackerSquares = isSquareChecked(squareOfInterest);
   if (attackerSquares.length > 0) {
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square(s): " + attackerSquares);
+    whiteMove ? whiteInCheck = true : blackInCheck = true;
   }
   else {
     console.log(kingsColor + " king is NOT in check");
