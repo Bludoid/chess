@@ -213,7 +213,7 @@ function isValidMove(square) {
     case "k": 
       if (isKingMove(square)) {
         returnValue = true;
-        kingBackupID = whiteMove? whiteKingID : blackKingID;
+        //kingBackupID = whiteMove? whiteKingID : blackKingID;
         whiteMove? whiteKingID = square.id : blackKingID = square.id;
       }
       break;
@@ -225,8 +225,10 @@ function isValidMove(square) {
     boardRepresentation[chosenSquare.id][1] = "e";
     let kingAttackers = isSquareChecked(whiteMove? whiteKingID : blackKingID); 
     if (kingAttackers.length > 0) {
+      if (boardRepresentation[square.id][0] == "k") {
+        whiteMove? whiteKingID = chosenSquare.id : blackKingID = chosenSquare.id;
+      }
       boardRepresentation = structuredClone(arrayBackup);
-      whiteMove? whiteKingID = kingBackupID : blackKingID = kingBackupID;
       return false;
     }
     else {return true;}
@@ -978,6 +980,8 @@ function switchMove() {
   else {
     console.log(kingsColor + " king is NOT in check");
   }
+  console.log("white king is on square: " + whiteKingID);
+  console.log("black king is on square: " + blackKingID);
 }
 
 
