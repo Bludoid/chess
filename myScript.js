@@ -334,18 +334,18 @@ function isBlackPawnMove(square) {
 
 function isRookMove(square) {
   if (isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id))) {
-    if (whiteMove) {
-      if (abilityToCastle.whiteA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 1) 
-        {abilityToCastle.whiteA = false;}
-      else if (abilityToCastle.whiteH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 1) 
-        {abilityToCastle.whiteH = false;}
-    }
-      else {
-      if (abilityToCastle.blackA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 8) 
-        {abilityToCastle.blackA = false;}
-      else if (abilityToCastle.blackH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 8) 
-        {abilityToCastle.blackH = false;}
-    }
+    // if (whiteMove) {
+    //   if (abilityToCastle.whiteA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 1) 
+    //     {abilityToCastle.whiteA = false;}
+    //   else if (abilityToCastle.whiteH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 1) 
+    //     {abilityToCastle.whiteH = false;}
+    // }
+    //   else {
+    //   if (abilityToCastle.blackA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 8) 
+    //     {abilityToCastle.blackA = false;}
+    //   else if (abilityToCastle.blackH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 8) 
+    //     {abilityToCastle.blackH = false;}
+    // }
     return true    
   } 
 }
@@ -375,23 +375,14 @@ function isKingMove(square) {
   console.log("validation of king move to square: " + square.id);
   if (([-9, 9, -7, 7].includes(idDifference) && isSameSquareColor(square)) || 
       ([-8, 8, -1, 1].includes(idDifference) && !isSameSquareColor(square))) {
-      // update castling ability to false when it moves
-      if (whiteMove) {
-        disableCastlingWhite();
-      }
-      else {
-        disableCastlingBlack();
-      }
       return true;
     }
-  if (whiteMove) {
-    // update rook boolean to false when it moves
+  if (whiteMove && !whiteInCheck) {
     if (square.id == 59 && abilityToCastle.whiteA) {
       console.log("white king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       // using arrow function and "num" to get around !isSquareCheck (would try to negate the function reference itself)
       if ([58, 59, 60].every(isEmptySquare) && !isPathChecked([58, 59, 60])) {
         rookCastling(57, 60, "rw");
-        disableCastlingWhite()
         return true;
       }
     }
@@ -399,17 +390,15 @@ function isKingMove(square) {
       console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if ([62, 63].every(isEmptySquare) && !isPathChecked([62, 63])) {
         rookCastling(64, 62, "rw");
-        disableCastlingWhite()
         return true;
       }
     }
   }
-  else {
+  else if (!blackInCheck) {
     if (square.id == 3 && abilityToCastle.blackA) {
       console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if ([2, 3, 4].every(isEmptySquare) && !isPathChecked([2, 3, 4])) {
         rookCastling(1, 4, "rb");
-        disableCastlingBlack()
         return true;
       }
     }
@@ -417,7 +406,6 @@ function isKingMove(square) {
       console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if ([6, 7].every(isEmptySquare) && !isPathChecked([6, 7])) {
         rookCastling(8, 6, "rb");
-        disableCastlingBlack()
         return true;
       }
     }    
@@ -945,6 +933,23 @@ function executeMove(oldSquare, newSquare) {
   console.log(pieceToString(newSquare));
   console.log(coordinatesOfSquare(newSquare.id));
 
+  // disable castling ability of white/black after a king moved
+  if (boardRepresentation[newSquare.id][0] == "k") {
+    whiteMove? disableCastlingWhite() : disableCastlingBlack();
+  }
+
+  // disable the specific castling after a rook moved for the first time
+  if (whiteMove) {
+    if (abilityToCastle.whiteA && oldSquare.id == 57) {abilityToCastle.whiteA = false;}
+    else if (abilityToCastle.whiteH && oldSquare.id == 64) {abilityToCastle.whiteH = false;}
+  }
+  else {
+    if (abilityToCastle.blackA && oldSquare.id == 1) {abilityToCastle.blackA = false;}
+    else if (abilityToCastle.blackH && oldSquare.id == 8) {abilityToCastle.blackH = false;}
+  }  
+
+  // player's king cannot be in check after any move...
+  whiteMove? whiteInCheck = false : blackInCheck = false; 
 
   // pawn promotion logic:
   if (isPawnPromotion(newSquare)) {
