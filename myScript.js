@@ -14,6 +14,7 @@ let activateEnPassant = false;
 let enPassantInProgress = false;
 let pawnsAbleToEnPassant = [];
 let pawnInEnPassant = [];
+let enPassantStarted = false;
 
 let whitePromotion = false;
 
@@ -228,6 +229,7 @@ function isValidMove(square) {
       if (boardRepresentation[square.id][0] == "k") {
         whiteMove? whiteKingID = chosenSquare.id : blackKingID = chosenSquare.id;
       }
+      else if (enPassantStarted) {enPassantStarted = false;}
       boardRepresentation = structuredClone(arrayBackup);
       return false;
     }
@@ -243,10 +245,11 @@ function isWhitePawnMove(square) {
     if (enPassantInProgress) {
       if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == pawnInEnPassant[0] - 8) {
           // remove pawn taken by en passant:
-          removePiece(document.getElementById(Number(square.id) + 8)); 
+          //removePiece(document.getElementById(Number(square.id) + 8)); 
+          enPassantStarted = true;
           // update board array: 
-          boardRepresentation[Number(square.id) + 8][0] = "e";
-          boardRepresentation[Number(square.id) + 8][1] = "e";
+          boardRepresentation[pawnInEnPassant[0]][0] = "e";
+          boardRepresentation[pawnInEnPassant[0]][1] = "e";
           return true;
       }
     }
@@ -290,10 +293,12 @@ function isBlackPawnMove(square) {
     if (enPassantInProgress) {
       if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == Number(pawnInEnPassant[0]) + 8) {
           // remove pawn taken by en passant:
-          removePiece(document.getElementById(pawnInEnPassant[0])); 
+          // removePiece(document.getElementById(pawnInEnPassant[0])); 
+          
+          enPassantStarted = true;
           // update board array:
-          boardRepresentation[square.id - 8][0] = "e";
-          boardRepresentation[square.id - 8][1] = "e";
+          boardRepresentation[pawnInEnPassant[0]][0] = "e";
+          boardRepresentation[pawnInEnPassant[0]][1] = "e";
           return true;
       }
     }
@@ -918,6 +923,11 @@ function executeMove(oldSquare, newSquare) {
   
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
 
+  if (enPassantStarted) {
+    removePiece(document.getElementById(pawnInEnPassant[0]));
+    //removePiece(document.getElementById(Number(square.id) + 8));
+  }
+
   if (activateEnPassant) {
     enPassantInProgress = true;
     activateEnPassant = false;
@@ -928,6 +938,7 @@ function executeMove(oldSquare, newSquare) {
     enPassantInProgress = false;
     pawnInEnPassant = [];
     pawnsAbleToEnPassant = [];
+    enPassantStarted = false;
     console.log("blablebli from enpassant reset");
   }
   console.log(pieceToString(newSquare));
@@ -937,6 +948,8 @@ function executeMove(oldSquare, newSquare) {
   if (boardRepresentation[newSquare.id][0] == "k") {
     whiteMove? disableCastlingWhite() : disableCastlingBlack();
   }
+
+  
 
   // disable the specific castling after a rook moved for the first time
   if (whiteMove) {
