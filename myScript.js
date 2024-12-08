@@ -824,6 +824,30 @@ function isSquareChecked(squareID) {
     }
   }
   
+  // checking for checks from king
+  // (for kings cannot get too close to each other and king can check empty squares in castling area)
+  // diagonal directions
+  for (explored of [-9, -7, +9, +7]) {
+    exploredSquareID = Number(squareID) - explored;
+    if (isSquareOnBoard(exploredSquareID) && 
+      isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
+      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "k") {
+        attackers.push(exploredSquareID);
+    }
+  }
+
+  // checking for checks from king
+  // horizontal and vertical directions
+  for (explored of [-8, +8, -1, +1]) {
+    exploredSquareID = Number(squareID) - explored;
+    if (isSquareOnBoard(exploredSquareID) && 
+      !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
+      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "k") {
+        attackers.push(exploredSquareID);
+    }
+  }
+
+
   return attackers;
 }
 
