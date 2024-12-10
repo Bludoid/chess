@@ -973,17 +973,20 @@ function executeMove(oldSquare, newSquare) {
     whiteMove? disableCastlingWhite() : disableCastlingBlack();
   }
 
-  
 
-  // disable the specific castling after a rook moved for the first time
-  if (whiteMove) {
-    if (abilityToCastle.whiteA && oldSquare.id == 57) {abilityToCastle.whiteA = false;}
-    else if (abilityToCastle.whiteH && oldSquare.id == 64) {abilityToCastle.whiteH = false;}
+  // alterntive where it is not checked who's move it is
+  if (abilityToCastle.whiteA && (oldSquare.id == 57 || newSquare.id == 57)) {
+  abilityToCastle.whiteA = false;
   }
-  else {
-    if (abilityToCastle.blackA && oldSquare.id == 1) {abilityToCastle.blackA = false;}
-    else if (abilityToCastle.blackH && oldSquare.id == 8) {abilityToCastle.blackH = false;}
-  }  
+  if (abilityToCastle.whiteH && (oldSquare.id == 64 || newSquare.id == 64)) {
+    abilityToCastle.whiteH = false;
+  }
+  if (abilityToCastle.blackA&& (oldSquare.id == 1 || newSquare.id == 1)) {
+    abilityToCastle.blackA = false;
+  }
+  if (abilityToCastle.blackH && (oldSquare.id == 8 || newSquare.id == 8)) {
+    abilityToCastle.blackH = false;}
+
 
   // player's king cannot be in check after any move...
   whiteMove? whiteInCheck = false : blackInCheck = false; 
