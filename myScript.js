@@ -684,8 +684,8 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
 
 function isPawnPromotion(square) {
   console.log("checking promotion of the pawn");
-  return ((whiteMove && boardRepresentation[square.id][0] == "p" && boardRepresentation[square.id][3] == 8) ||
-  (!whiteMove && boardRepresentation[square.id][0] == "p" && boardRepresentation[square.id][3] == 1));
+  return (boardRepresentation[square.id][0] == "p" && 
+    (boardRepresentation[square.id][3] == 8 || boardRepresentation[square.id][3] == 1));
 }
 
 function promotePawn(square) {
