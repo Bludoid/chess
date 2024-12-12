@@ -225,7 +225,7 @@ function isValidMove(square) {
     boardRepresentation[square.id][1] = boardRepresentation[chosenSquare.id][1]; 
     boardRepresentation[chosenSquare.id][1] = "e";
     let kingAttackers = isSquareChecked(whiteMove? whiteKingID : blackKingID); 
-    if (kingAttackers.length > 0) {
+    if (kingAttackers.length) {
       if (boardRepresentation[square.id][0] == "k") {
         whiteMove? whiteKingID = chosenSquare.id : blackKingID = chosenSquare.id;
       }
@@ -422,7 +422,7 @@ function isPathChecked(arrayOfSquareIDs) {
   let attackersArray;
   for (square of arrayOfSquareIDs) {
     attackersArray = isSquareChecked(square);
-    if (attackersArray.length > 0) {
+    if (attackersArray.length) {
       return true;
     }
   }
@@ -875,7 +875,7 @@ function canKingMove() {
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
       attackers = isSquareChecked(exploredSquareID);
-      if (attackers.length == 0) {
+      if (!attackers.length) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;
       }
@@ -889,7 +889,7 @@ function canKingMove() {
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
       attackers = isSquareChecked(exploredSquareID);
-      if (attackers.length == 0) {
+      if (!attackers.length) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;} 
     }
@@ -1081,7 +1081,7 @@ function switchMove() {
   // take the attacker
   // block the attack
   // if non of the above applies it's checkmate
-  else if (attackerSquares.length > 0) {
+  else if (attackerSquares.length) {
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate()) {console.log(kingsColor + " player has been checkmated.");}
