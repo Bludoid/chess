@@ -858,10 +858,10 @@ function isSquareOnBoard(squareID) {
 
 // checkmate logic functions:
 
-function isCheckmate() {
+function isCheckmate(attackerID) {
   // if more attackers then king has to move!!!!!
   // check for potential checks from blocking pieces - cancel such moves as invalid
-  return (!canKingMove() && !canAttackerBeTaken() && !canAttackBeBlocked());
+  return (!canKingMove() && !canAttackerBeTaken(attackerID) && !canAttackBeBlocked(attackerID));
 }
 
 function canKingMove() {
@@ -894,18 +894,44 @@ function canKingMove() {
         return true;} 
     }
   }
-  console.log("king cannot move!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  console.log(">->-> king cannot move");
   return false;
 }
 
-function canAttackerBeTaken() {
+function canAttackerBeTaken(attackerID) {
+  let attackersOfAttacker;
+  whiteMove = !whiteMove;
+  attackersOfAttacker = isSquareChecked(attackerID);
+  whiteMove = !whiteMove;
+  
+  // for members of attackersOfAttacker run a function to check if it would not cause a self check
+  if (attackersOfAttacker.length) {
+    console.log(">->-> attacker can be taken from square or squares: " + attackersOfAttacker);
+    return true;
+  }
+  else {">->-> attacker CANNOT be taken"}
+}
+
+function canAttackBeBlocked(attackerID) {
+  if (["p", "n"].includes(boardRepresentation[attackerID][0])) {
+    console.log(">->-> attack from pawn or knight CANNOT be blocked")
+    return false;
+  }
+  // get path between king and attacker
+  // for each square get attackersOfPathSquare...,
+  // for each attacker check validDefenseMove()
+  // first valid move returns true
   return true;
 }
 
-function canAttackBeBlocked() {
-  return true;
-}
 
+// function isValidDefenseMove() {
+  // arrayBackup = structuredClone(boardRepresentation);
+  // update boardRepresentation array
+  // use functions isValidQueenMove() or isValidBishopnMove() or isValidRookMove()
+  // restore boardRepresentation array
+  // return true or false
+// }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -1084,7 +1110,7 @@ function switchMove() {
   else if (attackerSquares.length) {
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (isCheckmate()) {console.log(kingsColor + " player has been checkmated.");}
+    if (isCheckmate(attackerSquares[0])) {console.log(kingsColor + " player has been checkmated.");}
   }
   else {
     console.log(kingsColor + " king is NOT in check");
