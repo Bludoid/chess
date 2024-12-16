@@ -185,12 +185,12 @@ function outputToInfobox(infoMessage) {
 }
 
 function isValidMove(square) {
-  let pieceSchortcut = boardRepresentation[chosenSquare.id][0];
+  let pieceShortcut = boardRepresentation[chosenSquare.id][0];
   arrayBackup = structuredClone(boardRepresentation);
-  console.log(pieceSchortcut);
+  console.log(pieceShortcut);
   let returnValue = false;
-  let kingBackupID;
-  switch (pieceSchortcut) {
+  // let kingBackupID;
+  switch (pieceShortcut) {
     case "p": 
         if (boardRepresentation[chosenSquare.id][1] == "w") {
           if (isWhitePawnMove(square)) returnValue = true;
@@ -858,7 +858,7 @@ function isSquareOnBoard(squareID) {
 
 // checkmate logic functions:
 
-function isCheckmate(attackerID) {
+function  isCheckmate(attackerID) {
   // if more attackers then king has to move!!!!!
   // check for potential checks from blocking pieces - cancel such moves as invalid
   return (!canKingMove() && !canAttackerBeTaken(attackerID) && !canAttackBeBlocked(attackerID));
@@ -900,13 +900,14 @@ function canKingMove() {
 
 function canAttackerBeTaken(attackerID) {
   let attackersOfAttacker;
+  // temporarily switching the active player to get attackers from the active player's view
   whiteMove = !whiteMove;
   attackersOfAttacker = isSquareChecked(attackerID);
   whiteMove = !whiteMove;
   
   // for members of attackersOfAttacker run a function to check if it would not cause a self check
-  if (attackersOfAttacker.length) {
-    console.log(">->-> attacker can be taken from square or squares: " + attackersOfAttacker);
+  if (attackersOfAttacker.some(thisID => isValidDefenseMove(attackerID, thisID))) {
+    console.log(">->-> attacker can be taken");
     return true;
   }
   else {">->-> attacker CANNOT be taken"}
@@ -925,13 +926,34 @@ function canAttackBeBlocked(attackerID) {
 }
 
 
-// function isValidDefenseMove() {
-  // arrayBackup = structuredClone(boardRepresentation);
+function isValidDefenseMove(attackerID, playerPieceID) {
+  arrayBackup = structuredClone(boardRepresentation);
+  console.log("attacker ID and player's piece id are: " + attackerID + ", " + playerPieceID);
+  let pieceShortcut = boardRepresentation[playerPieceID][0];
+  let attackersArray = [];
+  if (["q", "b", "r", "n"].includes(pieceShortcut)) {
+    boardRepresentation[attackerID][0] = pieceShortcut;
+    boardRepresentation[playerPieceID][0] = "e";
+    boardRepresentation[attackerID][1] = boardRepresentation[playerPieceID][1]; 
+    boardRepresentation[playerPieceID][1] = "e";
+    attackersArray = isSquareChecked(whiteMove? whiteKingID : blackKingID);
+    if (!attackersArray.length) {
+      boardRepresentation = structuredClone(arrayBackup);
+      return true;
+    } 
+    else {
+      boardRepresentation = structuredClone(arrayBackup);
+      console.log("the attacker at: " + attackerID + "cannot be taken by piece at: " + playerPieceID);
+    }
+  }
+
+ 
+  
   // update boardRepresentation array
   // use functions isValidQueenMove() or isValidBishopnMove() or isValidRookMove()
   // restore boardRepresentation array
   // return true or false
-// }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -941,7 +963,7 @@ function canAttackBeBlocked(attackerID) {
 function pieceToString(square) {
   let recognizedPiece = "";
   let pieceColor = boardRepresentation[square.id][1];
-  let pieceSchortcut = boardRepresentation[square.id][0];
+  let pieceShortcut = boardRepresentation[square.id][0];
   
   
   // is piece black or white?
@@ -956,7 +978,7 @@ function pieceToString(square) {
   }
   
   // figure out what piece it is
-  switch (pieceSchortcut) {
+  switch (pieceShortcut) {
     case "p": 
       recognizedPiece += "pawn";
       break;
