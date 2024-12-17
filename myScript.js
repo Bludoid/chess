@@ -931,7 +931,8 @@ function isValidDefenseMove(attackerID, playerPieceID) {
   console.log("attacker ID and player's piece id are: " + attackerID + ", " + playerPieceID);
   let pieceShortcut = boardRepresentation[playerPieceID][0];
   let attackersArray = [];
-  if (["q", "b", "r", "n"].includes(pieceShortcut)) {
+  if (pieceShortcut == "k") {return false;}  // taken care of in the canKingMove()
+  else {
     boardRepresentation[attackerID][0] = pieceShortcut;
     boardRepresentation[playerPieceID][0] = "e";
     boardRepresentation[attackerID][1] = boardRepresentation[playerPieceID][1]; 
@@ -943,16 +944,9 @@ function isValidDefenseMove(attackerID, playerPieceID) {
     } 
     else {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the attacker at: " + attackerID + "cannot be taken by piece at: " + playerPieceID);
+      console.log("the attacker at: " + attackerID + " cannot be taken by piece at: " + playerPieceID);
     }
   }
-
- 
-  
-  // update boardRepresentation array
-  // use functions isValidQueenMove() or isValidBishopnMove() or isValidRookMove()
-  // restore boardRepresentation array
-  // return true or false
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
