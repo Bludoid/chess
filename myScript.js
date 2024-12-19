@@ -517,8 +517,8 @@ function isDiagonalNeighbour(square, direction) {
   }
 }
 
-function getDiagonalDirection(squareID) {
-  let directionHelper = squareID - chosenSquare.id;
+function getDiagonalDirection(squareID, otherSquareID = chosenSquare.id) {
+  let directionHelper = squareID - otherSquareID;
   switch(true) {
     // top/left
     case (Object.is(directionHelper % 9, -0)):
@@ -596,8 +596,8 @@ function isDiagonalPath(endSquare, direction) {
   }
 }
 
-function getHorizontalOrVerticalDirection(squareID) {
-  let directionHelper = squareID - chosenSquare.id;
+function getHorizontalOrVerticalDirection(squareID, otherSquareID = chosenSquare.id) {
+  let directionHelper = squareID - otherSquareID;
   switch(true) {
     // up
     case ([-8, -16, -24, -32, -40, -48, -56].includes(directionHelper)):
@@ -616,7 +616,8 @@ function getHorizontalOrVerticalDirection(squareID) {
       console.log("left");
       return 3;
     default:
-      console.log("error");
+      console.log("other direction than horizontal or vertical");
+      return undefined;
   }
 }
 
@@ -861,6 +862,7 @@ function isSquareOnBoard(squareID) {
 function  isCheckmate(attackerID) {
   // if more attackers then king has to move!!!!!
   // check for potential checks from blocking pieces - cancel such moves as invalid
+  //getKingToAttackerPath(attackerID)
   return (!canKingMove() && !canAttackerBeTaken(attackerID) && !canAttackBeBlocked(attackerID));
 }
 
@@ -914,24 +916,33 @@ function canAttackerBeTaken(attackerID) {
 }
 
 function canAttackBeBlocked(attackerID) {
+  
   if (["p", "n"].includes(boardRepresentation[attackerID][0])) {
     console.log(">->-> attack from pawn or knight CANNOT be blocked")
     return false;
   }
+  let blockingSquares = getKingToAttackerPath(attackerID);
+  
+  console.log(blockingSquares);
   // get path between king and attacker
   // for each square get attackersOfPathSquare...,
-  // for each attacker check validDefenseMove()
+  // for each attacker check validDefenseMove() use the third parametre -> true to take care of blocking by pawn
   // first valid move returns true
   return true;
 }
 
 
-function isValidDefenseMove(attackerID, playerPieceID) {
+function isValidDefenseMove(attackerID, playerPieceID, blockingMove = false) {
   arrayBackup = structuredClone(boardRepresentation);
   console.log("attacker ID and player's piece id are: " + attackerID + ", " + playerPieceID);
   let pieceShortcut = boardRepresentation[playerPieceID][0];
   let attackersArray = [];
-  if (pieceShortcut == "k") {return false;}  // taken care of in the canKingMove()
+  if (blockingMove && pieceShortcut == "p") {
+    console.log("the defending piece trying to block a check is a pawn")
+    return true;
+  }
+  // king can either take attacker (taken care of by canKingMove() or it CANNOT block a check on self - return false)
+  else if (pieceShortcut == "k") {return false;}  
   else {
     boardRepresentation[attackerID][0] = pieceShortcut;
     boardRepresentation[playerPieceID][0] = "e";
@@ -940,13 +951,57 @@ function isValidDefenseMove(attackerID, playerPieceID) {
     attackersArray = isSquareChecked(whiteMove? whiteKingID : blackKingID);
     if (!attackersArray.length) {
       boardRepresentation = structuredClone(arrayBackup);
+      console.log("the attacker at: " + attackerID + " CAN be taken by piece at: " + playerPieceID);
       return true;
     } 
     else {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the attacker at: " + attackerID + " cannot be taken by piece at: " + playerPieceID);
+      console.log("the attacker at: " + attackerID + " CANNOT be taken by piece at: " + playerPieceID);
     }
   }
+}
+
+function getKingToAttackerPath(attackerID) {
+  let kingID = whiteMove? whiteKingID : blackKingID;
+  let attackerDirection = getHorizontalOrVerticalDirection(attackerID, kingID);
+  // bottom or up
+  if ([0, 2].includes(attackerDirection)) {
+    console.log(getPathArray(attackerID, kingID, 8));  // make it return
+  }
+  // left or right
+  else if([1, 3].includes(attackerDirection)) {
+    console.log(getPathArray(attackerID, kingID, 1));  // make it return
+  }
+  else {
+    attackerDirection = getDiagonalDirection(attackerID, kingID);
+    if ([0, 2].includes(attackerDirection)) {
+      console.log(getPathArray(attackerID, kingID, 9));  // make it return
+    }
+    // left or right
+    else if([1, 3].includes(attackerDirection)) {
+      console.log(getPathArray(attackerID, kingID, 7));  // make it return
+    }
+  }  
+}
+
+// returns ID's of squares between checked king and the attacker, returns empty array if they are neighbours
+function getPathArray(attackerID, kingID, directionOffset) {
+  let path = [];
+  if (attackerID > kingID) {
+    attackerID -= directionOffset;
+    while (attackerID > kingID) {
+      path.push(attackerID);
+      attackerID -= directionOffset;
+    }
+  }
+  else {
+    attackerID += directionOffset;
+    while (attackerID < kingID) {
+      path.push(attackerID);
+      attackerID += directionOffset;
+    }
+  }
+  return path;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
