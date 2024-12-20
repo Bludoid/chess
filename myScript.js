@@ -859,7 +859,7 @@ function isSquareOnBoard(squareID) {
 
 // checkmate logic functions:
 
-function  isCheckmate(attackerID) {
+function isCheckmate(attackerID) {
   // if more attackers then king has to move!!!!!
   // check for potential checks from blocking pieces - cancel such moves as invalid
   //getKingToAttackerPath(attackerID)
@@ -922,16 +922,35 @@ function canAttackBeBlocked(attackerID) {
     return false;
   }
   let blockingSquares = getKingToAttackerPath(attackerID);
+  let isCheckBlockable = false;
+
   
-  console.log(blockingSquares);
+
+  for (let blockingSquare of blockingSquares) {
+    if (isCheckBlockable) break; // stop the loop if check can be blocked
+  
+    whiteMove = !whiteMove;
+    const blockingCandidates = isSquareChecked(blockingSquare); // Get the new array
+    whiteMove = !whiteMove;
+
+    for (let blockingCandidate of blockingCandidates) {
+      if (isValidDefenseMove(blockingSquare, blockingCandidate, true)) {
+        console.log("check is blockable at least by a piece at: " + blockingCandidate);
+        isCheckBlockable = true; // set the flag and break the inner loop
+        break;
+      }
+    }
+  }
+
+  //console.log(blockingSquares);
   // get path between king and attacker
   // for each square get attackersOfPathSquare...,
   // for each attacker check validDefenseMove() use the third parametre -> true to take care of blocking by pawn
   // first valid move returns true
-  return true;
+  if (isCheckBlockable) return true;
 }
 
-
+// returns true if a piece can move to a specific square without putting its own king in check
 function isValidDefenseMove(attackerID, playerPieceID, blockingMove = false) {
   arrayBackup = structuredClone(boardRepresentation);
   console.log("attacker ID and player's piece id are: " + attackerID + ", " + playerPieceID);
@@ -951,7 +970,7 @@ function isValidDefenseMove(attackerID, playerPieceID, blockingMove = false) {
     attackersArray = isSquareChecked(whiteMove? whiteKingID : blackKingID);
     if (!attackersArray.length) {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the attacker at: " + attackerID + " CAN be taken by piece at: " + playerPieceID);
+      console.log("the piece at: " + playerPieceID + " CAN block OR take a piece at: " + attackerID);
       return true;
     } 
     else {
@@ -966,20 +985,21 @@ function getKingToAttackerPath(attackerID) {
   let attackerDirection = getHorizontalOrVerticalDirection(attackerID, kingID);
   // bottom or up
   if ([0, 2].includes(attackerDirection)) {
-    console.log(getPathArray(attackerID, kingID, 8));  // make it return
+    return getPathArray(attackerID, kingID, 8);
   }
   // left or right
   else if([1, 3].includes(attackerDirection)) {
-    console.log(getPathArray(attackerID, kingID, 1));  // make it return
+    return getPathArray(attackerID, kingID, 1);  // make it return
   }
   else {
     attackerDirection = getDiagonalDirection(attackerID, kingID);
+    // left/top or bottom/right
     if ([0, 2].includes(attackerDirection)) {
-      console.log(getPathArray(attackerID, kingID, 9));  // make it return
+      return getPathArray(attackerID, kingID, 9);
     }
-    // left or right
+    // right/top or bottom/left
     else if([1, 3].includes(attackerDirection)) {
-      console.log(getPathArray(attackerID, kingID, 7));  // make it return
+      return getPathArray(attackerID, kingID, 7);
     }
   }  
 }
