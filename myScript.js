@@ -617,6 +617,7 @@ function getHorizontalOrVerticalDirection(squareID, otherSquareID = chosenSquare
       return 3;
     default:
       console.log("other direction than horizontal or vertical");
+      // will this be needed??????????????,
       return undefined;
   }
 }
@@ -937,7 +938,7 @@ function canAttackBeBlocked(attackerID) {
     addCorrectPawnBlockers(blockableSquareID);
 
     for (let blockingCandidate of blockingCandidates) {
-      if (isValidDefenseMove(blockingSquare, blockingCandidate, true)) {
+      if (isValidDefenseMove(blockableSquareID, blockingCandidate, true)) {
         console.log("check is blockable at least by a piece at: " + blockingCandidate);
         return true;
       }
@@ -953,11 +954,12 @@ function canAttackBeBlocked(attackerID) {
 }
 
 // returns true if a piece can move to a specific square without putting its own king in check
-function isValidDefenseMove(attackerID, playerPieceID, blockingMove = false) {
+function isValidDefenseMove(attackerID, squareToGoID, blockingMove = false) {
   arrayBackup = structuredClone(boardRepresentation);
-  console.log("attacker ID and player's piece id are: " + attackerID + ", " + playerPieceID);
-  let pieceShortcut = boardRepresentation[playerPieceID][0];
+  console.log("defending piece ID and a square ID to block attack or to take attacker: " + attackerID + ", " + squareToGoID);
+  let pieceShortcut = boardRepresentation[squareToGoID][0];
   let attackersArray = [];
+  // will this be needed??????????????????,
   if (blockingMove && pieceShortcut == "p") {
     console.log("the defending piece trying to block a check is a pawn")
     return true;
@@ -966,18 +968,18 @@ function isValidDefenseMove(attackerID, playerPieceID, blockingMove = false) {
   else if (pieceShortcut == "k") {return false;}  
   else {
     boardRepresentation[attackerID][0] = pieceShortcut;
-    boardRepresentation[playerPieceID][0] = "e";
-    boardRepresentation[attackerID][1] = boardRepresentation[playerPieceID][1]; 
-    boardRepresentation[playerPieceID][1] = "e";
+    boardRepresentation[squareToGoID][0] = "e";
+    boardRepresentation[attackerID][1] = boardRepresentation[squareToGoID][1]; 
+    boardRepresentation[squareToGoID][1] = "e";
     attackersArray = isSquareChecked(whiteMove? whiteKingID : blackKingID);
     if (!attackersArray.length) {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the piece at: " + playerPieceID + " CAN block OR take a piece at: " + attackerID);
+      console.log("the piece at: " + squareToGoID + " CAN block OR take a piece at square: " + attackerID);
       return true;
     } 
     else {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the attacker at: " + attackerID + " CANNOT be taken by piece at: " + playerPieceID);
+      console.log("the attacker at: " + attackerID + " CANNOT be taken by piece at square: " + squareToGoID);
     }
   }
 }
@@ -1039,6 +1041,11 @@ function deleteFalseBlockers(blockersArray) {
 
 function addCorrectPawnBlockers(squareOnPathID) {
   console.log("this is a place where I add correct blocker pawns to the square number: "+ squareOnPathID);
+  if ([1, 8].includes(boardRepresentation[squareOnPathID][3])) {
+    console.log("no way to block with pawn");
+    return;
+  }
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
