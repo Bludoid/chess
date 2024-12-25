@@ -420,7 +420,7 @@ function isKingMove(square) {
 // helper function for evaluating checks in the castling area
 function isPathChecked(arrayOfSquareIDs) {
   let attackersArray;
-  for (square of arrayOfSquareIDs) {
+  for (let square of arrayOfSquareIDs) {
     attackersArray = isSquareChecked(square);
     if (attackersArray.length) {
       return true;
@@ -757,7 +757,7 @@ function isSquareChecked(squareID) {
 // when whiteMove is false, looks for a check from white      
   let attackers = [];
   // checking vertical directions for checks from  rook and queen
-  for (direction of [-8, 8]) {
+  for (let direction of [-8, 8]) {
     let exploredSquareID = Number(squareID) - direction;
     while (isSquareOnBoard(exploredSquareID)) {
       if (isEmptySquare(exploredSquareID)) {
@@ -773,7 +773,7 @@ function isSquareChecked(squareID) {
   }
 
   // checking horizontal directions for checks from  rook and queen
-  for (direction of [-1, 1]) {
+  for (let direction of [-1, 1]) {
     exploredSquareID = Number(squareID) - direction;
     while (isSquareOnBoard(exploredSquareID) && isSameRank(exploredSquareID, squareID))  {
       if (isEmptySquare(exploredSquareID)) {
@@ -789,7 +789,7 @@ function isSquareChecked(squareID) {
   }
 
   // checking diagonal directions for check from queen and bishop
-  for (direction of [-7, 7, -9, 9]) {
+  for (let direction of [-7, 7, -9, 9]) {
     exploredSquareID = Number(squareID) - direction;
     while (isSquareOnBoard(exploredSquareID) && isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID))) {
       if (isEmptySquare(exploredSquareID)) {
@@ -805,7 +805,7 @@ function isSquareChecked(squareID) {
   }
 
   // checking for checks from knights
-  for (explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
+  for (let explored of [-17, 17, -15, 15, -10, 10, -6, 6]) {
     exploredSquareID = Number(squareID) - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
@@ -816,7 +816,7 @@ function isSquareChecked(squareID) {
 
   // checknig for checks from pawns
   let pawnDirections = whiteMove? [9,7] : [-9, -7];
-  for (direction of pawnDirections) {
+  for (let direction of pawnDirections) {
     exploredSquareID = Number(squareID) - direction;
     if (isSquareOnBoard(exploredSquareID)  && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
@@ -828,7 +828,7 @@ function isSquareChecked(squareID) {
   // checking for checks from king
   // (for kings cannot get too close to each other and king can check empty squares in castling area)
   // diagonal directions
-  for (explored of [-9, -7, +9, +7]) {
+  for (let explored of [-9, -7, +9, +7]) {
     exploredSquareID = Number(squareID) - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
@@ -839,7 +839,7 @@ function isSquareChecked(squareID) {
 
   // checking for checks from king
   // horizontal and vertical directions
-  for (explored of [-8, +8, -1, +1]) {
+  for (let explored of [-8, +8, -1, +1]) {
     exploredSquareID = Number(squareID) - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
@@ -871,7 +871,7 @@ function canKingMove() {
   let exploredSquareID;
   let attackers;
   // horizontals and verticals
-  for (explored of [-8, +8, -1, +1]) {
+  for (let explored of [-8, +8, -1, +1]) {
     exploredSquareID = kingPosition - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
@@ -885,7 +885,7 @@ function canKingMove() {
   }
 
   // diagonals
-  for (explored of [-9, -7, +9, +7]) {
+  for (let explored of [-9, -7, +9, +7]) {
     exploredSquareID = kingPosition - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
@@ -921,23 +921,25 @@ function canAttackBeBlocked(attackerID) {
     console.log(">->-> attack from pawn or knight CANNOT be blocked")
     return false;
   }
-  let blockingSquares = getKingToAttackerPath(attackerID);
-  let isCheckBlockable = false;
 
-  
+  let blockablePath = getKingToAttackerPath(attackerID);
 
-  for (let blockingSquare of blockingSquares) {
-    if (isCheckBlockable) break; // stop the loop if check can be blocked
-  
+  for (let blockableSquareID of blockablePath) {
+
     whiteMove = !whiteMove;
-    const blockingCandidates = isSquareChecked(blockingSquare); // Get the new array
+    const blockingCandidates = isSquareChecked(blockableSquareID); // get the path that can potentialy be blocked
     whiteMove = !whiteMove;
+
+    // delete false blocking candidates - pawns and a king
+    console.log("check the array before change: " + blockingCandidates);
+    deleteFalseBlockers(blockingCandidates);
+    console.log("check if the array changed: " + blockingCandidates);
+    addCorrectPawnBlockers(blockableSquareID);
 
     for (let blockingCandidate of blockingCandidates) {
       if (isValidDefenseMove(blockingSquare, blockingCandidate, true)) {
         console.log("check is blockable at least by a piece at: " + blockingCandidate);
-        isCheckBlockable = true; // set the flag and break the inner loop
-        break;
+        return true;
       }
     }
   }
@@ -947,7 +949,7 @@ function canAttackBeBlocked(attackerID) {
   // for each square get attackersOfPathSquare...,
   // for each attacker check validDefenseMove() use the third parametre -> true to take care of blocking by pawn
   // first valid move returns true
-  if (isCheckBlockable) return true;
+  //if (isCheckBlockable) return true;
 }
 
 // returns true if a piece can move to a specific square without putting its own king in check
@@ -1022,6 +1024,21 @@ function getPathArray(attackerID, kingID, directionOffset) {
     }
   }
   return path;
+}
+
+// discard pawns and a king as blocking candidates
+function deleteFalseBlockers(blockersArray) {
+  console.log("before deleting false blockers: " + blockersArray);
+  for (let i = blockersArray.length - 1; i >= 0; i--) {
+    if (["p", "k"].includes(boardRepresentation[blockersArray[i]][0])) {
+      blockersArray.splice(i, 1); // Remove the element at index i
+    }
+  }
+  console.log("after deleting false blockers: " + blockersArray);
+}
+
+function addCorrectPawnBlockers(squareOnPathID) {
+  console.log("this is a place where I add correct blocker pawns to the square number: "+ squareOnPathID);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
