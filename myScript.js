@@ -913,6 +913,7 @@ function canAttackerBeTaken(attackerID) {
     console.log(">->-> attacker can be taken");
     return true;
   }
+  // does not trigger: ???????
   else {">->-> attacker CANNOT be taken"}
 }
 
@@ -924,6 +925,7 @@ function canAttackBeBlocked(attackerID) {
   }
 
   let blockablePath = getKingToAttackerPath(attackerID);
+  if (!blockablePath.length) {return false;}
 
   for (let blockableSquareID of blockablePath) {
 
@@ -935,7 +937,8 @@ function canAttackBeBlocked(attackerID) {
     console.log("check the array before change: " + blockingCandidates);
     deleteFalseBlockers(blockingCandidates);
     console.log("check if the array changed: " + blockingCandidates);
-    addCorrectPawnBlockers(blockableSquareID);
+    addCorrectPawnBlockers(blockableSquareID, blockingCandidates);
+    console.log("check the array after adding correct pawn blockers: " + blockingCandidates);
 
     for (let blockingCandidate of blockingCandidates) {
       if (isValidDefenseMove(blockableSquareID, blockingCandidate, true)) {
@@ -1039,14 +1042,30 @@ function deleteFalseBlockers(blockersArray) {
   console.log("after deleting false blockers: " + blockersArray);
 }
 
-function addCorrectPawnBlockers(squareOnPathID) {
+function addCorrectPawnBlockers(squareOnPathID, blockersArray) {
   console.log("this is a place where I add correct blocker pawns to the square number: "+ squareOnPathID);
-  if ([1, 8].includes(boardRepresentation[squareOnPathID][3])) {
-    console.log("no way to block with pawn");
-    return;
-  }
-
+  if (whiteMove) {
+    if (boardRepresentation[squareOnPathID][3] == 4 && boardRepresentation[squareOnPathID + 16][0] == "p" 
+      && boardRepresentation[squareOnPathID + 16][1] == "w" && boardRepresentation[squareOnPathID + 8][0] == "e") {
+        blockersArray.push(squareOnPathID + 16);
+    }
+    else if (![1, 2].includes(boardRepresentation[squareOnPathID][3]) && boardRepresentation[squareOnPathID + 8][0] == "p" && boardRepresentation[squareOnPathID + 8][1] == "w") {
+      blockersArray.push(squareOnPathID + 8);
+    }
+  }  
+  else {
+    if (boardRepresentation[squareOnPathID][3] == 4 && boardRepresentation[squareOnPathID - 16][0] == "p" 
+      && boardRepresentation[squareOnPathID - 16][1] == "b" && boardRepresentation[squareOnPathID - 8][0] == "e") {
+        blockersArray.push(squareOnPathID - 16);
+    }
+    else if (![7, 8].includes(boardRepresentation[squareOnPathID][3]) && boardRepresentation[squareOnPathID - 8][0] == "p" && boardRepresentation[squareOnPathID - 8][1] == "b") {
+      blockersArray.push(squareOnPathID - 8);
+    }
+  } 
+    // add 8 and check for the same..., convert ID to number to be sure...
 }
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 
