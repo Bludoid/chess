@@ -224,7 +224,7 @@ function isValidMove(square) {
     boardRepresentation[chosenSquare.id][0] = "e";
     boardRepresentation[square.id][1] = boardRepresentation[chosenSquare.id][1]; 
     boardRepresentation[chosenSquare.id][1] = "e";
-    let kingAttackers = isSquareChecked(whiteMove? whiteKingID : blackKingID); 
+    let kingAttackers = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID); 
     if (kingAttackers.length) {
       if (boardRepresentation[square.id][0] == "k") {
         whiteMove? whiteKingID = chosenSquare.id : blackKingID = chosenSquare.id;
@@ -421,7 +421,7 @@ function isKingMove(square) {
 function isPathChecked(arrayOfSquareIDs) {
   let attackersArray;
   for (let square of arrayOfSquareIDs) {
-    attackersArray = isSquareChecked(square);
+    attackersArray = getAttackersOfSquare(square);
     if (attackersArray.length) {
       return true;
     }
@@ -753,7 +753,7 @@ function toggleClicking() {
 // checking king or empty square for checks
 
 
-function isSquareChecked(squareID) {
+function getAttackersOfSquare(squareID) {
 // when whiteMove is true, looks for a check from black,
 // when whiteMove is false, looks for a check from white      
   let attackers = [];
@@ -877,7 +877,7 @@ function canKingMove() {
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
-      attackers = isSquareChecked(exploredSquareID);
+      attackers = getAttackersOfSquare(exploredSquareID);
       if (!attackers.length) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;
@@ -891,7 +891,7 @@ function canKingMove() {
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
-      attackers = isSquareChecked(exploredSquareID);
+      attackers = getAttackersOfSquare(exploredSquareID);
       if (!attackers.length) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;} 
@@ -905,7 +905,7 @@ function canAttackerBeTaken(attackerID) {
   let attackersOfAttacker;
   // temporarily switching the active player to get attackers from the active player's view
   whiteMove = !whiteMove;
-  attackersOfAttacker = isSquareChecked(attackerID);
+  attackersOfAttacker = getAttackersOfSquare(attackerID);
   whiteMove = !whiteMove;
   
   // for members of attackersOfAttacker run a function to check if it would not cause a self check
@@ -930,7 +930,7 @@ function canAttackBeBlocked(attackerID) {
   for (let blockableSquareID of blockablePath) {
 
     whiteMove = !whiteMove;
-    const blockingCandidates = isSquareChecked(blockableSquareID); // get the path that can potentialy be blocked
+    const blockingCandidates = getAttackersOfSquare(blockableSquareID); // get the path that can potentialy be blocked
     whiteMove = !whiteMove;
 
     // delete false blocking candidates - pawns and a king
@@ -974,7 +974,7 @@ function isValidDefenseMove(attackerID, squareToGoID, blockingMove = false) {
     boardRepresentation[squareToGoID][0] = "e";
     boardRepresentation[attackerID][1] = boardRepresentation[squareToGoID][1]; 
     boardRepresentation[squareToGoID][1] = "e";
-    attackersArray = isSquareChecked(whiteMove? whiteKingID : blackKingID);
+    attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
     if (!attackersArray.length) {
       boardRepresentation = structuredClone(arrayBackup);
       console.log("the piece at: " + squareToGoID + " CAN block OR take a piece at square: " + attackerID);
@@ -1229,7 +1229,7 @@ function switchMove() {
   // after a move was switched
   let kingsColor = whiteMove ? "White" : "Black";
   let squareOfInterest = whiteMove? whiteKingID : blackKingID;
-  let attackerSquares = isSquareChecked(squareOfInterest);
+  let attackerSquares = getAttackersOfSquare(squareOfInterest);
   // if there is a multiple check, king has to be able to move or it's checkmate
   if (attackerSquares.length > 1) {
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
