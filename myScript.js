@@ -877,7 +877,7 @@ function canKingMove() {
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
-      if (isValidDefenseMove(kingPosition, exploredSquareID)) {
+      if (simulateMove(kingPosition, exploredSquareID)) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;
       }
@@ -890,7 +890,7 @@ function canKingMove() {
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
-      if (isValidDefenseMove(kingPosition, exploredSquareID)) {
+      if (simulateMove(kingPosition, exploredSquareID)) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;} 
     }
@@ -907,7 +907,7 @@ function canAttackerBeTaken(attackerID) {
   whiteMove = !whiteMove;
   
   // for members of attackersOfAttacker run a function to check if it would not cause a self check
-  if (attackersOfAttacker.some(thisID => isValidDefenseMove(attackerID, thisID))) {
+  if (attackersOfAttacker.some(thisID => simulateMove(attackerID, thisID))) {
     console.log(">->-> attacker can be taken");
     return true;
   }
@@ -941,7 +941,7 @@ function canAttackBeBlocked(attackerID) {
     console.log("check the array after adding correct pawn blockers: " + blockingCandidates);
 
     for (let blockingCandidate of blockingCandidates) {
-      if (isValidDefenseMove(blockableSquareID, blockingCandidate, true)) {
+      if (simulateMove(blockableSquareID, blockingCandidate, true)) {
         console.log("check is blockable at least by a piece at: " + blockingCandidate);
         return true;
       }
@@ -958,7 +958,7 @@ function canAttackBeBlocked(attackerID) {
 
 // returns true if a piece can move to a specific square without putting its own king in check
 // is the blockingMove boolean needed?????????????
-function isValidDefenseMove(attackerID, squareToGoID, blockingMove = false) {
+function simulateMove(attackerID, squareToGoID, blockingMove = false) {
   arrayBackup = structuredClone(boardRepresentation);
   console.log("defending piece ID and a square ID to block attack or to take attacker: " + attackerID + ", " + squareToGoID);
   let pieceShortcut = boardRepresentation[squareToGoID][0];
