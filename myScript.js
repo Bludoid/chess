@@ -860,11 +860,11 @@ function isSquareOnBoard(squareID) {
 
 // checkmate logic functions:
 
-function isCheckmate(attackerID) {
+function isCheckmate(squareToGoID) {
   // if more attackers then king has to move!!!!!
   // check for potential checks from blocking pieces - cancel such moves as invalid
-  //getKingToAttackerPath(attackerID)
-  return (!canKingMove() && !canAttackerBeTaken(attackerID) && !canAttackBeBlocked(attackerID));
+  //getKingToAttackerPath(squareToGoID)
+  return (!canKingMove() && !canAttackerBeTaken(squareToGoID) && !canAttackBeBlocked(squareToGoID));
 }
 
 function canKingMove() {
@@ -899,32 +899,36 @@ function canKingMove() {
   return false;
 }
 
-function canAttackerBeTaken(attackerID) {
+function canAttackerBeTaken(squareToGoID) {
   let attackersOfAttacker;
   // temporarily switching the active player to get attackers from the active player's view
   whiteMove = !whiteMove;
-  attackersOfAttacker = getAttackersOfSquare(attackerID);
+  attackersOfAttacker = getAttackersOfSquare(squareToGoID);
   whiteMove = !whiteMove;
   
+  // check for pawn in enpassant, check if it can be taken en passant to relieve the check 
+  // (simulate the en passant move in simulateMove)
+
   // for members of attackersOfAttacker run a function to check if it would not cause a self check
-  if (attackersOfAttacker.some(thisID => simulateMove(attackerID, thisID))) {
+  if (attackersOfAttacker.some(defenderID => simulateMove(squareToGoID, defenderID))) {
     console.log(">->-> attacker can be taken");
     return true;
   }
+    
   // does not trigger: ???????
   else {">->-> attacker CANNOT be taken"}
 
   // when attacker is a pawn in en passant, it can be taken en passant to relieve check (if it doesn't cause self check)
 }
 
-function canAttackBeBlocked(attackerID) {
+function canAttackBeBlocked(squareToGoID) {
   
-  if (["p", "n"].includes(boardRepresentation[attackerID][0])) {
+  if (["p", "n"].includes(boardRepresentation[squareToGoID][0])) {
     console.log(">->-> attack from pawn or knight CANNOT be blocked")
     return false;
   }
 
-  let blockablePath = getKingToAttackerPath(attackerID);
+  let blockablePath = getKingToAttackerPath(squareToGoID);
   if (!blockablePath.length) {return false;}
 
   for (let blockableSquareID of blockablePath) {
@@ -958,10 +962,10 @@ function canAttackBeBlocked(attackerID) {
 
 // returns true if a piece can move to a specific square without putting its own king in check
 // is the blockingMove boolean needed?????????????
-function simulateMove(attackerID, squareToGoID, blockingMove = false) {
+function simulateMove(squareToGoID, pieceID, blockingMove = false) {
   arrayBackup = structuredClone(boardRepresentation);
-  console.log("defending piece ID and a square ID to block attack or to take attacker: " + attackerID + ", " + squareToGoID);
-  let pieceShortcut = boardRepresentation[squareToGoID][0];
+  console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
+  let pieceShortcut = boardRepresentation[pieceID][0];
   let attackersArray = [];
   // will this be needed??????????????????,
   if (blockingMove && pieceShortcut == "p") {
@@ -971,62 +975,86 @@ function simulateMove(attackerID, squareToGoID, blockingMove = false) {
   // king can either take attacker (taken care of by canKingMove() or it CANNOT block a check on self -> return false)
   else if (pieceShortcut == "k") {return false;}  
   else {
-    boardRepresentation[attackerID][0] = pieceShortcut;
-    boardRepresentation[squareToGoID][0] = "e";
-    boardRepresentation[attackerID][1] = boardRepresentation[squareToGoID][1]; 
-    boardRepresentation[squareToGoID][1] = "e";
+    boardRepresentation[squareToGoID][0] = pieceShortcut;
+    boardRepresentation[pieceID][0] = "e";
+    boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
+    boardRepresentation[pieceID][1] = "e";
     attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
     if (!attackersArray.length) {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the piece at: " + squareToGoID + " CAN block OR take a piece at square: " + attackerID);
+      console.log("the piece at: " + pieceID + " CAN block OR take a piece at square: " + squareToGoID);
       return true;
     } 
     else {
       boardRepresentation = structuredClone(arrayBackup);
-      console.log("the attacker at: " + attackerID + " CANNOT be taken by piece at square: " + squareToGoID);
+      console.log("the attacker at: " + squareToGoID + " CANNOT be taken by piece at square: " + pieceID);
     }
   }
 }
 
-function getKingToAttackerPath(attackerID) {
+// returns true if king can move to a specific square without putting itself into check
+function simulateKingMove(squareToGoID, pieceID) {
+  arrayBackup = structuredClone(boardRepresentation);
+  console.log("king position ID and a square ID to block attack or to take attacker: " + squareToGoID + ", " + pieceID);
+  let pieceShortcut = "k";
+  let attackersArray = [];
+  // king can either take attacker (taken care of by canKingMove() or it CANNOT block a check on self -> return false)
+  
+  boardRepresentation[squareToGoID][0] = pieceShortcut;
+  boardRepresentation[pieceID][0] = "e";
+  boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
+  boardRepresentation[pieceID][1] = "e";
+  attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
+  if (!attackersArray.length) {
+    boardRepresentation = structuredClone(arrayBackup);
+    console.log("the piece at: " + pieceID + " CAN block OR take a piece at square: " + squareToGoID);
+    return true;
+  } 
+  else {
+    boardRepresentation = structuredClone(arrayBackup);
+    console.log("the attacker at: " + squareToGoID + " CANNOT be taken by piece at square: " + pieceID);
+  }
+}
+
+function getKingToAttackerPath(squareToGoID) {
   let kingID = whiteMove? whiteKingID : blackKingID;
-  let attackerDirection = getHorizontalOrVerticalDirection(attackerID, kingID);
+  let attackerDirection = getHorizontalOrVerticalDirection(squareToGoID, kingID);
   // bottom or up
   if ([0, 2].includes(attackerDirection)) {
-    return getPathArray(attackerID, kingID, 8);
+    return getPathArray(squareToGoID, kingID, 8);
   }
   // left or right
   else if([1, 3].includes(attackerDirection)) {
-    return getPathArray(attackerID, kingID, 1);  // make it return
+    return getPathArray(squareToGoID, kingID, 1);  // make it return
   }
   else {
-    attackerDirection = getDiagonalDirection(attackerID, kingID);
+    attackerDirection = getDiagonalDirection(squareToGoID, kingID);
     // left/top or bottom/right
     if ([0, 2].includes(attackerDirection)) {
-      return getPathArray(attackerID, kingID, 9);
+      return getPathArray(squareToGoID, kingID, 9);
     }
     // right/top or bottom/left
     else if([1, 3].includes(attackerDirection)) {
-      return getPathArray(attackerID, kingID, 7);
+      return getPathArray(squareToGoID, kingID, 7);
     }
   }  
 }
 
 // returns ID's of squares between checked king and the attacker, returns empty array if they are neighbours
-function getPathArray(attackerID, kingID, directionOffset) {
+function getPathArray(squareToGoID, kingID, directionOffset) {
   let path = [];
-  if (attackerID > kingID) {
-    attackerID -= directionOffset;
-    while (attackerID > kingID) {
-      path.push(attackerID);
-      attackerID -= directionOffset;
+  if (squareToGoID > kingID) {
+    squareToGoID -= directionOffset;
+    while (squareToGoID > kingID) {
+      path.push(squareToGoID);
+      squareToGoID -= directionOffset;
     }
   }
   else {
-    attackerID += directionOffset;
-    while (attackerID < kingID) {
-      path.push(attackerID);
-      attackerID += directionOffset;
+    squareToGoID += directionOffset;
+    while (squareToGoID < kingID) {
+      path.push(squareToGoID);
+      squareToGoID += directionOffset;
     }
   }
   return path;
