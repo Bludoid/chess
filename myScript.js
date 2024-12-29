@@ -909,14 +909,12 @@ function canAttackerBeTaken(squareToGoID) {
   // check for pawn in enpassant, check if it can be taken en passant to relieve the check 
   // (simulate the en passant move in simulateMove)
 
-  // for members of attackersOfAttacker run a function to check if it would not cause a self check
+  //for members of attackersOfAttacker run a function to check if it would not cause a self check
   if (attackersOfAttacker.some(defenderID => simulateMove(squareToGoID, defenderID))) {
     console.log(">->-> attacker can be taken");
     return true;
   }
-    
-  // does not trigger: ???????
-  else {">->-> attacker CANNOT be taken"}
+  else {console.log(">->-> attacker CANNOT be taken");}
 
   // when attacker is a pawn in en passant, it can be taken en passant to relieve check (if it doesn't cause self check)
 }
@@ -950,6 +948,7 @@ function canAttackBeBlocked(squareToGoID) {
         return true;
       }
     }
+    console.log(">->-> attack CANNOT be blocked");
   }
 
   //console.log(blockingSquares);
@@ -992,25 +991,25 @@ function simulateMove(squareToGoID, pieceID, blockingMove = false) {
 }
 
 // returns true if king can move to a specific square without putting itself into check
-function simulateKingMove(squareToGoID, pieceID) {
+function simulateKingMove(squareToGoID, kingID) {
   arrayBackup = structuredClone(boardRepresentation);
-  console.log("king position ID and a square to go ID: " + pieceID + ", " + squareToGoID);
+  console.log("king position ID and a square to go ID: " + kingID + ", " + squareToGoID);
   let pieceShortcut = "k";
   let attackersArray = [];
   // king can either take attacker (taken care of by canKingMove() or it CANNOT block a check on self -> return false)
   
   boardRepresentation[squareToGoID][0] = pieceShortcut;
-  boardRepresentation[pieceID][0] = "e";
-  boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
-  boardRepresentation[pieceID][1] = "e";
+  boardRepresentation[kingID][0] = "e";
+  boardRepresentation[squareToGoID][1] = boardRepresentation[kingID][1]; 
+  boardRepresentation[kingID][1] = "e";
   attackersArray = getAttackersOfSquare(squareToGoID);
   boardRepresentation = structuredClone(arrayBackup);
   if (!attackersArray.length) {
-    console.log("the king at: " + pieceID + " CAN safely go at least to a square: " + squareToGoID);
+    console.log("the king at: " + kingID + " CAN safely go at least to a square: " + squareToGoID);
     return true;
   } 
   else {
-    console.log("the king at: " + pieceID + " CANNOT safely go to a square: " + squareToGoID);
+    console.log("the king at: " + kingID + " CANNOT safely go to a square: " + squareToGoID);
   }
 }
 
@@ -1264,7 +1263,7 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (!canKingMove()) {console.log(kingsColor + " player has been checkmated.");}
+    if (!canKingMove()) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated.");}
   }
   // when it's a single check, player has to be able to do one of three things:
   // move king to a save (non-checked) square
@@ -1275,7 +1274,7 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (isCheckmate(attackerSquares[0])) {console.log(kingsColor + " player has been checkmated.");}
+    if (isCheckmate(attackerSquares[0])) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated.");}
   }
   else {
     console.log(kingsColor + " king is NOT in check");
