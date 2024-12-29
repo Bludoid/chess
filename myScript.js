@@ -877,7 +877,7 @@ function canKingMove() {
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
-      if (simulateMove(kingPosition, exploredSquareID)) {
+      if (simulateKingMove(exploredSquareID, kingPosition)) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;
       }
@@ -890,7 +890,7 @@ function canKingMove() {
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
       !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
-      if (simulateMove(kingPosition, exploredSquareID)) {
+      if (simulateKingMove(exploredSquareID, kingPosition)) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;} 
     }
@@ -980,13 +980,12 @@ function simulateMove(squareToGoID, pieceID, blockingMove = false) {
     boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
     boardRepresentation[pieceID][1] = "e";
     attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
+    boardRepresentation = structuredClone(arrayBackup);
     if (!attackersArray.length) {
-      boardRepresentation = structuredClone(arrayBackup);
       console.log("the piece at: " + pieceID + " CAN block OR take a piece at square: " + squareToGoID);
       return true;
     } 
     else {
-      boardRepresentation = structuredClone(arrayBackup);
       console.log("the attacker at: " + squareToGoID + " CANNOT be taken by piece at square: " + pieceID);
     }
   }
@@ -995,7 +994,7 @@ function simulateMove(squareToGoID, pieceID, blockingMove = false) {
 // returns true if king can move to a specific square without putting itself into check
 function simulateKingMove(squareToGoID, pieceID) {
   arrayBackup = structuredClone(boardRepresentation);
-  console.log("king position ID and a square ID to block attack or to take attacker: " + squareToGoID + ", " + pieceID);
+  console.log("king position ID and a square to go ID: " + pieceID + ", " + squareToGoID);
   let pieceShortcut = "k";
   let attackersArray = [];
   // king can either take attacker (taken care of by canKingMove() or it CANNOT block a check on self -> return false)
@@ -1004,15 +1003,14 @@ function simulateKingMove(squareToGoID, pieceID) {
   boardRepresentation[pieceID][0] = "e";
   boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
   boardRepresentation[pieceID][1] = "e";
-  attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
+  attackersArray = getAttackersOfSquare(squareToGoID);
+  boardRepresentation = structuredClone(arrayBackup);
   if (!attackersArray.length) {
-    boardRepresentation = structuredClone(arrayBackup);
-    console.log("the piece at: " + pieceID + " CAN block OR take a piece at square: " + squareToGoID);
+    console.log("the king at: " + pieceID + " CAN safely go at least to a square: " + squareToGoID);
     return true;
   } 
   else {
-    boardRepresentation = structuredClone(arrayBackup);
-    console.log("the attacker at: " + squareToGoID + " CANNOT be taken by piece at square: " + pieceID);
+    console.log("the king at: " + pieceID + " CANNOT safely go to a square: " + squareToGoID);
   }
 }
 
