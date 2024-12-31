@@ -905,13 +905,15 @@ function canAttackerBeTaken(attackerID) {
   attackersOfAttacker = getAttackersOfSquare(attackerID);
   whiteMove = !whiteMove;
   
-  // check for pawn in enpassant, check if it can be taken en passant to relieve the check 
-  // (simulate the en passant move in simulateMove)
-
   //for members of attackersOfAttacker run a function to check if it would not cause a self check
   if (attackersOfAttacker.some(defenderID => simulateMove(attackerID, defenderID))) {
     console.log(">->-> attacker can be taken");
     return true;
+  }
+  // check for pawn in enpassant, check if it can be taken en passant to relieve the check 
+  // (simulate the en passant move in simulateMove)
+  else if (enPassantInProgress && attackerID == pawnInEnPassant[0]) {
+    console.log("attacker is a pawn in en passant, can it be taken en passant?  ")
   }
   else {console.log(">->-> attacker CANNOT be taken");}
 }
@@ -1243,7 +1245,7 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (!canKingMove()) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated.");}
+    if (!canKingMove()) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");}
   }
   // when it's a single check, player has to be able to do one of three things:
   // move king to a save (non-checked) square
@@ -1254,7 +1256,7 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (isCheckmate(attackerSquares[0])) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated.");}
+    if (isCheckmate(attackerSquares[0])) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");}
   }
   else {
     console.log(kingsColor + " king is NOT in check");
