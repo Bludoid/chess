@@ -913,7 +913,10 @@ function canAttackerBeTaken(attackerID) {
   // check for pawn in enpassant, check if it can be taken en passant to relieve the check 
   // (simulate the en passant move in simulateMove)
   else if (enPassantInProgress && attackerID == pawnInEnPassant[0]) {
-    console.log("attacker is a pawn in en passant, can it be taken en passant?  ")
+    for (defenderID of pawnsAbleToEnPassant) {
+      // practical use of ternary operation, could be used also elswhere in the code!!!!!!!!!!
+      if (simulateMove(attackerID + (whiteMove ? -8 : 8), defenderID, true)) {return true;}
+    }
   }
   else {console.log(">->-> attacker CANNOT be taken");}
 }
@@ -948,9 +951,8 @@ function canAttackBeBlocked(attackerID) {
 }
 
 // returns true if a piece can move to a specific square without putting its own king in check
-function simulateMove(squareToGoID, pieceID) {
+function simulateMove(squareToGoID, pieceID, enPassantTake = false) {
   arrayBackup = structuredClone(boardRepresentation);
-  console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
   let pieceShortcut = boardRepresentation[pieceID][0];
   let attackersArray = [];
 
@@ -962,8 +964,15 @@ function simulateMove(squareToGoID, pieceID) {
     boardRepresentation[pieceID][0] = "e";
     boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
     boardRepresentation[pieceID][1] = "e";
+    // delete pawn in en passant that is an attacker, would not probably be needed
+    // since if the pawn was to discover a diagonal check the check would have to be there before the check move = impossible
+    if (enPassantTake) {
+      boardRepresentation[pawnInEnPassant[0]][0] = "e";
+      boardRepresentation[pawnInEnPassant[0]][1] = "e";
+    }
     attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
     boardRepresentation = structuredClone(arrayBackup);
+    console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
     if (!attackersArray.length) {
       console.log("defending piece at: " + pieceID + " CAN safely (take or move) go to square: " + squareToGoID);
       return true;
