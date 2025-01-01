@@ -918,7 +918,8 @@ function canAttackerBeTaken(attackerID) {
       if (simulateMove(attackerID + (whiteMove ? -8 : 8), defenderID, true)) {return true;}
     }
   }
-  else {console.log(">->-> attacker CANNOT be taken");}
+  console.log(">->-> attacker CANNOT be taken");
+  return false;
 }
 
 function canAttackBeBlocked(attackerID) {
@@ -972,7 +973,7 @@ function simulateMove(squareToGoID, pieceID, enPassantTake = false) {
     }
     attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
     boardRepresentation = structuredClone(arrayBackup);
-    console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
+    //console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
     if (!attackersArray.length) {
       console.log("defending piece at: " + pieceID + " CAN safely (take or move) go to square: " + squareToGoID);
       return true;
