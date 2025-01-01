@@ -958,15 +958,13 @@ function simulateMove(squareToGoID, pieceID, enPassantTake = false) {
   let attackersArray = [];
 
   // if king can take attacker, it's taken care of by canKingMove()
-  // otherwise king CANNOT block a check on self -> return false
+  // otherwise king CANNOT block a check on itself -> return false
   if (pieceShortcut == "k") {return false;}  
   else {
     boardRepresentation[squareToGoID][0] = pieceShortcut;
     boardRepresentation[pieceID][0] = "e";
     boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
     boardRepresentation[pieceID][1] = "e";
-    // delete pawn in en passant that is an attacker, would not probably be needed
-    // since if the pawn was to discover a diagonal check the check would have to be there before the check move = impossible
     if (enPassantTake) {
       boardRepresentation[pawnInEnPassant[0]][0] = "e";
       boardRepresentation[pawnInEnPassant[0]][1] = "e";
