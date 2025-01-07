@@ -14,7 +14,7 @@ let activateEnPassant = false;
 let enPassantInProgress = false;
 let pawnsAbleToEnPassant = [];
 let pawnInEnPassant = [];
-let enPassantStarted = false;
+let enPassantExecutionStarted = false;
 
 let whitePromotion = false;
 
@@ -25,7 +25,7 @@ let blackInCheck = false;
 let whiteKingID = 61;
 let blackKingID = 5;
 
-let arrayBackup;
+let boardArrayBackup;
 
 // validMoves = [];
 
@@ -37,7 +37,7 @@ let abilityToCastle = { whiteA: true, whiteH: true, blackA: true, blackH: true }
 
 // array or arrays with empty member on index 0
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
-let boardRepresentation = [
+let boardArray = [
   [],
   ['r', 'b', 'a', 8], ['n', 'b', 'b', 8], ['b', 'b', 'c', 8], ['q', 'b', 'd', 8], ['k', 'b', 'e', 8], ['b', 'b', 'f', 8], ['n', 'b', 'g', 8], ['r', 'b', 'h', 8],
   ['p', 'b', 'a', 7], ['p', 'b', 'b', 7], ['p', 'b', 'c', 7], ['p', 'b', 'd', 7], ['p', 'b', 'e', 7], ['p', 'b', 'f', 7], ['p', 'b', 'g', 7], ['p', 'b', 'h', 7], 
@@ -144,10 +144,7 @@ function unhighlightSquare(square) {
 // checks if the square contains a piece and if it belongs to the player who's turn it is - if yes, returns true
 // if it's not the right player's turn or the square is empty, returns false
 function isPlayersTurnAndPiece(square) {
-  if (boardRepresentation[square.id][1] == "w" && whiteMove) {
-    return true;
-  }
-  else if (boardRepresentation[square.id][1] == "b" && !whiteMove) {
+  if ((boardArray[square.id][1] == "w" && whiteMove) || (boardArray[square.id][1] == "b" && !whiteMove)) {
     return true;
   }
   else {return false}
@@ -155,13 +152,15 @@ function isPlayersTurnAndPiece(square) {
 }
 
 function isEmptySquare(squareID) {
-  return (boardRepresentation[squareID][0] == "e");
+  return (boardArray[squareID][0] == "e");
 }
 
 function isOpponentsPiece(squareID) {
-  return ((!whiteMove && boardRepresentation[squareID][1] == "w") || (whiteMove && boardRepresentation[squareID][1] == "b"));
+  return ((!whiteMove && boardArray[squareID][1] == "w") || (whiteMove && boardArray[squareID][1] == "b"));
 }
 
+// clears the square (unhighlights it); variables chosenSquare and moveInProgress are reset
+// used after a move was made or canceled (canceled by chosing different square or move is not valid) 
 function clearSquare(square) {
   unhighlightSquare(square);
   chosenSquare = null;
@@ -176,7 +175,7 @@ function takePiece(takingPieceSquare, takenPieceSquare) {
 
 // converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
 function coordinatesOfSquare(squareID) {
-  return (boardRepresentation[squareID][2] + boardRepresentation[squareID][3]);
+  return (boardArray[squareID][2] + boardArray[squareID][3]);
 }
 
 // outputs message for players to the infobox
@@ -184,15 +183,21 @@ function outputToInfobox(infoMessage) {
   infobox.innerHTML = infoMessage;
 }
 
+// creates backup for the boardArray
+// checks if a move is valid for different pieces:
+// switch case calls a specific function which returns true a move is valid (example - bishop can move diagonally)
+// then tests (simulates) a move for potential self checks
+// if no checks would happen, move is allowed
+// if checks would happen, move is canceled and board array is restored
 function isValidMove(square) {
-  let pieceShortcut = boardRepresentation[chosenSquare.id][0];
-  arrayBackup = structuredClone(boardRepresentation);
-  console.log(pieceShortcut);
+  let pieceShortcut = boardArray[chosenSquare.id][0];
+  boardArrayBackup = structuredClone(boardArray);
+  console.log("checking move validity for piece: " + pieceShortcut);
   let returnValue = false;
-  // let kingBackupID;
+ 
   switch (pieceShortcut) {
     case "p": 
-        if (boardRepresentation[chosenSquare.id][1] == "w") {
+        if (boardArray[chosenSquare.id][1] == "w") {
           if (isWhitePawnMove(square)) returnValue = true;
         }
         else {
@@ -220,17 +225,19 @@ function isValidMove(square) {
       break;
   }
   if (returnValue) {
-    boardRepresentation[square.id][0] = boardRepresentation[chosenSquare.id][0]; 
-    boardRepresentation[chosenSquare.id][0] = "e";
-    boardRepresentation[square.id][1] = boardRepresentation[chosenSquare.id][1]; 
-    boardRepresentation[chosenSquare.id][1] = "e";
+    // updates the board and checks for potentional self checks
+    // could be done by simulateMove() function????????????
+    boardArray[square.id][0] = boardArray[chosenSquare.id][0]; 
+    boardArray[chosenSquare.id][0] = "e";
+    boardArray[square.id][1] = boardArray[chosenSquare.id][1]; 
+    boardArray[chosenSquare.id][1] = "e";
     let kingAttackers = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID); 
     if (kingAttackers.length) {
-      if (boardRepresentation[square.id][0] == "k") {
+      if (boardArray[square.id][0] == "k") {
         whiteMove? whiteKingID = chosenSquare.id : blackKingID = chosenSquare.id;
       }
-      else if (enPassantStarted) {enPassantStarted = false;}
-      boardRepresentation = structuredClone(arrayBackup);
+      else if (enPassantExecutionStarted) {enPassantExecutionStarted = false;}
+      boardArray = structuredClone(boardArrayBackup);
       return false;
     }
     else {return true;}
@@ -240,16 +247,13 @@ function isValidMove(square) {
 //////////////////////////////////////
 
 function isWhitePawnMove(square) {
-  console.log("hi from white pawn move logic");
   if (!isSameFile(square.id)) {
     if (enPassantInProgress) {
       if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == pawnInEnPassant[0] - 8) {
-          // remove pawn taken by en passant:
-          //removePiece(document.getElementById(Number(square.id) + 8)); 
-          enPassantStarted = true;
-          // update board array: 
-          boardRepresentation[pawnInEnPassant[0]][0] = "e";
-          boardRepresentation[pawnInEnPassant[0]][1] = "e";
+          enPassantExecutionStarted = true;
+          // update board array when en passanting: 
+          boardArray[pawnInEnPassant[0]][0] = "e";
+          boardArray[pawnInEnPassant[0]][1] = "e";
           return true;
       }
     }
@@ -260,7 +264,7 @@ function isWhitePawnMove(square) {
   
   else {
     // initial 2 square move of a pawn
-    if ((boardRepresentation[chosenSquare.id][3] == 2) && (boardRepresentation[square.id][3] == 4) && 
+    if ((boardArray[chosenSquare.id][3] == 2) && (boardArray[square.id][3] == 4) && 
         isEmptySquare(chosenSquare.id - 8) && isEmptySquare(square.id)) {
       // en passant logic:
       let possibleAttackingPawn = document.getElementById(square.id-1);
@@ -269,13 +273,13 @@ function isWhitePawnMove(square) {
         pawnInEnPassant = [];
         pawnsAbleToEnPassant = [];
       }
-      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
+      if (boardArray[possibleAttackingPawn.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn.id);    // storing file of pawn that can take en passant
         pawnInEnPassant.push(square.id); 
         activateEnPassant = true; 
       }
-      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
+      if (boardArray[possibleAttackingPawn2.id][0] == "p" && 
           !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn2.id);
         pawnInEnPassant.push(square.id);
@@ -288,17 +292,13 @@ function isWhitePawnMove(square) {
 }
 
 function isBlackPawnMove(square) {
-  console.log("hi from black pawn move logic");
   if (!isSameFile(square.id)) {
     if (enPassantInProgress) {
       if (pawnsAbleToEnPassant.includes(chosenSquare.id) && square.id == Number(pawnInEnPassant[0]) + 8) {
-          // remove pawn taken by en passant:
-          // removePiece(document.getElementById(pawnInEnPassant[0])); 
-          
-          enPassantStarted = true;
+          enPassantExecutionStarted = true;
           // update board array:
-          boardRepresentation[pawnInEnPassant[0]][0] = "e";
-          boardRepresentation[pawnInEnPassant[0]][1] = "e";
+          boardArray[pawnInEnPassant[0]][0] = "e";
+          boardArray[pawnInEnPassant[0]][1] = "e";
           return true;
       }
     }
@@ -309,7 +309,7 @@ function isBlackPawnMove(square) {
  
   // initial 2 square move of a pawn 
   else {
-    if ((boardRepresentation[chosenSquare.id][3] == 7) && (boardRepresentation[square.id][3] == 5) && 
+    if ((boardArray[chosenSquare.id][3] == 7) && (boardArray[square.id][3] == 5) && 
         isEmptySquare(Number(chosenSquare.id) + 8) && isEmptySquare(square.id)) {
       // en passant logic:    
       let possibleAttackingPawn = document.getElementById(square.id-1);
@@ -318,13 +318,13 @@ function isBlackPawnMove(square) {
         pawnInEnPassant = [];
         pawnsAbleToEnPassant = [];
       }
-      if (boardRepresentation[possibleAttackingPawn.id][0] == "p" && 
+      if (boardArray[possibleAttackingPawn.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn) && isOpponentsPiece(possibleAttackingPawn.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn.id);  // storing file of pawn that can take en passant
         pawnInEnPassant.push(square.id);                      // storing file of a pawn that can be taken en passant
         activateEnPassant = true;                    
       }
-      if (boardRepresentation[possibleAttackingPawn2.id][0] == "p" && 
+      if (boardArray[possibleAttackingPawn2.id][0] == "p" && 
         !isSameSquareColor(possibleAttackingPawn2) && isOpponentsPiece(possibleAttackingPawn2.id)) {
         pawnsAbleToEnPassant.push(possibleAttackingPawn2.id);
         pawnInEnPassant.push(square.id); 
@@ -338,21 +338,7 @@ function isBlackPawnMove(square) {
 
 
 function isRookMove(square) {
-  if (isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id))) {
-    // if (whiteMove) {
-    //   if (abilityToCastle.whiteA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 1) 
-    //     {abilityToCastle.whiteA = false;}
-    //   else if (abilityToCastle.whiteH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 1) 
-    //     {abilityToCastle.whiteH = false;}
-    // }
-    //   else {
-    //   if (abilityToCastle.blackA && boardRepresentation[chosenSquare.id][2] == "a" && boardRepresentation[chosenSquare.id][3] == 8) 
-    //     {abilityToCastle.blackA = false;}
-    //   else if (abilityToCastle.blackH && boardRepresentation[chosenSquare.id][2] == "h" && boardRepresentation[chosenSquare.id][3] == 8) 
-    //     {abilityToCastle.blackH = false;}
-    // }
-    return true    
-  } 
+  if (isHorizontalOrVerticalPath(square, getHorizontalOrVerticalDirection(square.id))) {return true;} 
 }
 
 // checks if id's of start and end square corespond to a knight move
@@ -417,7 +403,7 @@ function isKingMove(square) {
   }
 }
 
-// helper function for evaluating checks in the castling area
+// helper function for evaluating checks in the Castling area
 function isPathChecked(arrayOfSquareIDs) {
   let attackersArray;
   for (let square of arrayOfSquareIDs) {
@@ -428,16 +414,17 @@ function isPathChecked(arrayOfSquareIDs) {
   }
 }
 
-
+// executes the castling move for rook (player moves the king so that is done the normal way)
 function rookCastling(rookPosition, newRookPosition, rookName) {
-  boardRepresentation[newRookPosition][0] = "r"; 
-  boardRepresentation[rookPosition][0] = "e";
-  boardRepresentation[newRookPosition][1] = rookName[1]; 
-  boardRepresentation[rookPosition][1] = "e";
+  boardArray[newRookPosition][0] = "r"; 
+  boardArray[rookPosition][0] = "e";
+  boardArray[newRookPosition][1] = rookName[1]; 
+  boardArray[rookPosition][1] = "e";
   removePiece(document.getElementById(rookPosition));
   placePiece(document.getElementById(newRookPosition), rookName);
 }
 
+// disables castling if it is not possible anymore
 function disableCastlingWhite() {
   abilityToCastle.whiteA = false;
   abilityToCastle.whiteH = false;
@@ -453,11 +440,11 @@ function disableCastlingBlack() {
 /////////////////////////////////////////////////
 
 function isSameRank(squareID, otherSquareID = chosenSquare.id) {
-  return (boardRepresentation[squareID][3] == boardRepresentation[otherSquareID][3]); 
+  return (boardArray[squareID][3] == boardArray[otherSquareID][3]); 
 }
 
 function isSameFile(squareID) {
-  return (boardRepresentation[chosenSquare.id][2] == boardRepresentation[squareID][2]); 
+  return (boardArray[chosenSquare.id][2] == boardArray[squareID][2]); 
 }
 
 function isSameSquareColor(square, otherSquare = chosenSquare) {
@@ -466,19 +453,11 @@ function isSameSquareColor(square, otherSquare = chosenSquare) {
 }
 
 function isAFile() {
-  return (boardRepresentation[chosenSquare.id][2] == "a"); 
+  return (boardArray[chosenSquare.id][2] == "a"); 
 }
 
 function isHFile() {
-  return (boardRepresentation[chosenSquare.id][2] == "h"); 
-}
-
-function isFirstRank() {
-  return (boardRepresentation[chosenSquare.id][3] == 1); 
-}
-
-function isEighthRank() {
-  return (boardRepresentation[chosenSquare.id][3] == 8); 
+  return (boardArray[chosenSquare.id][2] == "h"); 
 }
 
 // not used???
@@ -517,6 +496,7 @@ function isDiagonalNeighbour(square, direction) {
   }
 }
 
+// returns diagonal direction
 function getDiagonalDirection(squareID, otherSquareID = chosenSquare.id) {
   let directionHelper = squareID - otherSquareID;
   switch(true) {
@@ -533,14 +513,14 @@ function getDiagonalDirection(squareID, otherSquareID = chosenSquare.id) {
     case (directionHelper % 7 == 0):
       return 3;
     default:
-      console.log("error");
+      console.log("not diagonal direction");
   }
 }
 
 function isDiagonalPath(endSquare, direction) {
   
   // checking for same color of start and ending square
-  // for situation where %7 allows to move to wrong placec (they are of different square color)
+  // for situation where %7 allows to move to wrong place (such squares are of different square color)
   if (!isSameSquareColor(endSquare)) {
     return false;
   }
@@ -616,7 +596,7 @@ function getHorizontalOrVerticalDirection(squareID, otherSquareID = chosenSquare
       console.log("left");
       return 3;
     default:
-      console.log("other direction than horizontal or vertical");
+      // console.log("other direction than horizontal or vertical");
       // will this be needed??????????????,
       return undefined;
   }
@@ -686,8 +666,8 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
 
 function isPawnPromotion(square) {
   //console.log("checking promotion of the pawn");
-  return (boardRepresentation[square.id][0] == "p" && 
-    (boardRepresentation[square.id][3] == 8 || boardRepresentation[square.id][3] == 1));
+  return (boardArray[square.id][0] == "p" && 
+    (boardArray[square.id][3] == 8 || boardArray[square.id][3] == 1));
 }
 
 function promotePawn(square) {
@@ -725,7 +705,7 @@ function promotePawn(square) {
 function choosePromotion(chosenPiece, squareID) {
   console.log("Clicked image ID:", chosenPiece);
   console.log("destination of the desired piece is: " + squareID);
-  boardRepresentation[squareID][0] = chosenPiece[0];
+  boardArray[squareID][0] = chosenPiece[0];
   let promotionSquare = document.getElementById(squareID);
   promotionSquare.innerHTML = "";
   placePiece(promotionSquare, chosenPiece);
@@ -753,9 +733,10 @@ function toggleClicking() {
 // checking king or empty square for checks
 
 
+// when whiteMove is true (it's white's move), looks for attackers of black color
+// when whiteMove is false (it's black's move), looks for attackers of white color  
+// returns an array which is empty (no attackers), has one attacker ID (single check) or two ID's (double check)
 function getAttackersOfSquare(squareID) {
-// when whiteMove is true, looks for a check from black,
-// when whiteMove is false, looks for a check from white      
   let attackers = [];
   // checking vertical directions for checks from  rook and queen
   for (let direction of [-8, 8]) {
@@ -767,7 +748,7 @@ function getAttackersOfSquare(squareID) {
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {attackers.push(exploredSquareID);}
+        if (["q", "r"].includes(boardArray[exploredSquareID][0])) {attackers.push(exploredSquareID);}
         break;
       }
     }
@@ -783,7 +764,7 @@ function getAttackersOfSquare(squareID) {
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if (["q", "r"].includes(boardRepresentation[exploredSquareID][0])) {attackers.push(exploredSquareID);}
+        if (["q", "r"].includes(boardArray[exploredSquareID][0])) {attackers.push(exploredSquareID);}
         break;
       }
     }
@@ -799,7 +780,7 @@ function getAttackersOfSquare(squareID) {
       }
       else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
       else {
-        if(["q", "b"].includes(boardRepresentation[exploredSquareID][0])) {attackers.push(exploredSquareID);}
+        if(["q", "b"].includes(boardArray[exploredSquareID][0])) {attackers.push(exploredSquareID);}
         break;
       }
     }
@@ -810,7 +791,7 @@ function getAttackersOfSquare(squareID) {
     exploredSquareID = Number(squareID) - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
-      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "n") {
+      isOpponentsPiece(exploredSquareID) && boardArray[exploredSquareID][0] == "n") {
         attackers.push(exploredSquareID);
     }
   }
@@ -821,7 +802,7 @@ function getAttackersOfSquare(squareID) {
     exploredSquareID = Number(squareID) - direction;
     if (isSquareOnBoard(exploredSquareID)  && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
-      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "p") {
+      isOpponentsPiece(exploredSquareID) && boardArray[exploredSquareID][0] == "p") {
         attackers.push(exploredSquareID);;
     }
   }
@@ -833,7 +814,7 @@ function getAttackersOfSquare(squareID) {
     exploredSquareID = Number(squareID) - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
-      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "k") {
+      isOpponentsPiece(exploredSquareID) && boardArray[exploredSquareID][0] == "k") {
         attackers.push(exploredSquareID);
     }
   }
@@ -844,7 +825,7 @@ function getAttackersOfSquare(squareID) {
     exploredSquareID = Number(squareID) - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(squareID)) &&
-      isOpponentsPiece(exploredSquareID) && boardRepresentation[exploredSquareID][0] == "k") {
+      isOpponentsPiece(exploredSquareID) && boardArray[exploredSquareID][0] == "k") {
         attackers.push(exploredSquareID);
     }
   }
@@ -852,21 +833,23 @@ function getAttackersOfSquare(squareID) {
   return attackers;
 }
 
+// returns true if squareID is between 1 and 64 (inclusive)
 function isSquareOnBoard(squareID) {
   return (squareID > 0 && squareID < 65)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-// checkmate logic functions:
+// CHECKMATE LOGIC FUNCTIONS:
 
+  //checks if king can move OR attacker can be taken OR attack can be blocked
+  // if all of them return false, then checkmate happened - this function returns true
 function isCheckmate(attackerID) {
-  // if more attackers then king has to move!!!!!
-  // check for potential checks from blocking pieces - cancel such moves as invalid
-  //getKingToAttackerPath(squareToGoID)
   return (!canKingMove() && !canAttackerBeTaken(attackerID) && !canAttackBeBlocked(attackerID));
 }
 
+  // used by isCheckmate
+  // when double check in effect, check cannot be relieved by take or block so it is used to detect checkmate
 function canKingMove() {
   let kingPosition = whiteMove ? whiteKingID : blackKingID;
   let exploredSquareID;
@@ -901,6 +884,7 @@ function canKingMove() {
 function canAttackerBeTaken(attackerID) {
   let attackersOfAttacker;
   // temporarily switching the active player to get attackers from the active player's view
+  // ex.: it's white's turn, black is checking, attackersOfAttacker are white pieces attacking black checking piece
   whiteMove = !whiteMove;
   attackersOfAttacker = getAttackersOfSquare(attackerID);
   whiteMove = !whiteMove;
@@ -910,11 +894,11 @@ function canAttackerBeTaken(attackerID) {
     console.log(">->-> attacker can be taken");
     return true;
   }
-  // check for pawn in enpassant, check if it can be taken en passant to relieve the check 
-  // (simulate the en passant move in simulateMove)
+  // checking piece is a pawn in enpassant, find out if it can be taken en passant to relieve the check 
+  // (simulate the en passant move in simulateMove() with optional parameter)
   else if (enPassantInProgress && attackerID == pawnInEnPassant[0]) {
     for (defenderID of pawnsAbleToEnPassant) {
-      // practical use of ternary operation, could be used also elswhere in the code!!!!!!!!!!
+      // practical use of ternary operation, could be used also elsewhere in the code!!!!!!!!!!
       if (simulateMove(attackerID + (whiteMove ? -8 : 8), defenderID, true)) {return true;}
     }
   }
@@ -924,15 +908,18 @@ function canAttackerBeTaken(attackerID) {
 
 function canAttackBeBlocked(attackerID) {
   
-  if (["p", "n"].includes(boardRepresentation[attackerID][0])) {
+  // attacks from pawns and knights cannot be blocked:
+  if (["p", "n"].includes(boardArray[attackerID][0])) {
     console.log(">->-> attack from pawn or knight CANNOT be blocked")
     return false;
   }
 
   let blockablePath = getKingToAttackerPath(attackerID);
+  // attack from right beside king cannot be blocked
   if (!blockablePath.length) {return false;}
 
   for (let blockableSquareID of blockablePath) {
+    // temporary switch who's move it is
     whiteMove = !whiteMove;
     const blockingCandidates = getAttackersOfSquare(blockableSquareID); // get the path that can potentialy be blocked
     whiteMove = !whiteMove;
@@ -953,24 +940,24 @@ function canAttackBeBlocked(attackerID) {
 
 // returns true if a piece can move to a specific square without putting its own king in check
 function simulateMove(squareToGoID, pieceID, enPassantTake = false) {
-  arrayBackup = structuredClone(boardRepresentation);
-  let pieceShortcut = boardRepresentation[pieceID][0];
+  boardArrayBackup = structuredClone(boardArray);
+  let pieceShortcut = boardArray[pieceID][0];
   let attackersArray = [];
 
   // if king can take attacker, it's taken care of by canKingMove()
   // otherwise king CANNOT block a check on itself -> return false
   if (pieceShortcut == "k") {return false;}  
   else {
-    boardRepresentation[squareToGoID][0] = pieceShortcut;
-    boardRepresentation[pieceID][0] = "e";
-    boardRepresentation[squareToGoID][1] = boardRepresentation[pieceID][1]; 
-    boardRepresentation[pieceID][1] = "e";
+    boardArray[squareToGoID][0] = pieceShortcut;
+    boardArray[pieceID][0] = "e";
+    boardArray[squareToGoID][1] = boardArray[pieceID][1]; 
+    boardArray[pieceID][1] = "e";
     if (enPassantTake) {
-      boardRepresentation[pawnInEnPassant[0]][0] = "e";
-      boardRepresentation[pawnInEnPassant[0]][1] = "e";
+      boardArray[pawnInEnPassant[0]][0] = "e";
+      boardArray[pawnInEnPassant[0]][1] = "e";
     }
     attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
-    boardRepresentation = structuredClone(arrayBackup);
+    boardArray = structuredClone(boardArrayBackup);
     //console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
     if (!attackersArray.length) {
       console.log("defending piece at: " + pieceID + " CAN safely (take or move) go to square: " + squareToGoID);
@@ -984,17 +971,17 @@ function simulateMove(squareToGoID, pieceID, enPassantTake = false) {
 
 // returns true if king can move to a specific square without putting itself into check
 function simulateKingMove(squareToGoID, kingID) {
-  arrayBackup = structuredClone(boardRepresentation);
+  boardArrayBackup = structuredClone(boardArray);
   console.log("king position ID and a square to go ID: " + kingID + ", " + squareToGoID);
   let pieceShortcut = "k";
   let attackersArray = [];
  
-  boardRepresentation[squareToGoID][0] = pieceShortcut;
-  boardRepresentation[kingID][0] = "e";
-  boardRepresentation[squareToGoID][1] = boardRepresentation[kingID][1]; 
-  boardRepresentation[kingID][1] = "e";
+  boardArray[squareToGoID][0] = pieceShortcut;
+  boardArray[kingID][0] = "e";
+  boardArray[squareToGoID][1] = boardArray[kingID][1]; 
+  boardArray[kingID][1] = "e";
   attackersArray = getAttackersOfSquare(squareToGoID);
-  boardRepresentation = structuredClone(arrayBackup);
+  boardArray = structuredClone(boardArrayBackup);
   if (!attackersArray.length) {
     console.log("the king at: " + kingID + " CAN safely go at least to a square: " + squareToGoID);
     return true;
@@ -1013,7 +1000,7 @@ function getKingToAttackerPath(squareToGoID) {
   }
   // left or right
   else if([1, 3].includes(attackerDirection)) {
-    return getPathArray(squareToGoID, kingID, 1);  // make it return
+    return getPathArray(squareToGoID, kingID, 1); 
   }
   else {
     attackerDirection = getDiagonalDirection(squareToGoID, kingID);
@@ -1049,36 +1036,38 @@ function getPathArray(squareToGoID, kingID, directionOffset) {
 }
 
 // discard pawns and a king as blocking candidates
+// pawns cannot "block" at empty square by typical diagonal attack 
+// king cannot block an attack on itself
 function deleteFalseBlockers(blockersArray) {
-  console.log("before deleting false blockers: " + blockersArray);
   for (let i = blockersArray.length - 1; i >= 0; i--) {
-    if (["p", "k"].includes(boardRepresentation[blockersArray[i]][0])) {
+    if (["p", "k"].includes(boardArray[blockersArray[i]][0])) {
       blockersArray.splice(i, 1); // remove the element at index i
     }
   }
 }
 
+// adds possible pawn blockers
 function addCorrectPawnBlockers(squareOnPathID, blockersArray) {
-  console.log("this is a place where I add correct blocker pawns to the square number: "+ squareOnPathID);
+  // console.log("adding correct blocker pawns to the square number: "+ squareOnPathID);
   if (whiteMove) {
-    if (boardRepresentation[squareOnPathID][3] == 4 && boardRepresentation[squareOnPathID + 16][0] == "p" 
-      && boardRepresentation[squareOnPathID + 16][1] == "w" && boardRepresentation[squareOnPathID + 8][0] == "e") {
+    if (boardArray[squareOnPathID][3] == 4 && boardArray[squareOnPathID + 16][0] == "p" 
+      && boardArray[squareOnPathID + 16][1] == "w" && boardArray[squareOnPathID + 8][0] == "e") {
         blockersArray.push(squareOnPathID + 16);
     }
-    else if (![1, 2].includes(boardRepresentation[squareOnPathID][3]) && boardRepresentation[squareOnPathID + 8][0] == "p" && boardRepresentation[squareOnPathID + 8][1] == "w") {
+    else if (![1, 2].includes(boardArray[squareOnPathID][3]) && boardArray[squareOnPathID + 8][0] == "p" && boardArray[squareOnPathID + 8][1] == "w") {
       blockersArray.push(squareOnPathID + 8);
     }
   }  
   else {
-    if (boardRepresentation[squareOnPathID][3] == 4 && boardRepresentation[squareOnPathID - 16][0] == "p" 
-      && boardRepresentation[squareOnPathID - 16][1] == "b" && boardRepresentation[squareOnPathID - 8][0] == "e") {
+    if (boardArray[squareOnPathID][3] == 4 && boardArray[squareOnPathID - 16][0] == "p" 
+      && boardArray[squareOnPathID - 16][1] == "b" && boardArray[squareOnPathID - 8][0] == "e") {
         blockersArray.push(squareOnPathID - 16);
     }
-    else if (![7, 8].includes(boardRepresentation[squareOnPathID][3]) && boardRepresentation[squareOnPathID - 8][0] == "p" && boardRepresentation[squareOnPathID - 8][1] == "b") {
+    else if (![7, 8].includes(boardArray[squareOnPathID][3]) && boardArray[squareOnPathID - 8][0] == "p" && boardArray[squareOnPathID - 8][1] == "b") {
       blockersArray.push(squareOnPathID - 8);
     }
   } 
-    // en passant is not a way to block a check, diagonal check would already have to be there and
+    // executing en passant is not a way to block a check, diagonal check would already have to be there and
     // horizontal (discovered by en passant) check can only happen on 2nd or 7th rank! but then is NOT blockable 
     // by taking en passant
 }
@@ -1087,13 +1076,22 @@ function addCorrectPawnBlockers(squareOnPathID, blockersArray) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+// STALEMATE LOGIC FUNCTIONS:
+
+function isStalemate() {
+  console.log("pretending the stalemate is happening");
+  return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
 
 
 // return a string with colour and piece ("white rook")
 function pieceToString(square) {
   let recognizedPiece = "";
-  let pieceColor = boardRepresentation[square.id][1];
-  let pieceShortcut = boardRepresentation[square.id][0];
+  let pieceColor = boardArray[square.id][1];
+  let pieceShortcut = boardArray[square.id][0];
   
   
   // is piece black or white?
@@ -1125,7 +1123,7 @@ function pieceToString(square) {
       recognizedPiece += "queen";
       break;
     case "k": 
-      recognizedPiece += "King";
+      recognizedPiece += "king";
       break;
     default: recognizedPiece = "error"; 
   }
@@ -1133,14 +1131,14 @@ function pieceToString(square) {
   return recognizedPiece;
 }
 
-// sets up the chessboard by placing the pieces in their correct starting positions
+// sets up the chessboard by placing the pieces in their correct STARTING position
 function setUpBoard() {
   for (let i = 1; i<17; i++) {
-    let pieceName = boardRepresentation[i][0] + boardRepresentation[i][1];
+    let pieceName = boardArray[i][0] + boardArray[i][1];
     placePiece(document.getElementById(i), pieceName);
   }
   for (let i = 49; i<65; i++) {
-    let pieceName = boardRepresentation[i][0] + boardRepresentation[i][1];
+    let pieceName = boardArray[i][0] + boardArray[i][1];
     placePiece(document.getElementById(i), pieceName);
   }
 }
@@ -1155,55 +1153,46 @@ function markPossibleMove(square) {
 }
 
 // executes the move of a piece from given oldSquare to newSquare
-// updates the board state in boardRepresentation
+// updates the board state in boardArray
 // switches the turn to the other player (in whiteMove)
 function executeMove(oldSquare, newSquare) {
-  // updates boardRepresentation array
-  console.log("executing move");
   
-  // moves the piece to the new square
-  placePiece(newSquare, (boardRepresentation[newSquare.id][0] +  boardRepresentation[newSquare.id][1]));
+  // moves the piece to the new square (visually)
+  placePiece(newSquare, (boardArray[newSquare.id][0] +  boardArray[newSquare.id][1]));
 
-  // make an updateboardRepresentation function?????? : 
-  // updates the boardRepresentation array
-  // boardRepresentation[newSquare.id][0] = boardRepresentation[oldSquare.id][0]; 
-  // boardRepresentation[oldSquare.id][0] = "e";
-  // boardRepresentation[newSquare.id][1] = boardRepresentation[oldSquare.id][1]; 
-  // boardRepresentation[oldSquare.id][1] = "e";
-  
-  
   // cleans up after the move
   clearSquare(oldSquare);
   removePiece(oldSquare);
   
+  // inform the players about the move made
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
 
-  if (enPassantStarted) {
+  // a piece that previously stepped in en passant is being taken en passant
+  if (enPassantExecutionStarted) {
     removePiece(document.getElementById(pawnInEnPassant[0]));
-    //removePiece(document.getElementById(Number(square.id) + 8));
   }
 
+  // pawn moved into en passant situation
   if (activateEnPassant) {
     enPassantInProgress = true;
     activateEnPassant = false;
-    console.log(pawnInEnPassant + ", " + pawnsAbleToEnPassant);
+    console.log("pawn in en passant: " + pawnInEnPassant + ", pawns able to en passant: " + pawnsAbleToEnPassant);
     console.log("enPassantInProgress=true, activateEnPassant=false");
   }
+  // reseting en passant after it was or was not executed
   else if (enPassantInProgress) {
     enPassantInProgress = false;
     pawnInEnPassant = [];
     pawnsAbleToEnPassant = [];
-    enPassantStarted = false;
-    console.log("blablebli from enpassant reset");
+    enPassantExecutionStarted = false;
+    console.log("reseting en passant");
   }
-  console.log(pieceToString(newSquare));
-  console.log(coordinatesOfSquare(newSquare.id));
+  
 
   // disable castling ability of white/black after a king moved
-  if (boardRepresentation[newSquare.id][0] == "k") {
+  if (boardArray[newSquare.id][0] == "k") {
     whiteMove? disableCastlingWhite() : disableCastlingBlack();
   }
-
 
   // disable specific castling when a rook first moves or is taken on its home square
   if (abilityToCastle.whiteA && (oldSquare.id == 57 || newSquare.id == 57)) {
@@ -1231,8 +1220,8 @@ function executeMove(oldSquare, newSquare) {
   }
 }
 
+
 function switchMove() {
-  
 
   // toggling white/black player move
   whiteMove = !whiteMove;  
@@ -1244,7 +1233,7 @@ function switchMove() {
   wBanner.classList.toggle("hideBanner");
 
 
-  // after a move was switched
+  // after a move was switched:
   let kingsColor = whiteMove ? "White" : "Black";
   let squareOfInterest = whiteMove? whiteKingID : blackKingID;
   let attackerSquares = getAttackersOfSquare(squareOfInterest);
@@ -1253,7 +1242,10 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (!canKingMove()) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");}
+    if (!canKingMove()) {
+      console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
+      toggleClicking();
+    }
   }
   // when it's a single check, player has to be able to do one of three things:
   // move king to a save (non-checked) square
@@ -1264,14 +1256,18 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     whiteMove ? whiteInCheck = true : blackInCheck = true;
-    if (isCheckmate(attackerSquares[0])) {console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");}
+    if (isCheckmate(attackerSquares[0])) {
+      console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
+      toggleClicking();
+    }
   }
   else {
     console.log(kingsColor + " king is NOT in check");
-    // if a player is not in check, a stalemate possibility must be explored here!!!!!!
+    console.log("checking for a stalemate");
+    if (isStalemate()) {console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");}
   }
-  console.log("white king is on square: " + whiteKingID);
-  console.log("black king is on square: " + blackKingID);
+  //console.log("white king is on square: " + whiteKingID);
+  //console.log("black king is on square: " + blackKingID);
 }
 
 
@@ -1280,5 +1276,13 @@ function switchMove() {
 setUpBoard();
 
 
-// // todo:
+  // // todo:
+  // make an updateboardArray function??????
+  // are funtions isDiagonal() and isDiagonalNeighbour() even ever used??????
+  // add functions for ending the game by different ways (checkmate, stalemate, draw ... which announce that and toggleClicking())
+  // simplify getAttackersOfSquare() function
+  // put some often used expressions into a function (like for checking validity of the diagonal squares:
+  // on board && same color of the square && ....
+  // simplify canKingMove()
+  // simplify getKingToAttackerPath() and getPathArray()
 
