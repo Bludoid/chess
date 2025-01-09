@@ -56,7 +56,7 @@ for(let i = 0; i<64; i++) {
   thisSquare.addEventListener("click", function() {
 
     //console.log("this is a square number: " + thisSquare.id);
-    if (!moveInProgress && isPlayersTurnAndPiece(thisSquare)) {
+    if (!moveInProgress && isPlayersTurnAndPiece(thisSquare.id)) {
       // user selected a piece to move (there was no other piece selected before)
       markPossibleMove(thisSquare); 
     }
@@ -64,7 +64,7 @@ for(let i = 0; i<64; i++) {
       // same piece clicked twice ==> highlight/unhighlight ==> move in progress canceled 
       clearSquare(chosenSquare);
     }
-    else if (isPlayersTurnAndPiece(thisSquare)) {
+    else if (isPlayersTurnAndPiece(thisSquare.id)) {
       // player clicked another of his pieces (player selected a different piece to move)
       clearSquare(chosenSquare);
       markPossibleMove(thisSquare);
@@ -143,14 +143,11 @@ function unhighlightSquare(square) {
 
 // checks if the square contains a piece and if it belongs to the player who's turn it is - if yes, returns true
 // if it's not the right player's turn or the square is empty, returns false
-function isPlayersTurnAndPiece(square) {
-  if ((boardArray[square.id][1] == "w" && whiteMove) || (boardArray[square.id][1] == "b" && !whiteMove)) {
-    return true;
-  }
-  else {return false}
-    // returns false if it's not player's move or if the clicked square is empty
+function isPlayersTurnAndPiece(squareID) {
+  return ((boardArray[squareID][1] == "w" && whiteMove) || (boardArray[squareID][1] == "b" && !whiteMove)); 
 }
 
+// returns true if the square is empty
 function isEmptySquare(squareID) {
   return (boardArray[squareID][0] == "e");
 }
@@ -746,7 +743,7 @@ function getAttackersOfSquare(squareID) {
         exploredSquareID -= direction;
         continue;
       }
-      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
+      else if (isPlayersTurnAndPiece(exploredSquareID)) {break;}
       else {
         if (["q", "r"].includes(boardArray[exploredSquareID][0])) {attackers.push(exploredSquareID);}
         break;
@@ -762,7 +759,7 @@ function getAttackersOfSquare(squareID) {
         exploredSquareID -= direction;
         continue;
       }
-      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
+      else if (isPlayersTurnAndPiece(exploredSquareID)) {break;}
       else {
         if (["q", "r"].includes(boardArray[exploredSquareID][0])) {attackers.push(exploredSquareID);}
         break;
@@ -778,7 +775,7 @@ function getAttackersOfSquare(squareID) {
         exploredSquareID -= direction;
         continue;
       }
-      else if (isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {break;}
+      else if (isPlayersTurnAndPiece(exploredSquareID)) {break;}
       else {
         if(["q", "b"].includes(boardArray[exploredSquareID][0])) {attackers.push(exploredSquareID);}
         break;
@@ -859,7 +856,7 @@ function canKingMove() {
     exploredSquareID = kingPosition - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       !isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
-      !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
+      !isPlayersTurnAndPiece(exploredSquareID)) {
       if (simulateKingMove(exploredSquareID, kingPosition)) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;
@@ -871,7 +868,7 @@ function canKingMove() {
     exploredSquareID = kingPosition - explored;
     if (isSquareOnBoard(exploredSquareID) && 
       isSameSquareColor(document.getElementById(exploredSquareID), document.getElementById(kingPosition)) &&
-      !isPlayersTurnAndPiece(document.getElementById(exploredSquareID))) {
+      !isPlayersTurnAndPiece(exploredSquareID)) {
       if (simulateKingMove(exploredSquareID, kingPosition)) {
         console.log("king has at least one square to move: " + exploredSquareID);
         return true;} 
@@ -958,13 +955,13 @@ function simulateMove(squareToGoID, pieceID, enPassantTake = false) {
     }
     attackersArray = getAttackersOfSquare(whiteMove? whiteKingID : blackKingID);
     boardArray = structuredClone(boardArrayBackup);
-    //console.log("defending piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
+    //console.log("piece ID and a square ID to block attack or to take attacker: " + pieceID + ", " + squareToGoID);
     if (!attackersArray.length) {
-      console.log("defending piece at: " + pieceID + " CAN safely (take or move) go to square: " + squareToGoID);
+      console.log("piece at: " + pieceID + " CAN safely (take a piece at / move to) square: " + squareToGoID);
       return true;
     } 
     else {
-      console.log("defending piece at: " + pieceID + " CANNNOT safely (take or move) go to square: " + squareToGoID);
+      console.log("piece at: " + pieceID + " CANNNOT safely (take a piece at / move to) square: " + squareToGoID);
     }
   }
 }
@@ -1079,11 +1076,99 @@ function addCorrectPawnBlockers(squareOnPathID, blockersArray) {
 // STALEMATE LOGIC FUNCTIONS:
 
 function isStalemate() {
-  console.log("pretending the stalemate is happening");
+  let playersColor = whiteMove? "w" : "b";
+  for (let i=1; i<65; i++) {
+    if (boardArray[i][1] == playersColor) {
+      console.log("..............exploring piece at ID: " + i);
+      if (canPieceMove(i, boardArray[i][0])) {
+        console.log("piece at: " + i + " can move, color of the piece: " + playersColor);
+        return false;}
+    }
+  }
+  console.log("Game ended by stalemate.")
   return true;
 }
 
+function canPieceMove(pieceID, pieceShortcut) {
+  let possibleSquares;
+  switch (pieceShortcut) {
+    case "b":
+      possibleSquares = getDiagonalSquares(pieceID);
+      console.log("checking for posibility to move the bishop");
+      break;
+    case "r":
+      possibleSquares = getHorVerSquares(pieceID);
+      console.log("checking for posibility to move the rook");
+      break;
+    case "n":
+      possibleSquares = getKnightSquares(pieceID);
+      console.log("checking for posibility to move the knight");
+      break;
+    case "k":
+    case "q":
+      possibleSquares = getDiagonalSquares(pieceID).concat(getHorVerSquares(pieceID));
+      console.log("checking for posibility to move the queen or king");
+      break;
+    default:
+      console.log("unknown piece");
+      return false;
+  }
+  if (pieceShortcut == "k") {return possibleSquares.some(square => simulateKingMove(square, pieceID))}
+  return possibleSquares.some(square => simulateMove(square, pieceID));
+}
 
+// returns an array of neighbouring diagonal squares that are on the board
+function getDiagonalSquares(squareID, directions = 0) {
+  let squareArray = [];
+  if ([0,1].includes(directions)) {
+    if (areSquaresDiagonal(squareID, squareID - 9)) {squareArray.push(squareID - 9)};
+    if (areSquaresDiagonal(squareID, squareID - 7)) {squareArray.push(squareID - 7)};
+  }
+  if ([0,2].includes(directions)) {
+    if (areSquaresDiagonal(squareID, squareID + 9)) {squareArray.push(squareID + 9)};
+    if (areSquaresDiagonal(squareID, squareID + 7)) {squareArray.push(squareID + 7)};
+  }
+  console.log("square array: " + squareArray);
+  return squareArray;
+}
+
+// returns an array of neighbouring horizontal or vertical squares that are on the board
+function getHorVerSquares(squareID) {
+  let squareArray = [];
+for (let offset of [-1, 1, -8, +8]) {
+    if (areSquaresRookKnight(squareID, squareID - offset)) {squareArray.push(squareID - offset)};
+  }
+  console.log("square array: " + squareArray);
+  return squareArray;
+}
+
+// returns an array of neighbouring horizontal or vertical squares that are on the board
+function getKnightSquares(squareID) {
+  let squareArray = [];
+for (let offset of [-17, 17, -15, 15, -10, 10, -6, 6]) {
+    if (areSquaresRookKnight(squareID, squareID - offset)) {squareArray.push(squareID - offset)};
+  }
+  console.log("square array: " + squareArray);
+  return squareArray;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+// helper functions for validity of moves / potential moves
+
+// returns true if two given square ID's are on a diagonal
+function  areSquaresDiagonal(squareID, exploredSquareID) {
+  return (isSquareOnBoard(exploredSquareID) 
+  && isSameSquareColor(document.getElementById(squareID), document.getElementById(exploredSquareID))
+  && !isPlayersTurnAndPiece(exploredSquareID));
+}
+
+// returns true if two given square ID's are neighbouring horizontal or vertical squares
+function  areSquaresRookKnight(squareID, exploredSquareID) {
+  return (isSquareOnBoard(exploredSquareID) 
+  && !isSameSquareColor(document.getElementById(squareID), document.getElementById(exploredSquareID))
+  && !isPlayersTurnAndPiece(exploredSquareID));
+}
 /////////////////////////////////////////////////////////////////////////////////////
 
 
