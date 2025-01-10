@@ -1109,15 +1109,24 @@ function canPieceMove(pieceID, pieceShortcut) {
       possibleSquares = getDiagonalSquares(pieceID).concat(getHorVerSquares(pieceID));
       console.log("checking for posibility to move the queen or king");
       break;
+    case "p":
+      // diagonal squares
+      possibleSquares = getDiagonalSquares(pieceID, whiteMove? 1 : 2);
+      // filter those ID's that include opponent's piece (diagonal take of the pawn)
+      possibleSquares = possibleSquares.filter(isOpponentsPiece);
+      console.log("checking for posibility to move the pawn");
+      break;
     default:
       console.log("unknown piece");
       return false;
   }
+  console.log("squares to move a piece: " + possibleSquares);
   if (pieceShortcut == "k") {return possibleSquares.some(square => simulateKingMove(square, pieceID))}
   return possibleSquares.some(square => simulateMove(square, pieceID));
 }
 
 // returns an array of neighbouring diagonal squares that are on the board
+// directions: 0 -> all diagonal directions, 1 -> up the board (white pawn), 2 -> down the board (black pawn)
 function getDiagonalSquares(squareID, directions = 0) {
   let squareArray = [];
   if ([0,1].includes(directions)) {
@@ -1128,7 +1137,7 @@ function getDiagonalSquares(squareID, directions = 0) {
     if (areSquaresDiagonal(squareID, squareID + 9)) {squareArray.push(squareID + 9)};
     if (areSquaresDiagonal(squareID, squareID + 7)) {squareArray.push(squareID + 7)};
   }
-  console.log("square array: " + squareArray);
+  console.log("diagonal square array: " + squareArray);
   return squareArray;
 }
 
@@ -1138,7 +1147,7 @@ function getHorVerSquares(squareID) {
 for (let offset of [-1, 1, -8, +8]) {
     if (areSquaresRookKnight(squareID, squareID - offset)) {squareArray.push(squareID - offset)};
   }
-  console.log("square array: " + squareArray);
+  console.log("hor ver square array: " + squareArray);
   return squareArray;
 }
 
@@ -1156,7 +1165,7 @@ for (let offset of [-17, 17, -15, 15, -10, 10, -6, 6]) {
 
 // helper functions for validity of moves / potential moves
 
-// returns true if two given square ID's are on a diagonal
+// returns true if two given square ID's are on a diagonal and are not possesed by player's own piece
 function  areSquaresDiagonal(squareID, exploredSquareID) {
   return (isSquareOnBoard(exploredSquareID) 
   && isSameSquareColor(document.getElementById(squareID), document.getElementById(exploredSquareID))
@@ -1164,6 +1173,7 @@ function  areSquaresDiagonal(squareID, exploredSquareID) {
 }
 
 // returns true if two given square ID's are neighbouring horizontal or vertical squares
+// and are not possesed by the player's own piece
 function  areSquaresRookKnight(squareID, exploredSquareID) {
   return (isSquareOnBoard(exploredSquareID) 
   && !isSameSquareColor(document.getElementById(squareID), document.getElementById(exploredSquareID))
