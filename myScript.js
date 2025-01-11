@@ -1110,10 +1110,14 @@ function canPieceMove(pieceID, pieceShortcut) {
       console.log("checking for posibility to move the queen or king");
       break;
     case "p":
-      // diagonal squares
-      possibleSquares = getDiagonalSquares(pieceID, whiteMove? 1 : 2);
-      // filter those ID's that include opponent's piece (diagonal take of the pawn)
-      possibleSquares = possibleSquares.filter(isOpponentsPiece);
+      // diagonal takes squares and vertical advance to empty squares
+      possibleSquares = getDiagonalSquares(pieceID, whiteMove? 1 : 2).concat(getPawnSquares(pieceID));
+      console.log("my Array" + possibleSquares);
+      if (!possibleSquares.length) {console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");} 
+      if (!possibleSquares.length && enPassantInProgress && pawnsAbleToEnPassant.includes(String(pieceID))) {
+        console.log("inside the weird condition");
+        return simulateMove(Number(pawnInEnPassant[0]) + (whiteMove? -8 : 8), pieceID, true);
+      }
       console.log("checking for posibility to move the pawn");
       break;
     default:
@@ -1137,6 +1141,8 @@ function getDiagonalSquares(squareID, directions = 0) {
     if (areSquaresDiagonal(squareID, squareID + 9)) {squareArray.push(squareID + 9)};
     if (areSquaresDiagonal(squareID, squareID + 7)) {squareArray.push(squareID + 7)};
   }
+  // keep those ID's that include opponent's piece (diagonal take of the pawn)
+  if ([1, 2].includes(directions)) {squareArray = squareArray.filter(isOpponentsPiece);}
   console.log("diagonal square array: " + squareArray);
   return squareArray;
 }
@@ -1161,6 +1167,18 @@ for (let offset of [-17, 17, -15, 15, -10, 10, -6, 6]) {
   return squareArray;
 }
 
+function getPawnSquares(squareID) {
+  let squareArray = [];
+  let offset = whiteMove? -8 : 8;
+  let startRank = whiteMove? 2 : 7;
+
+  if ([1, 8].includes(boardArray[squareID][3])) {return squareArray;}
+  if (boardArray[squareID][3] == startRank && isEmptySquare(squareID + offset) && isEmptySquare(squareID + 2*offset)) 
+    {squareArray.push(squareID + 2*offset)};
+  if (isEmptySquare(squareID + offset)) {squareArray.push(squareID + offset);}
+  console.log("square array: " + squareArray);
+  return squareArray;
+}
 /////////////////////////////////////////////////////////////////////////////////////
 
 // helper functions for validity of moves / potential moves
