@@ -1199,6 +1199,96 @@ function  areSquaresRookKnight(squareID, exploredSquareID) {
 }
 /////////////////////////////////////////////////////////////////////////////////////
 
+// INSUFICIENCY OF MATERIAL LOGIC
+
+function isInsuficientDraw() {
+  let piecesArray = getPiecesArray();
+  
+  let noOfWhitePieces = piecesArray[0].length;
+  let noOfBlackPieces = piecesArray[1].length;
+
+  console.log(noOfWhitePieces);
+  console.log(noOfBlackPieces);
+  
+  
+  if (noOfWhitePieces < 4 && noOfBlackPieces < 4) {
+    console.log("DRAW??? Both players have less than 4 pieces.")
+    if (noOfWhitePieces == 1) {
+      if (noOfBlackPieces == 1) {
+        console.log("Draw by insuficient material: KING vs KING.");
+        return true;
+      }
+      else if (noOfBlackPieces == 2) {
+        if (piecesArray[1].includes("b")) {
+          console.log("Draw by insuficient material: KING vs KING + BISHOP.");
+          return true;
+        }
+        else if (piecesArray[1].includes("n")) {
+          console.log("Draw by insuficient material: KING vs KING + KNIGHT.");
+          return true;
+        }
+      }
+      // noOfBlackPieces = 3:
+      else {
+        let withoutKnights = piecesArray[1].filter(value => value !== "n");
+        if (withoutKnights.length == 1) {
+          console.log("Draw by insuficient material: KING vs KING + KNIGHT + KNIGHT.");
+          return true;
+        } 
+      }
+    }
+    else if (noOfWhitePieces == 2) {
+      if (noOfBlackPieces == 1) {
+          if (piecesArray[0].includes("b")) {
+            "Draw by insuficient material: KING + BISHOP vs KING."
+            return true;
+          }
+          else if (piecesArray[0].includes("n")) {
+            console.log("Draw by insuficient material: KING + KNIGHT vs KING.");
+            return true;
+          }
+        }
+      else if (noOfBlackPieces == 2) {
+        if ((piecesArray[0].includes("b") || piecesArray[0].includes("n"))
+          && (piecesArray[1].includes("b") || piecesArray[1].includes("n"))) {
+            console.log("Draw by insuficient material: KING + KNIGHT/BISHOP vs KING + KNIGHT/BISHOP.");
+            return true;
+        }
+      }
+    }
+    // noOfWhitePieces = 3:
+    else if (noOfBlackPieces == 1) {
+      withoutKnights = piecesArray[0].filter(value => value !== "n");
+      if (withoutKnights.length == 1) {
+        console.log("Draw by insuficient material: KING + KNIGHT + KNIGHT vs KING.");
+        return true;
+      } 
+    }
+    console.log("This is NOT a draw by insuficient material.")
+    return false;
+  }
+  else {
+    console.log("This is not a draw - at least one of the players has more than 3 pieces.");
+    return false;
+  }
+}
+
+function getPiecesArray() {
+  let piecesArray = [[],[]]
+  for (let i=1; i<65; i++) {
+    if (boardArray[i][1] == "w") {
+      piecesArray[0].push(boardArray[i][0]);
+    }
+    else if (boardArray[i][1] == "b") {
+      piecesArray[1].push(boardArray[i][0]);
+    }
+  }
+  console.log("-------these are the pieces on the board:");
+  console.log(piecesArray);
+  return piecesArray;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+
 
 // return a string with colour and piece ("white rook")
 function pieceToString(square) {
@@ -1378,6 +1468,7 @@ function switchMove() {
     console.log(kingsColor + " king is NOT in check");
     console.log("checking for a stalemate");
     if (isStalemate()) {console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");}
+    else {isInsuficientDraw();}
   }
   //console.log("white king is on square: " + whiteKingID);
   //console.log("black king is on square: " + blackKingID);
