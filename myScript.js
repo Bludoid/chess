@@ -9,6 +9,8 @@ let board = document.getElementById("board");
 let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
+let moveBox = document.getElementById("moveLogger");
+let moveNumber = 1;
 
 let activateEnPassant = false;
 let enPassantInProgress = false;
@@ -47,7 +49,7 @@ let boardArray = [
   ['e', 'e', 'a', 3], ['e', 'e', 'b', 3], ['e', 'e', 'c', 3], ['e', 'e', 'd', 3], ['e', 'e', 'e', 3], ['e', 'e', 'f', 3], ['e', 'e', 'g', 3], ['e', 'e', 'h', 3],
   ['p', 'w', 'a', 2], ['p', 'w', 'b', 2], ['p', 'w', 'c', 2], ['p', 'w', 'd', 2], ['p', 'w', 'e', 2], ['p', 'w', 'f', 2], ['p', 'w', 'g', 2], ['p', 'w', 'h', 2],
   ['r', 'w', 'a', 1], ['n', 'w', 'b', 1], ['b', 'w', 'c', 1], ['q', 'w', 'd', 1], ['k', 'w', 'e', 1], ['b', 'w', 'f', 1], ['n', 'w', 'g', 1], ['r', 'w', 'h', 1]
- ]
+ ];
 
 // create the board and add click ability to the squares
 for(let i = 0; i<64; i++) {
@@ -168,16 +170,6 @@ function takePiece(takingPieceSquare, takenPieceSquare) {
   // taking a piece
   removePiece(takenPieceSquare);
   executeMove(takingPieceSquare, takenPieceSquare);
-}
-
-// converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
-function coordinatesOfSquare(squareID) {
-  return (boardArray[squareID][2] + boardArray[squareID][3]);
-}
-
-// outputs message for players to the infobox
-function outputToInfobox(infoMessage) {
-  infobox.innerHTML = infoMessage;
 }
 
 // creates backup for the boardArray
@@ -1289,6 +1281,8 @@ function getPiecesArray() {
 }
 /////////////////////////////////////////////////////////////////////////////////////
 
+// functions to inform player about move history and additional info about moves (promotion, en passant...)
+// in the infobox and moveBox divs
 
 // return a string with colour and piece ("white rook")
 function pieceToString(square) {
@@ -1334,6 +1328,31 @@ function pieceToString(square) {
   return recognizedPiece;
 }
 
+// converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
+function coordinatesOfSquare(squareID) {
+  return (boardArray[squareID][2] + boardArray[squareID][3]);
+}
+
+// outputs message for players to the infobox
+function outputToInfobox(infoMessage) {
+  infobox.innerHTML = infoMessage;
+}
+
+function outputToMoveBox(newSquare) {
+  if (whiteMove) {
+    moveBox.innerHTML += moveNumber + ". ";
+    moveBox.innerHTML += boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
+    + coordinatesOfSquare(newSquare.id);
+  }
+  else {
+    moveBox.innerHTML += "   ||   " + boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
+    + coordinatesOfSquare(newSquare.id) + "<br>";
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+
 // sets up the chessboard by placing the pieces in their correct STARTING position
 function setUpBoard() {
   for (let i = 1; i<17; i++) {
@@ -1369,6 +1388,9 @@ function executeMove(oldSquare, newSquare) {
   
   // inform the players about the move made
   outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
+
+  // log a move in the move history box
+  outputToMoveBox(newSquare);
 
   // a piece that previously stepped in en passant is being taken en passant
   if (enPassantExecutionStarted) {
@@ -1427,7 +1449,8 @@ function executeMove(oldSquare, newSquare) {
 function switchMove() {
 
   // toggling white/black player move
-  whiteMove = !whiteMove;  
+  whiteMove = !whiteMove; 
+  if (!whiteMove) {moveNumber++;} 
   
   // switch the colour banners for making the players know who's move it is
   let wBanner = document.getElementById("whiteBanner");
