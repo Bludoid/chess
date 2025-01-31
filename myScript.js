@@ -1329,7 +1329,7 @@ function pieceToString(square) {
 }
 
 // converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
-function coordinatesOfSquare(squareID) {
+function getCoordinatesOfSquare(squareID) {
   return (boardArray[squareID][2] + boardArray[squareID][3]);
 }
 
@@ -1340,15 +1340,45 @@ function outputToInfobox(infoMessage) {
 
 function outputToMoveBox(newSquare) {
   if (whiteMove) {
-    moveBox.innerHTML += moveNumber + ". ";
-    moveBox.innerHTML += boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
-    + coordinatesOfSquare(newSquare.id);
+    createMoveDiv(newSquare.id, true);
+    createMoveDiv(newSquare.id);
+    // moveBox.innerHTML += moveNumber + ". ";
+    // moveBox.innerHTML += boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
+    // + coordinatesOfSquare(newSquare.id);
   }
   else {
-    moveBox.innerHTML += "   ||   " + boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
-    + coordinatesOfSquare(newSquare.id) + "<br>";
+    createMoveDiv(newSquare.id);
+    moveBox.innerHTML += "<br>";
+    // moveBox.innerHTML += "   ||   " + boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
+    // + coordinatesOfSquare(newSquare.id) + "<br>";
   }
 }
+
+
+function createMoveDiv(newSquareID, numbering = false) {
+  let moveDiv = document.createElement("div");
+  moveDiv.id = "move" + getMoveHistoryIndex();
+  moveDiv.className = "moveDivTemplate";
+  if (numbering) {
+    moveDiv.innerHTML = moveNumber;
+    moveDiv.style.width = "30px";
+  }
+  else {
+    moveDiv.innerHTML = getPieceShortcut(newSquareID) + " " + getCoordinatesOfSquare(newSquareID);
+    moveDiv.addEventListener("click", function() {console.log("creating a div for the move")})
+  }
+  moveBox.appendChild(moveDiv);
+}
+
+function getMoveHistoryIndex(moveNo = moveNumber, whiteTurn = whiteMove) {
+  return moveNo * 2 - (whiteTurn ? 1 : 0);
+}
+
+function getPieceShortcut(squareID) {
+  return boardArray[squareID][0] + boardArray[squareID][1];
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -1387,7 +1417,7 @@ function executeMove(oldSquare, newSquare) {
   removePiece(oldSquare);
   
   // inform the players about the move made
-  outputToInfobox(pieceToString(newSquare) + " moved to " + coordinatesOfSquare(newSquare.id))
+  outputToInfobox(pieceToString(newSquare) + " moved to " + getCoordinatesOfSquare(newSquare.id))
 
   // log a move in the move history box
   outputToMoveBox(newSquare);
