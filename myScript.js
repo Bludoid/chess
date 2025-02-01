@@ -13,10 +13,7 @@ let moveBox = document.getElementById("moveLogger");
 // adds event listeners for click on divs in the move history box 
 // (div informing about a move made will take the user to that move = set up a board)
 moveBox.addEventListener("click", function(event) {
-  if (event.target.matches(".moveDivTemplate")) {
-      console.log("Inner div clicked: " + event.target.id);
-  }
-});
+  if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id)}});
 
 let moveNumber = 1;
 
@@ -1404,7 +1401,9 @@ function getPieceShortcut(squareID) {
   return boardArray[squareID][0] + boardArray[squareID][1];
 }
 
-
+function showMove(divID) {
+  console.log("Inner div clicked: " + divID);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 

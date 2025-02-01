@@ -162,6 +162,7 @@ body {
 
 .numberDivTemplate {
   width: 30px;
+  border-color: green;
 }
 
 .moveDivTemplate img {
@@ -169,4 +170,6 @@ body {
   width: 30px;
   height: 30px;
   vertical-align: middle;
+  /* making the image "see through" for clicks so DIV under it can be clicked */
+  pointer-events: none;
 }
