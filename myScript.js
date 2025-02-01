@@ -10,6 +10,14 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
 let moveBox = document.getElementById("moveLogger");
+// adds event listeners for click on divs in the move history box 
+// (div informing about a move made will take the user to that move = set up a board)
+moveBox.addEventListener("click", function(event) {
+  if (event.target.matches(".moveDivTemplate")) {
+      console.log("Inner div clicked: " + event.target.id);
+  }
+});
+
 let moveNumber = 1;
 
 let activateEnPassant = false;
@@ -1328,7 +1336,7 @@ function pieceToString(square) {
   return recognizedPiece;
 }
 
-// converts square ID to actual chess board coordinates (1 => a8, 64 => h1, ...)
+// returns actual chess board coordinates (1 => a8, 64 => h1, ...) for the square ID given
 function getCoordinatesOfSquare(squareID) {
   return (boardArray[squareID][2] + boardArray[squareID][3]);
 }
@@ -1338,42 +1346,60 @@ function outputToInfobox(infoMessage) {
   infobox.innerHTML = infoMessage;
 }
 
+// outputs the move history into the "moveBox"
+// called by executeMove()
 function outputToMoveBox(newSquare) {
   if (whiteMove) {
-    createMoveDiv(newSquare.id, true);
-    createMoveDiv(newSquare.id);
+    addMoveDiv(newSquare.id, true);
+    addMoveDiv(newSquare.id);
     // moveBox.innerHTML += moveNumber + ". ";
     // moveBox.innerHTML += boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
     // + coordinatesOfSquare(newSquare.id);
   }
   else {
-    createMoveDiv(newSquare.id);
+    addMoveDiv(newSquare.id);
     moveBox.innerHTML += "<br>";
     // moveBox.innerHTML += "   ||   " + boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
     // + coordinatesOfSquare(newSquare.id) + "<br>";
   }
 }
 
-
-function createMoveDiv(newSquareID, numbering = false) {
+// creates a new div and adds it to the moveBox
+// it's either a number of the move (numbering = true) or info about a move made by white or black player
+// in case of move it calls addImabe() and also adds event listener (for navigating in the move history)
+function addMoveDiv(newSquareID, numbering = false) {
   let moveDiv = document.createElement("div");
-  moveDiv.id = "move" + getMoveHistoryIndex();
-  moveDiv.className = "moveDivTemplate";
   if (numbering) {
+    moveDiv.className = "numberDivTemplate";
     moveDiv.innerHTML = moveNumber;
-    moveDiv.style.width = "30px";
+    // moveDiv.style.width = "30px";
   }
   else {
-    moveDiv.innerHTML = getPieceShortcut(newSquareID) + " " + getCoordinatesOfSquare(newSquareID);
-    moveDiv.addEventListener("click", function() {console.log("creating a div for the move")})
+    moveDiv.className = "moveDivTemplate";
+    addImage(moveDiv, getPieceShortcut(newSquareID));
+    moveDiv.innerHTML += " " + getCoordinatesOfSquare(newSquareID);
+    moveDiv.id = "move" + getMoveHistoryIndex();
   }
   moveBox.appendChild(moveDiv);
 }
 
+// creates an img element with the image of the appropriate piece and adds it to the moveDive from addMoveDiv
+function addImage(moveDiv, imageShortcut) {
+  let imgElement = document.createElement("img");
+  let pathString = "img/" + imageShortcut + ".png";   // puts together the name of the image
+  imgElement.src = pathString;
+  //newPiece.className = pieceName;
+  moveDiv.appendChild(imgElement);
+}
+
+// converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
+// 4 white => 7
+// 2 black => 4
 function getMoveHistoryIndex(moveNo = moveNumber, whiteTurn = whiteMove) {
   return moveNo * 2 - (whiteTurn ? 1 : 0);
 }
 
+// returns string with piece shortcut base on the square ID given ("kw" - king white)
 function getPieceShortcut(squareID) {
   return boardArray[squareID][0] + boardArray[squareID][1];
 }
@@ -1480,7 +1506,7 @@ function switchMove() {
 
   // toggling white/black player move
   whiteMove = !whiteMove; 
-  if (!whiteMove) {moveNumber++;} 
+  if (whiteMove) {moveNumber++;} 
   
   // switch the colour banners for making the players know who's move it is
   let wBanner = document.getElementById("whiteBanner");

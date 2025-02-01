@@ -63,34 +63,57 @@ body {
   background-color: white;
 }
 
+/* template for class of boxes of different type (infobox itself, promotion, move history) */
 .infoboxTemplate {
-  margin-left: 100px;
+  margin-left: 50px;
   margin-top: 20px;
-  padding-top: 30px;
-  padding-left: 20px;
-  width: 500px;
-  height: 80px;
+  padding-top: 20px;
+  padding-left: 10px;
+  /* width: 250px; */
+  /* height: 80px; */
   border: grey solid 5px;
   border-radius: 10px;
 }
 
 #infobox {
-  /* margin-left: 100px;
-  margin-top: 20px;
-  padding-top: 30px;
-  padding-left: 20px;
-  width: 500px;
-  height: 80px;
-  border: grey solid 5px;
-  border-radius: 10px; */
   background-color: yellow;
-  font-size: 40px;
+  font-size: 25px;
+  width: 260px;
+  height: 150px;
 }
 
+/* sideways view (board on left and boxes on the right) */
+.container {
+  display: flex; /* Enables flexbox */
+}
+
+/* specifying style of div for move history and its navigation */
+#moveBox {
+  /* margin-left: 50px; */
+  margin-top: 55px;
+  height: 300px;
+  width: 250px;
+  background-color: lightsalmon;
+  padding-right: 10px;
+  font-size: 25px;
+}
+
+/* div for showing the moves and scrolling */
+#moveLogger {
+  font-size: 20px;
+  /* overflow: auto; (will replace the two lines below)*/
+  overflow: scroll;
+  overflow-x: hidden;
+  height: 220px;
+  padding-right: 10px;
+}
+
+
+/* box showing pieces the used can chose from to promote */
 #promotionInfo {
   background-color: orangered;
   font-size: 30px;
-   
+  margin-left: 100px; 
 }
 
 #promotionInfo>span {
@@ -113,7 +136,6 @@ body {
   border-style: inset;
 }
 
-
 .hideInfo {
   /* does not take take any space: */
   display: none;
@@ -123,5 +145,28 @@ body {
 .displayFlex {
   display: flex;
   align-items: center; 
-  padding-bottom: 30px;
+  padding-bottom: 20px;
+}
+
+/* template for divs to display (log) moves */
+.moveDivTemplate, .numberDivTemplate {
+  height: 40px;
+  width: 60px;
+  border: 3px solid blue;
+  display: inline-block;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  vertical-align: top;
+}
+
+.numberDivTemplate {
+  width: 30px;
+}
+
+.moveDivTemplate img {
+  padding-top: 5px;
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
 }
