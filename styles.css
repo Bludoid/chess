@@ -75,6 +75,7 @@ body {
   border-radius: 10px;
 }
 
+/* specifying style of div = console for informing player about moves */
 #infobox {
   background-color: yellow;
   font-size: 25px;
@@ -101,13 +102,37 @@ body {
 /* div for showing the moves and scrolling */
 #moveLogger {
   font-size: 20px;
-  /* overflow: auto; (will replace the two lines below)*/
+  /* overflow: auto; (would replace the two lines below)*/
   overflow: scroll;
   overflow-x: hidden;
   height: 220px;
   padding-right: 10px;
 }
 
+/* specifying style for div for buttons (resign, draw offer, flip board) */
+#gameButtonsDiv {
+  background-color: rgb(38, 255, 0);
+  padding: 20px;
+}
+
+/* style for buttons */
+button {
+  font-size: 18px;
+  border-style: 2px solid blue;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* when hovered over */
+button:hover {
+  background-color: red;
+  border-style: inset;
+}
+
+/* when clicked */
+button:active {
+  background-color: grey;
+}
 
 /* box showing pieces the used can chose from to promote */
 #promotionInfo {
@@ -158,6 +183,10 @@ body {
   margin-bottom: 5px;
   border-radius: 4px;
   vertical-align: top;
+}
+
+.moveDivTemplate {
+  cursor: pointer;
 }
 
 .numberDivTemplate {

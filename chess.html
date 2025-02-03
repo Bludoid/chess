@@ -9,17 +9,32 @@
 </head>
 <body>
 
-    <div id="blackBanner" class="hideBanner"></div>
+  <div class="container">
+    <div id="game">
+      <div id="blackBanner" class="hideBanner"></div>
 
-    <div id="board"></div>
+      <div id="board"></div>
 
-    <div id="whiteBanner"></div>
-    
-    <div id="infobox" class="infoboxTemplate"></div>
+      <div id="whiteBanner"></div>
+      
+      <!-- <div id="infobox" class="infoboxTemplate"></div> -->
 
-    <div id="promotionInfo" class="hideInfo infoboxTemplate"></div>
-
-
+      <div id="promotionInfo" class="hideInfo infoboxTemplate"></div>
+    </div>
+    <div id="sideBox">
+      <div id="moveBox" class="infoboxTemplate">
+        MOVE HISTORY:
+        <hr>
+        <div id="moveLogger">
+        </div>
+      </div>
+      <div id="gameButtonsDiv" class="infoboxTemplate">
+        <button onclick="rotateBoard()">ROTATE BOARD</button>
+      </div>
+      <div id="infobox" class="infoboxTemplate"></div>
+    </div>
+  </div>
+  
     <script src="myScript.js"></script>
 </body>
 </html>

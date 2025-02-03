@@ -116,7 +116,7 @@ for(let i = 0; i<64; i++) {
     thisSquare.className = "blackSquare"; 
   }
   // new File of squares (adding <br>)
-  if((i+1)%8 === 0) {
+  if((i+1)%8 === 0 && i != 63) {
     let breakLine = document.createElement("br");
     board.appendChild(breakLine);
     colorCounter++;
@@ -1404,6 +1404,18 @@ function getPieceShortcut(squareID) {
 function showMove(divID) {
   console.log("Inner div clicked: " + divID);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+// FLIPPING/ROTATING THE BOARD
+
+function rotateBoard() {
+  let chessSquares = Array.from(board.children); // Convert NodeList to Array
+  
+  // Reverse the order and re-append elements
+  chessSquares.reverse().forEach(square => board.appendChild(square));
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 
