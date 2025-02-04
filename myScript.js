@@ -13,9 +13,12 @@ let moveBox = document.getElementById("moveLogger");
 // adds event listeners for click on divs in the move history box 
 // (div informing about a move made will take the user to that move = set up a board)
 moveBox.addEventListener("click", function(event) {
-  if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id)}});
+  if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id.slice(4))}});
 
 let moveNumber = 1;
+
+// move history array, member at index 0 dedicated to move Index shown currently on the board, default = 0
+let moveHistory = [[0]];
 
 let activateEnPassant = false;
 let enPassantInProgress = false;
@@ -1401,8 +1404,40 @@ function getPieceShortcut(squareID) {
   return boardArray[squareID][0] + boardArray[squareID][1];
 }
 
-function showMove(divID) {
-  console.log("Inner div clicked: " + divID);
+/////////////////////////////////////////////////////////////////////////////////////
+
+// LOGIC TO SAVE MOVES INTO MOVE HISTORY AND SHOW SPECIFIC MOVE ON THE BOARD
+
+// shows (displays) a move on the board based on the history index given
+function showMove(moveIndex) {
+  for (let i=1; i<65; i++) {
+    let thisSquare = document.getElementById(i);
+    if (moveHistory[moveIndex][i] == "ee") {
+      thisSquare.innerHTML = "";
+    }
+    else {
+      thisSquare.innerHTML = "";
+      placePiece(thisSquare, moveHistory[moveIndex][i]);
+    }
+  }
+  console.log("Board set up to move index: " + moveIndex);
+  // setting first member of move History to currently shown move
+  moveHistory[0] = moveIndex;
+}
+
+function saveMove() {
+  moveHistory.push(takeMoveSnapshot());
+  moveHistory[0] = getMoveHistoryIndex();
+}
+
+function takeMoveSnapshot() {
+  let oneMove = [];
+  // aditional info can be: what kind of piece moved to which square, en passant?, castling?...
+  oneMove.push(["additional info", true]);
+  for (let i = 1; i < 65; i++) {
+    oneMove.push(boardArray[i][0] + boardArray[i][1]);
+  }
+  return oneMove;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1514,6 +1549,8 @@ function executeMove(oldSquare, newSquare) {
 
 
 function switchMove() {
+  // save a move to move history
+  saveMove();
 
   // toggling white/black player move
   whiteMove = !whiteMove; 
