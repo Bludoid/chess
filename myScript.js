@@ -1410,6 +1410,21 @@ function getPieceShortcut(squareID) {
 
 // LOGIC TO SAVE MOVES INTO MOVE HISTORY AND SHOW SPECIFIC MOVE ON THE BOARD
 
+function showPreviousMove() {
+  if (moveHistory[0][0] > 1) {
+    showMove(moveHistory[0][0] - 1);
+    scrollOnDiv(document.getElementById("move" + (moveHistory[0][0] - 1)));
+  }
+}
+
+function showNextMove() {
+  if (moveHistory[0][0] < moveHistory[0][1]) {
+    showMove(moveHistory[0][0] + 1);
+    scrollOnDiv(document.getElementById("move" + (moveHistory[0][0] + 1)));
+  }
+}
+
+
 // shows (displays) a move on the board based on the history index given
 function showMove(moveIndex) {
   // if player wants to view last move made and it is the currently displayed move (until now), do nothing (return)
@@ -1418,6 +1433,8 @@ function showMove(moveIndex) {
   else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {toggleClicking();}
   // else if player wants to view the last move made and it is not currently displayed move (until now)
   else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {toggleClicking();}
+
+  if(moveIndex == 1 || moveIndex == moveHistory[0][1]) {scrollOnDiv(document.getElementById("move" + moveIndex));}
 
   for (let i=1; i<65; i++) {
     let thisSquare = document.getElementById(i);
@@ -1446,8 +1463,14 @@ function saveMove() {
   if (currentMoveIndex > 1) {document.getElementById("move" + (currentMoveIndex-1)).classList.toggle("displayedMove");}
   let divToHighlight = document.getElementById("move" + currentMoveIndex);
   divToHighlight.classList.toggle("displayedMove");
-  divToHighlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  // divToHighlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  scrollOnDiv(divToHighlight);
   moveHistory[0][1]++;
+}
+
+function scrollOnDiv(divToFocuse) {
+  // let thisDiv = document.getElementById(divID)
+  divToFocuse.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function takeMoveSnapshot() {

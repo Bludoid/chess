@@ -23,13 +23,20 @@
     </div>
     <div id="sideBox">
       <div id="moveBox" class="infoboxTemplate">
-        MOVE HISTORY:
+          MOVE HISTORY:
         <hr>
-        <div id="moveLogger">
+        <div id="moveLogger"></div>
+        <hr>
+        <div>
+          <!-- html entities (special characters) https://duckduckgo.com/?q=HTML+entities&ia=answer&iax=answer -->
+          <button onclick="showMove(1)" title="FIRST MOVE">|&larrhk;</button>
+          <button onclick="showPreviousMove()" title="PREVIOUS MOVE">&larrhk;</button>
+          <button onclick="showNextMove()" title="NEXT MOVE">&rarrhk;</button>
+          <button onclick="showMove(moveHistory[0][1])" title="CURRENT/LAST MOVE">&rarrhk;|</button>
         </div>
       </div>
       <div id="gameButtonsDiv" class="infoboxTemplate">
-        <button onclick="rotateBoard()">ROTATE BOARD</button>
+        <button onclick="rotateBoard()" title="ROTATE BOARD">&orarr;</button>
       </div>
       <div id="infobox" class="infoboxTemplate"></div>
     </div>
