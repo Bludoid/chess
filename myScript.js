@@ -17,7 +17,9 @@ moveBox.addEventListener("click", function(event) {
 
 let moveNumber = 1;
 
-// move history array, member at index 0 dedicated to move Index shown currently on the board, default = 0
+// move history array, 
+// array at index 0 dedicated to move Index shown currently on the board and number of moves already made (max move index)
+// array by default set to default = [0, 0] (showing move number zero and zero moves made)
 let moveHistory = [[0, 0]];
 
 let activateEnPassant = false;
@@ -1410,6 +1412,13 @@ function getPieceShortcut(squareID) {
 
 // shows (displays) a move on the board based on the history index given
 function showMove(moveIndex) {
+  // if player wants to view last move made and it is the currently displayed move (until now), do nothing (return)
+  if (moveIndex == moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {return;}
+  // else if player wants to view other than last move and the last move is the displayed move (until now)
+  else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {toggleClicking();}
+  // else if player wants to view the last move made and it is not currently displayed move (until now)
+  else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {toggleClicking();}
+
   for (let i=1; i<65; i++) {
     let thisSquare = document.getElementById(i);
     if (moveHistory[moveIndex][i] == "ee") {
@@ -1421,9 +1430,11 @@ function showMove(moveIndex) {
     }
   }
   console.log("Board set up to move index: " + moveIndex);
-  // setting first member of move History to currently shown move
+  // UN-highlighting the div with currently displayed move in the move history box
   document.getElementById("move" + moveHistory[0][0]).classList.toggle("displayedMove");
+  // setting first member of array on index 0 in moveHistory to currently shown move
   moveHistory[0][0] = moveIndex;
+  // highlighting the div with currently displayed move in the move history box
   document.getElementById("move" + moveIndex).classList.toggle("displayedMove");
 }
 
@@ -1436,7 +1447,6 @@ function saveMove() {
   let divToHighlight = document.getElementById("move" + currentMoveIndex);
   divToHighlight.classList.toggle("displayedMove");
   divToHighlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
-
   moveHistory[0][1]++;
 }
 

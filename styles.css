@@ -38,7 +38,7 @@ body {
 
   .disableClicks>div {
     pointer-events: none; /* Disable click events for all divs */
-    opacity: 0.6;   /* "dimming the chess board" */
+    opacity: 0.75;   /* "dimming the chess board" */
 }
 
 #blackBanner, #whiteBanner {
