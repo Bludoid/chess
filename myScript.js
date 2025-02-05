@@ -18,7 +18,7 @@ moveBox.addEventListener("click", function(event) {
 let moveNumber = 1;
 
 // move history array, member at index 0 dedicated to move Index shown currently on the board, default = 0
-let moveHistory = [[0]];
+let moveHistory = [[0, 0]];
 
 let activateEnPassant = false;
 let enPassantInProgress = false;
@@ -1422,12 +1422,22 @@ function showMove(moveIndex) {
   }
   console.log("Board set up to move index: " + moveIndex);
   // setting first member of move History to currently shown move
-  moveHistory[0] = moveIndex;
+  document.getElementById("move" + moveHistory[0][0]).classList.toggle("displayedMove");
+  moveHistory[0][0] = moveIndex;
+  document.getElementById("move" + moveIndex).classList.toggle("displayedMove");
 }
 
 function saveMove() {
   moveHistory.push(takeMoveSnapshot());
-  moveHistory[0] = getMoveHistoryIndex();
+  let currentMoveIndex = getMoveHistoryIndex();
+  moveHistory[0][0] = currentMoveIndex;
+  // after first black's move - always remove the previous highlight
+  if (currentMoveIndex > 1) {document.getElementById("move" + (currentMoveIndex-1)).classList.toggle("displayedMove");}
+  let divToHighlight = document.getElementById("move" + currentMoveIndex);
+  divToHighlight.classList.toggle("displayedMove");
+  divToHighlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+  moveHistory[0][1]++;
 }
 
 function takeMoveSnapshot() {

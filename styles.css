@@ -202,3 +202,9 @@ button:active {
   /* making the image "see through" for clicks so DIV under it can be clicked */
   pointer-events: none;
 }
+
+/* highlight currently displayed move in the move history */
+/* it's either the last move made or a move the player chose to be diplayed */
+.displayedMove {
+  background-color: rgb(162, 0, 255);
+}
