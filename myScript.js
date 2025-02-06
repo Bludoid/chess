@@ -1427,12 +1427,20 @@ function showNextMove() {
 
 // shows (displays) a move on the board based on the history index given
 function showMove(moveIndex) {
-  // if player wants to view last move made and it is the currently displayed move (until now), do nothing (return)
-  if (moveIndex == moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {return;}
+  // if player wants to view last move made and it is the currently displayed move (until now)
+  // OR it's the beginning of the game (last move = 0) and player wants to go to "first move" before it happend)
+  if (moveIndex == moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]
+    || moveIndex == 1 && moveHistory[0][1] == 0) {return;}
   // else if player wants to view other than last move and the last move is the displayed move (until now)
-  else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {toggleClicking();}
+  else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {
+    toggleClicking();
+    document.getElementById("currentButton").style.backgroundColor = "red";
+  }
   // else if player wants to view the last move made and it is not currently displayed move (until now)
-  else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {toggleClicking();}
+  else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {
+    toggleClicking();
+    document.getElementById("currentButton").style.backgroundColor = "grey";
+  }
 
   if(moveIndex == 1 || moveIndex == moveHistory[0][1]) {scrollOnDiv(document.getElementById("move" + moveIndex));}
 

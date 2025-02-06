@@ -68,7 +68,7 @@ body {
   margin-left: 50px;
   margin-top: 20px;
   padding-top: 20px;
-  padding-left: 10px;
+  padding-left: 20px;
   /* width: 250px; */
   /* height: 80px; */
   border: grey solid 5px;
@@ -118,15 +118,18 @@ body {
 /* style for buttons */
 button {
   font-size: 25px;
-  border-style: 2px solid blue;
+  border-style: solid blue;
+  border-width: 3.5px;
   border-radius: 4px;
   cursor: pointer;
+  background-color: lightgrey;
 }
 
 /* when hovered over */
 button:hover {
-  background-color: red;
+  background-color: orange;
   border-style: inset;
+  border-color: green; 
 }
 
 /* when clicked */
@@ -187,11 +190,16 @@ button:active {
 
 .moveDivTemplate {
   cursor: pointer;
+  background-color: lightgoldenrodyellow;
 }
 
 .numberDivTemplate {
+  padding-left: 5px;
   width: 30px;
+  margin-right: 10px;
   border-color: green;
+  background-color: greenyellow;
+  font-size: 25px;
 }
 
 .moveDivTemplate img {
@@ -206,5 +214,5 @@ button:active {
 /* highlight currently displayed move in the move history */
 /* it's either the last move made or a move the player chose to be diplayed */
 .displayedMove {
-  background-color: rgb(162, 0, 255);
+  background-color: rgb(161, 40, 189);
 }
