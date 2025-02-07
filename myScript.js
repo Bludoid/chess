@@ -15,11 +15,16 @@ let moveBox = document.getElementById("moveLogger");
 moveBox.addEventListener("click", function(event) {
   if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id.slice(4))}});
 
+let gameOver = false;
+
 let moveNumber = 1;
 
 // move history array, 
-// array at index 0 dedicated to move Index shown currently on the board and number of moves already made (max move index)
+// array at index 0 dedicated to information about moves 
+// moveHistory[0][0] index of move displayed currently on the board
+// moveHistory[0][1] number of moves already made (max move index)
 // array by default set to default = [0, 0] (showing move number zero and zero moves made)
+// moveHistory[0][2] (added later) - html element -> div of square -> last move highlighted on the board
 let moveHistory = [[0, 0]];
 
 let activateEnPassant = false;
@@ -38,8 +43,6 @@ let whiteKingID = 61;
 let blackKingID = 5;
 
 let boardArrayBackup;
-
-// validMoves = [];
 
 let moveInProgress = false;
 let chosenSquare = null;
@@ -1291,6 +1294,19 @@ function getPiecesArray() {
 }
 /////////////////////////////////////////////////////////////////////////////////////
 
+// GAME OVER !!!
+
+// 0 - checkmate, 1 - draw, 2 - insuficient material
+function endGame(finishType) {
+  gameOver = true;
+  toggleClicking();
+  let gameEnd = ["checkmate", "draw", "stalemate"];
+  console.log("Game ended by " + gameEnd[finishType] + ".");
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+
 // functions to inform player about move history and additional info about moves (promotion, en passant...)
 // in the infobox and moveBox divs
 
@@ -1433,12 +1449,12 @@ function showMove(moveIndex) {
     || moveIndex == 1 && moveHistory[0][1] == 0) {return;}
   // else if player wants to view other than last move and the last move was the displayed move (until now)
   else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {
-    toggleClicking();
+    if (!gameOver) {toggleClicking();}
     document.getElementById("currentButton").classList.toggle("redBackground");
   }
   // else if player wants to view the last move made and it was not currently displayed move (until now)
   else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {
-    toggleClicking();
+    if (!gameOver) {toggleClicking();}
     document.getElementById("currentButton").classList.toggle("redBackground");
   }
 
@@ -1483,9 +1499,9 @@ function saveMove() {
   moveHistory[0][1]++;
 }
 
-function scrollOnDiv(divToFocuse) {
+function scrollOnDiv(divToFocus) {
   // let thisDiv = document.getElementById(divID)
-  divToFocuse.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  divToFocus.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function takeMoveSnapshot() {
@@ -1651,7 +1667,8 @@ function switchMove() {
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
-      toggleClicking();
+      endGame(0);
+      // toggleClicking();
     }
   }
   // when it's a single check, player has to be able to do one of three things:
@@ -1665,17 +1682,21 @@ function switchMove() {
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
-      toggleClicking();
+      endGame(0);
+      // toggleClicking();
     }
   }
   else {
     console.log(kingsColor + " king is NOT in check");
     console.log("checking for a stalemate");
-    if (isStalemate()) {console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");}
-    else {isInsuficientDraw();}
+    if (isStalemate()) {
+      console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");
+      endGame(1);
+    }
+    else if (isInsuficientDraw()) {
+      endGame(2);
+    }
   }
-  //console.log("white king is on square: " + whiteKingID);
-  //console.log("black king is on square: " + blackKingID);
 }
 
 
