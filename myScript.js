@@ -1431,15 +1431,15 @@ function showMove(moveIndex) {
   // OR it's the beginning of the game (last move = 0) and player wants to go to "first move" before it happend)
   if (moveIndex == moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]
     || moveIndex == 1 && moveHistory[0][1] == 0) {return;}
-  // else if player wants to view other than last move and the last move is the displayed move (until now)
+  // else if player wants to view other than last move and the last move was the displayed move (until now)
   else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {
     toggleClicking();
-    document.getElementById("currentButton").style.backgroundColor = "red";
+    document.getElementById("currentButton").classList.toggle("redBackground");
   }
-  // else if player wants to view the last move made and it is not currently displayed move (until now)
+  // else if player wants to view the last move made and it was not currently displayed move (until now)
   else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {
     toggleClicking();
-    document.getElementById("currentButton").style.backgroundColor = "grey";
+    document.getElementById("currentButton").classList.toggle("redBackground");
   }
 
   if(moveIndex == 1 || moveIndex == moveHistory[0][1]) {scrollOnDiv(document.getElementById("move" + moveIndex));}
@@ -1461,6 +1461,14 @@ function showMove(moveIndex) {
   moveHistory[0][0] = moveIndex;
   // highlighting the div with currently displayed move in the move history box
   document.getElementById("move" + moveIndex).classList.toggle("displayedMove");
+
+  // unhighlight the previous last move square
+  toggleLastMove(moveHistory[0][2]);
+
+  // 
+  moveHistory[0][2] = moveHistory[moveIndex][0];
+  toggleLastMove(moveHistory[moveIndex][0]);
+
 }
 
 function saveMove() {
@@ -1471,7 +1479,6 @@ function saveMove() {
   if (currentMoveIndex > 1) {document.getElementById("move" + (currentMoveIndex-1)).classList.toggle("displayedMove");}
   let divToHighlight = document.getElementById("move" + currentMoveIndex);
   divToHighlight.classList.toggle("displayedMove");
-  // divToHighlight.scrollIntoView({ behavior: "smooth", block: "nearest" });
   scrollOnDiv(divToHighlight);
   moveHistory[0][1]++;
 }
@@ -1484,7 +1491,7 @@ function scrollOnDiv(divToFocuse) {
 function takeMoveSnapshot() {
   let oneMove = [];
   // aditional info can be: what kind of piece moved to which square, en passant?, castling?...
-  oneMove.push(["additional info", true]);
+  oneMove.push([]);
   for (let i = 1; i < 65; i++) {
     oneMove.push(boardArray[i][0] + boardArray[i][1]);
   }
@@ -1502,6 +1509,14 @@ function rotateBoard() {
   chessSquares.reverse().forEach(square => board.appendChild(square));
 }
 
+/////////////////////////////////////////////////////////////////////////////////////
+
+// HIGHLIGHTING THE LAST MOVE MADE
+
+// toggles class of the square to highlight the last move made
+function toggleLastMove(thisSquare) {
+  thisSquare.classList.toggle("lastMove");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -1529,7 +1544,7 @@ function markPossibleMove(square) {
 
 // executes the move of a piece from given oldSquare to newSquare
 // updates the board state in boardArray
-// switches the turn to the other player (in whiteMove)
+// switches the turn to the other player (calls switchMove())
 function executeMove(oldSquare, newSquare) {
   
   // moves the piece to the new square (visually)
@@ -1544,6 +1559,14 @@ function executeMove(oldSquare, newSquare) {
 
   // log a move in the move history box
   outputToMoveBox(newSquare);
+
+
+  // unhighlightt the old square
+  if(getMoveHistoryIndex() > 1) {toggleLastMove(moveHistory[0][2]);}
+  // highlight square that a piece moved to
+  toggleLastMove(newSquare);
+  // take a note of last move/moves highlighted in moveHistory for last move highlighted
+  moveHistory[0][2] = newSquare;
 
   // a piece that previously stepped in en passant is being taken en passant
   if (enPassantExecutionStarted) {
@@ -1602,6 +1625,9 @@ function executeMove(oldSquare, newSquare) {
 function switchMove() {
   // save a move to move history
   saveMove();
+
+  // save the last move (reference to the square div element, for each specific move, for displaying history moves) 
+  moveHistory[getMoveHistoryIndex()][0] = moveHistory[0][2];
 
   // toggling white/black player move
   whiteMove = !whiteMove; 
