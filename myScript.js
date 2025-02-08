@@ -1296,12 +1296,12 @@ function getPiecesArray() {
 
 // GAME OVER !!!
 
-// 0 - checkmate, 1 - draw, 2 - insuficient material
 function endGame(finishType) {
+// 0 - checkmate, 1 - draw, 2 - insuficient material, 3 - stalemate, 4 - rezignation
   gameOver = true;
   toggleClicking();
-  let gameEnd = ["checkmate", "draw", "stalemate"];
-  console.log("Game ended by " + gameEnd[finishType] + ".");
+  let typeOfGameEnd = ["checkmate", "draw", "insuficient material draw", "stalemate", "rezignation of a player"];
+  console.log("Game ended by " + typeOfGameEnd[finishType] + ".");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1428,15 +1428,15 @@ function getPieceShortcut(squareID) {
 
 function showPreviousMove() {
   if (moveHistory[0][0] > 1) {
-    showMove(moveHistory[0][0] - 1);
     scrollOnDiv(document.getElementById("move" + (moveHistory[0][0] - 1)));
+    showMove(moveHistory[0][0] - 1);
   }
 }
 
 function showNextMove() {
   if (moveHistory[0][0] < moveHistory[0][1]) {
-    showMove(moveHistory[0][0] + 1);
     scrollOnDiv(document.getElementById("move" + (moveHistory[0][0] + 1)));
+    showMove(moveHistory[0][0] + 1);
   }
 }
 
@@ -1520,8 +1520,8 @@ function takeMoveSnapshot() {
 
 function rotateBoard() {
   let chessSquares = Array.from(board.children); // Convert NodeList to Array
-  
-  // Reverse the order and re-append elements
+  // reverse the order and re-append elements
+  // appending an element "takes" it from the previous location
   chessSquares.reverse().forEach(square => board.appendChild(square));
 }
 
@@ -1668,7 +1668,6 @@ function switchMove() {
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
       endGame(0);
-      // toggleClicking();
     }
   }
   // when it's a single check, player has to be able to do one of three things:
@@ -1691,7 +1690,7 @@ function switchMove() {
     console.log("checking for a stalemate");
     if (isStalemate()) {
       console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");
-      endGame(1);
+      endGame(3);
     }
     else if (isInsuficientDraw()) {
       endGame(2);
@@ -1701,7 +1700,7 @@ function switchMove() {
 
 
 
-// call the function to initially set up the board
+// call the function to initially set up the board (place pieces on the board)
 setUpBoard();
 
 
