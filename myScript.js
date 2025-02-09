@@ -72,72 +72,76 @@ let boardArray = [
   ['r', 'w', 'a', 1], ['n', 'w', 'b', 1], ['b', 'w', 'c', 1], ['q', 'w', 'd', 1], ['k', 'w', 'e', 1], ['b', 'w', 'f', 1], ['n', 'w', 'g', 1], ['r', 'w', 'h', 1]
  ];
 
-// create the board and add click ability to the squares
-for(let i = 0; i<64; i++) {
-  let thisSquare = document.createElement("div");
-  thisSquare.id = i+1;
-  thisSquare.addEventListener("click", function() {
+/////////////////////////////////////////////////////////////////////////////////////
 
-    //console.log("this is a square number: " + thisSquare.id);
-    if (!moveInProgress && isPlayersTurnAndPiece(thisSquare.id)) {
-      // user selected a piece to move (there was no other piece selected before)
-      markPossibleMove(thisSquare); 
-    }
-    else if (moveInProgress && thisSquare == chosenSquare) {
-      // same piece clicked twice ==> highlight/unhighlight ==> move in progress canceled 
-      clearSquare(chosenSquare);
-    }
-    else if (isPlayersTurnAndPiece(thisSquare.id)) {
-      // player clicked another of his pieces (player selected a different piece to move)
-      clearSquare(chosenSquare);
-      markPossibleMove(thisSquare);
-    }
-    else if (!moveInProgress && isEmptySquare(thisSquare.id)) {
-      // player clicked an empty square instead of his piece
-      console.log("This is an empty square!");
-    }
-    else if (!moveInProgress && isOpponentsPiece(thisSquare.id)) {
-      // player clicked an opponent's piece instead of his piece
-      console.log("It is not this colour's move!");
-    }
-    else if (isOpponentsPiece(thisSquare.id)) {
-      // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
-      // if (validSquares.includes(thisSquare))  {
-      
-      if (isValidMove(thisSquare)) {
-        takePiece(chosenSquare, thisSquare);
+
+function buildBoard() {
+  for(let i = 0; i<64; i++) {
+    let thisSquare = document.createElement("div");
+    thisSquare.id = i+1;
+    thisSquare.addEventListener("click", function() {
+  
+      //console.log("this is a square number: " + thisSquare.id);
+      if (!moveInProgress && isPlayersTurnAndPiece(thisSquare.id)) {
+        // user selected a piece to move (there was no other piece selected before)
+        markPossibleMove(thisSquare); 
       }
-      else {
+      else if (moveInProgress && thisSquare == chosenSquare) {
+        // same piece clicked twice ==> highlight/unhighlight ==> move in progress canceled 
         clearSquare(chosenSquare);
       }
-    }
-    else if (isEmptySquare(thisSquare.id)) {
-      // a square is hightlighted and player clicked empty square ==> if valid, a move happening
-      //console.log(thisSquare.id);
-      if (isValidMove(thisSquare))  {
-        console.log("moving to an empty square");
-        executeMove(chosenSquare, thisSquare);
-      }
-      else {
+      else if (isPlayersTurnAndPiece(thisSquare.id)) {
+        // player clicked another of his pieces (player selected a different piece to move)
         clearSquare(chosenSquare);
+        markPossibleMove(thisSquare);
       }
+      else if (!moveInProgress && isEmptySquare(thisSquare.id)) {
+        // player clicked an empty square instead of his piece
+        console.log("This is an empty square!");
+      }
+      else if (!moveInProgress && isOpponentsPiece(thisSquare.id)) {
+        // player clicked an opponent's piece instead of his piece
+        console.log("It is not this colour's move!");
+      }
+      else if (isOpponentsPiece(thisSquare.id)) {
+        // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
+        // if (validSquares.includes(thisSquare))  {
+        
+        if (isValidMove(thisSquare)) {
+          takePiece(chosenSquare, thisSquare);
+        }
+        else {
+          clearSquare(chosenSquare);
+        }
+      }
+      else if (isEmptySquare(thisSquare.id)) {
+        // a square is hightlighted and player clicked empty square ==> if valid, a move happening
+        //console.log(thisSquare.id);
+        if (isValidMove(thisSquare))  {
+          console.log("moving to an empty square");
+          executeMove(chosenSquare, thisSquare);
+        }
+        else {
+          clearSquare(chosenSquare);
+        }
+      }
+    })
+    // appending squares to board and giving them class names
+    board.appendChild(thisSquare)
+    if(colorCounter%2 == 1){
+      thisSquare.className = "whiteSquare";
     }
-  })
-  // appending squares to board and giving them class names
-  board.appendChild(thisSquare)
-  if(colorCounter%2 == 1){
-    thisSquare.className = "whiteSquare";
-  }
-  else{
-    thisSquare.className = "blackSquare"; 
-  }
-  // new File of squares (adding <br>)
-  if((i+1)%8 === 0 && i != 63) {
-    let breakLine = document.createElement("br");
-    board.appendChild(breakLine);
+    else{
+      thisSquare.className = "blackSquare"; 
+    }
+    // new File of squares (adding <br>)
+    if((i+1)%8 === 0 && i != 63) {
+      let breakLine = document.createElement("br");
+      board.appendChild(breakLine);
+      colorCounter++;
+    }
     colorCounter++;
   }
-  colorCounter++;
 }
 
 // places a piece on the board given the square and shortcut of the piece ("pb" - pawn black)
@@ -1700,9 +1704,9 @@ function switchMove() {
   }
 }
 
-
-
-// call the function to initially set up the board (place pieces on the board)
+// builds the html representation of the board (squares)
+buildBoard();
+// places pieces on the board - initially sets up the board 
 setUpBoard();
 
 
@@ -1715,4 +1719,5 @@ setUpBoard();
   // on board && same color of the square && ....
   // simplify canKingMove()
   // simplify getKingToAttackerPath() and getPathArray()
+  // improve logging of moves (en passant, promotion, check, checkmate, castle...)
 
