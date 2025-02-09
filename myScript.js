@@ -10,13 +10,18 @@ let whiteMove = true;         // true => white's move, false => black's move
 
 let infobox = document.getElementById("infobox");
 let moveBox = document.getElementById("moveLogger");
+
 // adds event listeners for click on divs in the move history box 
-// (div informing about a move made will take the user to that move = set up a board)
+// (the div's are creating dinamically based on the new moves made)
+// (div informing about a move will take the user to that move = display the situation on the board)
 moveBox.addEventListener("click", function(event) {
   if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id.slice(4))}});
 
+// set to true when the game is over by any reason (checkmate, draw, stalemate, resignation..)
 let gameOver = false;
 
+// counting the number of moves in this way: 1 for white player, 1 for black, 2 for white, 2 for black ...
+// (incremented after the black player has moved)
 let moveNumber = 1;
 
 // move history array, 
@@ -27,6 +32,7 @@ let moveNumber = 1;
 // moveHistory[0][2] (added later) - html element -> div of square -> last move highlighted on the board
 let moveHistory = [[0, 0]];
 
+// flags for en passant logic
 let activateEnPassant = false;
 let enPassantInProgress = false;
 let pawnsAbleToEnPassant = [];
@@ -35,22 +41,24 @@ let enPassantExecutionStarted = false;
 
 let whitePromotion = false;
 
-// not used yet:
+
 let whiteInCheck = false;    // if true => check or checkmate happening
 let blackInCheck = false;
 
 let whiteKingID = 61;
 let blackKingID = 5;
 
+// board array backup for simulation of move
 let boardArrayBackup;
 
 let moveInProgress = false;
+// 
 let chosenSquare = null;
 
 // A for long, H for short castling
 let abilityToCastle = { whiteA: true, whiteH: true, blackA: true, blackH: true };
 
-// array or arrays with empty member on index 0
+// array or arrays with empty member on index 0 (to match indexes with 1 to 64 id's of board squares (div's))
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
 let boardArray = [
   [],
@@ -1370,15 +1378,10 @@ function outputToMoveBox(newSquare) {
   if (whiteMove) {
     addMoveDiv(newSquare.id, true);
     addMoveDiv(newSquare.id);
-    // moveBox.innerHTML += moveNumber + ". ";
-    // moveBox.innerHTML += boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
-    // + coordinatesOfSquare(newSquare.id);
   }
   else {
     addMoveDiv(newSquare.id);
     moveBox.innerHTML += "<br>";
-    // moveBox.innerHTML += "   ||   " + boardArray[newSquare.id][1] + boardArray[newSquare.id][0] + " " 
-    // + coordinatesOfSquare(newSquare.id) + "<br>";
   }
 }
 
@@ -1390,7 +1393,6 @@ function addMoveDiv(newSquareID, numbering = false) {
   if (numbering) {
     moveDiv.className = "numberDivTemplate";
     moveDiv.innerHTML = moveNumber;
-    // moveDiv.style.width = "30px";
   }
   else {
     moveDiv.className = "moveDivTemplate";
