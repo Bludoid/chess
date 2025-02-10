@@ -74,58 +74,15 @@ let boardArray = [
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+//  FUNCTIONS TO START THE GAME (set up board, place pieces, handle clicking on squares)
 
+// builds the html div's as squares for chess board
 function buildBoard() {
   for(let i = 0; i<64; i++) {
     let thisSquare = document.createElement("div");
     thisSquare.id = i+1;
-    thisSquare.addEventListener("click", function() {
-  
-      //console.log("this is a square number: " + thisSquare.id);
-      if (!moveInProgress && isPlayersTurnAndPiece(thisSquare.id)) {
-        // user selected a piece to move (there was no other piece selected before)
-        markPossibleMove(thisSquare); 
-      }
-      else if (moveInProgress && thisSquare == chosenSquare) {
-        // same piece clicked twice ==> highlight/unhighlight ==> move in progress canceled 
-        clearSquare(chosenSquare);
-      }
-      else if (isPlayersTurnAndPiece(thisSquare.id)) {
-        // player clicked another of his pieces (player selected a different piece to move)
-        clearSquare(chosenSquare);
-        markPossibleMove(thisSquare);
-      }
-      else if (!moveInProgress && isEmptySquare(thisSquare.id)) {
-        // player clicked an empty square instead of his piece
-        console.log("This is an empty square!");
-      }
-      else if (!moveInProgress && isOpponentsPiece(thisSquare.id)) {
-        // player clicked an opponent's piece instead of his piece
-        console.log("It is not this colour's move!");
-      }
-      else if (isOpponentsPiece(thisSquare.id)) {
-        // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
-        // if (validSquares.includes(thisSquare))  {
-        
-        if (isValidMove(thisSquare)) {
-          takePiece(chosenSquare, thisSquare);
-        }
-        else {
-          clearSquare(chosenSquare);
-        }
-      }
-      else if (isEmptySquare(thisSquare.id)) {
-        // a square is hightlighted and player clicked empty square ==> if valid, a move happening
-        //console.log(thisSquare.id);
-        if (isValidMove(thisSquare))  {
-          console.log("moving to an empty square");
-          executeMove(chosenSquare, thisSquare);
-        }
-        else {
-          clearSquare(chosenSquare);
-        }
-      }
-    })
+    // adding event listener to each board square, click will call squareClicked
+    thisSquare.addEventListener("click", function() {squareClicked(thisSquare.id);});
     // appending squares to board and giving them class names
     board.appendChild(thisSquare)
     if(colorCounter%2 == 1){
@@ -143,6 +100,71 @@ function buildBoard() {
     colorCounter++;
   }
 }
+
+// sets up the chessboard by placing the pieces in their correct STARTING position
+function setUpBoard() {
+  for (let i = 1; i<17; i++) {
+    let pieceName = boardArray[i][0] + boardArray[i][1];
+    placePiece(document.getElementById(i), pieceName);
+  }
+  for (let i = 49; i<65; i++) {
+    let pieceName = boardArray[i][0] + boardArray[i][1];
+    placePiece(document.getElementById(i), pieceName);
+  }
+}
+
+// function to handle a click on a square on the board
+function squareClicked(squareID) {
+  let thisSquare = document.getElementById(squareID);
+  if (!moveInProgress && isPlayersTurnAndPiece(squareID)) {
+    // user selected a piece to move (there was no other piece selected before)
+    markPossibleMove(thisSquare); 
+  }
+  else if (moveInProgress && thisSquare == chosenSquare) {
+    // same piece clicked twice ==> highlight/unhighlight ==> move in progress canceled 
+    clearSquare(chosenSquare);
+  }
+  else if (isPlayersTurnAndPiece(squareID)) {
+    // player clicked another of his pieces (player selected a different piece to move)
+    clearSquare(chosenSquare);
+    markPossibleMove(thisSquare);
+  }
+  else if (!moveInProgress && isEmptySquare(squareID)) {
+    // player clicked an empty square instead of his piece
+    console.log("This is an empty square!");
+  }
+  else if (!moveInProgress && isOpponentsPiece(squareID)) {
+    // player clicked an opponent's piece instead of his piece
+    console.log("It is not this colour's move!");
+  }
+  else if (isOpponentsPiece(squareID)) {
+    // a square is highlighted and player clicked opponent's piece ==> if valid, a take happening
+    // if (validSquares.includes(thisSquare))  {
+    
+    if (isValidMove(thisSquare)) {
+      takePiece(chosenSquare, thisSquare);
+    }
+    else {
+      clearSquare(chosenSquare);
+    }
+  }
+  else if (isEmptySquare(squareID)) {
+    // a square is hightlighted and player clicked empty square ==> if valid, a move happening
+    //console.log(thisSquare.id);
+    if (isValidMove(thisSquare))  {
+      console.log("moving to an empty square");
+      executeMove(chosenSquare, thisSquare);
+    }
+    else {
+      clearSquare(chosenSquare);
+    }
+  }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+// LOGIC FOR BASIC BOARD FUNCTIONALITY (place/remove piece, highlight/unhighlight square, taking piece, clearing square) 
 
 // places a piece on the board given the square and shortcut of the piece ("pb" - pawn black)
 function placePiece(square, pieceName) {
@@ -168,6 +190,26 @@ function unhighlightSquare(square) {
   square.classList.remove("highlighted");
 }
 
+// taking a piece
+function takePiece(takingPieceSquare, takenPieceSquare) {
+  removePiece(takenPieceSquare);
+  executeMove(takingPieceSquare, takenPieceSquare);
+}
+
+// clears the square (unhighlights it); variables chosenSquare and moveInProgress are reset
+// used after a move was made or canceled (canceled by chosing different square or move is not valid) 
+function clearSquare(square) {
+  unhighlightSquare(square);
+  chosenSquare = null;
+  moveInProgress = false;
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+// HELPER FUNCTIONS FOR BASIC CHESS LOGIC
+
 // checks if the square contains a piece and if it belongs to the player who's turn it is - if yes, returns true
 // if it's not the right player's turn or the square is empty, returns false
 function isPlayersTurnAndPiece(squareID) {
@@ -183,19 +225,10 @@ function isOpponentsPiece(squareID) {
   return ((!whiteMove && boardArray[squareID][1] == "w") || (whiteMove && boardArray[squareID][1] == "b"));
 }
 
-// clears the square (unhighlights it); variables chosenSquare and moveInProgress are reset
-// used after a move was made or canceled (canceled by chosing different square or move is not valid) 
-function clearSquare(square) {
-  unhighlightSquare(square);
-  chosenSquare = null;
-  moveInProgress = false;
-}
 
-function takePiece(takingPieceSquare, takenPieceSquare) {
-  // taking a piece
-  removePiece(takenPieceSquare);
-  executeMove(takingPieceSquare, takenPieceSquare);
-}
+//////////////////////////////////////////////////////////////////////////
+
+// MAIN FUNCTION TO VALIDATE MOVE, CALLS OTHER FUNCTIONS FOR DIFFERENT KINGS OF PIECES
 
 // creates backup for the boardArray
 // checks if a move is valid for different pieces:
@@ -258,7 +291,10 @@ function isValidMove(square) {
   }
 }
 
-//////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+// FUNCTIONS TO VALIDATE MOVES OF DIFFERENT PIECES
+// CALLED BY validateMove() function
 
 function isWhitePawnMove(square) {
   if (!isSameFile(square.id)) {
@@ -450,8 +486,9 @@ function disableCastlingBlack() {
 }
 
 
+//////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////
+// HELPER FUNCTIONS FOR PIECE MANIPULATION / MOVE VALIDATION
 
 function isSameRank(squareID, otherSquareID = chosenSquare.id) {
   return (boardArray[squareID][3] == boardArray[otherSquareID][3]); 
@@ -676,7 +713,7 @@ function isHorizontalOrVerticalPath(endSquare, direction) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-/// pawn promotion helper functions:
+/// PAWN PROMOTION HELPER FUNCTIONS
 
 function isPawnPromotion(square) {
   //console.log("checking promotion of the pawn");
@@ -744,7 +781,7 @@ function toggleClicking() {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-// checking king or empty square for checks
+// LOGIC FOR DETECTING CHECKS
 
 
 // when whiteMove is true (it's white's move), looks for attackers of black color
@@ -1087,7 +1124,6 @@ function addCorrectPawnBlockers(squareOnPathID, blockersArray) {
 }
 
 
-
 /////////////////////////////////////////////////////////////////////////////////////
 
 // STALEMATE LOGIC FUNCTIONS:
@@ -1198,7 +1234,7 @@ function getPawnSquares(squareID) {
 }
 /////////////////////////////////////////////////////////////////////////////////////
 
-// helper functions for validity of moves / potential moves
+// VALILDITY OF MOVES / POTENTIAL MOVES HELPER FUNCTIONS
 
 // returns true if two given square ID's are on a diagonal and are not possesed by player's own piece
 function  areSquaresDiagonal(squareID, exploredSquareID) {
@@ -1216,7 +1252,7 @@ function  areSquaresRookKnight(squareID, exploredSquareID) {
 }
 /////////////////////////////////////////////////////////////////////////////////////
 
-// INSUFICIENCY OF MATERIAL LOGIC
+// INSUFICIENCY OF MATERIAL (DRAW) LOGIC
 
 function isInsuficientDraw() {
   let piecesArray = getPiecesArray();
@@ -1306,7 +1342,7 @@ function getPiecesArray() {
 }
 /////////////////////////////////////////////////////////////////////////////////////
 
-// GAME OVER !!!
+// GAME OVER function 
 
 function endGame(finishType) {
 // 0 - checkmate, 1 - draw, 2 - insuficient material, 3 - stalemate, 4 - rezignation
@@ -1318,9 +1354,29 @@ function endGame(finishType) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+// OUTPUT TO INFOBOX AND MOVEBOX FUNCTIONS
 
 // functions to inform player about move history and additional info about moves (promotion, en passant...)
 // in the infobox and moveBox divs
+
+
+// outputs message for players to the infobox
+function outputToInfobox(infoMessage) {
+  infobox.innerHTML = infoMessage;
+}
+
+// outputs the move history into the "moveBox"
+// called by executeMove()
+function outputToMoveBox(newSquare) {
+  if (whiteMove) {
+    addMoveDiv(newSquare.id, true);
+    addMoveDiv(newSquare.id);
+  }
+  else {
+    addMoveDiv(newSquare.id);
+    moveBox.innerHTML += "<br>";
+  }
+}
 
 // return a string with colour and piece ("white rook")
 function pieceToString(square) {
@@ -1371,23 +1427,6 @@ function getCoordinatesOfSquare(squareID) {
   return (boardArray[squareID][2] + boardArray[squareID][3]);
 }
 
-// outputs message for players to the infobox
-function outputToInfobox(infoMessage) {
-  infobox.innerHTML = infoMessage;
-}
-
-// outputs the move history into the "moveBox"
-// called by executeMove()
-function outputToMoveBox(newSquare) {
-  if (whiteMove) {
-    addMoveDiv(newSquare.id, true);
-    addMoveDiv(newSquare.id);
-  }
-  else {
-    addMoveDiv(newSquare.id);
-    moveBox.innerHTML += "<br>";
-  }
-}
 
 // creates a new div and adds it to the moveBox
 // it's either a number of the move (numbering = true) or info about a move made by white or black player
@@ -1505,11 +1544,13 @@ function saveMove() {
   moveHistory[0][1]++;
 }
 
+// automatically scroll to a div showing the move information about the displayed move
 function scrollOnDiv(divToFocus) {
   // let thisDiv = document.getElementById(divID)
   divToFocus.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
+// save board information about each move
 function takeMoveSnapshot() {
   let oneMove = [];
   // aditional info can be: what kind of piece moved to which square, en passant?, castling?...
@@ -1542,22 +1583,11 @@ function toggleLastMove(thisSquare) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+// LOGIC FOR MARKING POSSIBLE MOVE, EXECUTING VALID MOVE AND SWITCHING MOVE (from white to black player...) 
 
-// sets up the chessboard by placing the pieces in their correct STARTING position
-function setUpBoard() {
-  for (let i = 1; i<17; i++) {
-    let pieceName = boardArray[i][0] + boardArray[i][1];
-    placePiece(document.getElementById(i), pieceName);
-  }
-  for (let i = 49; i<65; i++) {
-    let pieceName = boardArray[i][0] + boardArray[i][1];
-    placePiece(document.getElementById(i), pieceName);
-  }
-}
 
 // starts the move by setting moveInProgress to true, highlights the given square and saves the square as chosenSquare 
 function markPossibleMove(square) {
-  //console.log("There is this piece on the square: " + square.firstChild.className);
   console.log(pieceToString(square));
   moveInProgress = true;
   highlightSquare(square);
@@ -1643,7 +1673,8 @@ function executeMove(oldSquare, newSquare) {
   }
 }
 
-
+// saves move to move history, swithes turn from player to player (white-black) and coloured banner
+// checks for checkmate and draw (calles functions accordingly)
 function switchMove() {
   // save a move to move history
   saveMove();
@@ -1688,7 +1719,6 @@ function switchMove() {
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
       endGame(0);
-      // toggleClicking();
     }
   }
   else {
@@ -1720,4 +1750,3 @@ setUpBoard();
   // simplify canKingMove()
   // simplify getKingToAttackerPath() and getPathArray()
   // improve logging of moves (en passant, promotion, check, checkmate, castle...)
-
