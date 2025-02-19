@@ -2,27 +2,18 @@
 //   chess board in HTML/CSS/JavaScript  //
 ///////////////////////////////////////////
 
-
-
-let colorCounter = 1;
-let board = document.getElementById("board");
 let whiteMove = true;         // true => white's move, false => black's move
-
-let infobox = document.getElementById("infobox");
-let moveBox = document.getElementById("moveLogger");
-
-// adds event listeners for click on divs in the move history box 
-// (the div's are creating dinamically based on the new moves made)
-// (div informing about a move will take the user to that move = display the situation on the board)
-moveBox.addEventListener("click", function(event) {
-  if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id.slice(4))}});
-
-// set to true when the game is over by any reason (checkmate, draw, stalemate, resignation..)
-let gameOver = false;
+let gameOver = false;         // when true => the game is over by any reason (checkmate, draw, stalemate, resigne..)
 
 // counting the number of moves in this way: 1 for white player, 1 for black, 2 for white, 2 for black ...
 // (incremented after the black player has moved)
 let moveNumber = 1;
+
+
+let board = document.getElementById("board");
+let infobox = document.getElementById("infobox");
+let moveBox = document.getElementById("moveLogger");
+
 
 // move history array, 
 // array at index 0 dedicated to information about moves 
@@ -30,6 +21,8 @@ let moveNumber = 1;
 // moveHistory[0][1] number of moves already made (max move index)
 // array by default set to default = [0, 0] (showing move number zero and zero moves made)
 // moveHistory[0][2] (added later) - html element -> div of square -> last move highlighted on the board
+// moveHistory[moveIndex][0][0] - information about last square to hightlight for the specific move
+// moveHistory[moveIndex][0][1] - special feature of the move (take, castle, promotion, en passant, check, checkmate)
 let moveHistory = [[0, 0]];
 
 // flags for en passant logic
@@ -39,8 +32,6 @@ let pawnsAbleToEnPassant = [];
 let pawnInEnPassant = [];
 let enPassantExecutionStarted = false;
 
-let whitePromotion = false;
-
 
 let whiteInCheck = false;    // if true => check or checkmate happening
 let blackInCheck = false;
@@ -48,15 +39,14 @@ let blackInCheck = false;
 let whiteKingID = 61;
 let blackKingID = 5;
 
-// board array backup for simulation of move
-let boardArrayBackup;
-
 let moveInProgress = false;
-// 
 let chosenSquare = null;
 
 // A for long, H for short castling
 let abilityToCastle = { whiteA: true, whiteH: true, blackA: true, blackH: true };
+
+// board array backup for simulation of move
+let boardArrayBackup;
 
 // array or arrays with empty member on index 0 (to match indexes with 1 to 64 id's of board squares (div's))
 // 64 squares represented as ['r', 'b', 'a', 8] (piece, color, File, file), indexes 0 and 1 possibly "e" for empty square
@@ -72,12 +62,22 @@ let boardArray = [
   ['r', 'w', 'a', 1], ['n', 'w', 'b', 1], ['b', 'w', 'c', 1], ['q', 'w', 'd', 1], ['k', 'w', 'e', 1], ['b', 'w', 'f', 1], ['n', 'w', 'g', 1], ['r', 'w', 'h', 1]
  ];
 
+// adds event listeners for click on divs in the move history box 
+// (the div's are created dynamically based on the new moves made)
+// (click on div informing about a move will take the user to that move => display the situation on the board)
+moveBox.addEventListener("click", function(event) {
+  if (event.target.matches(".moveDivTemplate")) {showMove(event.target.id.slice(4))}
+});
+
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 
 //  FUNCTIONS TO START THE GAME (set up board, place pieces, handle clicking on squares)
 
 // builds the html div's as squares for chess board
 function buildBoard() {
+  let colorCounter = 1;
   for(let i = 0; i<64; i++) {
     let thisSquare = document.createElement("div");
     thisSquare.id = i+1;
@@ -1544,12 +1544,6 @@ function saveMove() {
   moveHistory[0][1]++;
 }
 
-// automatically scroll to a div showing the move information about the displayed move
-function scrollOnDiv(divToFocus) {
-  // let thisDiv = document.getElementById(divID)
-  divToFocus.scrollIntoView({ behavior: "smooth", block: "nearest" });
-}
-
 // save board information about each move
 function takeMoveSnapshot() {
   let oneMove = [];
@@ -1559,6 +1553,12 @@ function takeMoveSnapshot() {
     oneMove.push(boardArray[i][0] + boardArray[i][1]);
   }
   return oneMove;
+}
+
+// automatically scroll to a div showing the move information about the displayed move
+function scrollOnDiv(divToFocus) {
+  // let thisDiv = document.getElementById(divID)
+  divToFocus.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
