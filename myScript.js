@@ -15,14 +15,22 @@ let infobox = document.getElementById("infobox");
 let moveBox = document.getElementById("moveLogger");
 
 
-// move history array, 
+// move history array
 // array at index 0 dedicated to information about moves 
 // moveHistory[0][0] index of move displayed currently on the board
 // moveHistory[0][1] number of moves already made (max move index)
-// array by default set to default = [0, 0] (showing move number zero and zero moves made)
-// moveHistory[0][2] (added later) - html element -> div of square -> last move highlighted on the board
-// moveHistory[moveIndex][0][0] - information about last square to hightlight for the specific move
-// moveHistory[moveIndex][0][1] - special feature of the move (take, castle, promotion, en passant, check, checkmate)
+// |-> array set to default = [0, 0] (showing move number zero and zero moves made)
+// moveHistory[0][2] (added later on) - html element -> div - chess square -> last move highlighted on the board
+
+// not used yet:
+// moveHistory[0][3] - if needed special feature of the move currently made move (en passant, promotion, ...)
+
+// moveHistory[moveIndex][0] - html element - last square to hightlight for the specific move
+
+// example of moveHistory array beginning:
+// [6, 9, div#23.whiteSquare.lastMove], // 6-currently displayed move, 9-moves saved overall, div-currently shown last move
+// [div#37.whiteSquare, 'rb', 'nb', 'bb', 'qb', 'kb'...] // move no 1 of white player, div - square to highlight, situation on the board after move
+
 let moveHistory = [[0, 0]];
 
 // flags for en passant logic
@@ -1529,7 +1537,6 @@ function showMove(moveIndex) {
   // 
   moveHistory[0][2] = moveHistory[moveIndex][0];
   toggleLastMove(moveHistory[moveIndex][0]);
-
 }
 
 function saveMove() {
