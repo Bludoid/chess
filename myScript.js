@@ -1468,6 +1468,13 @@ function addCheckToMoveDiv() {
   moveDiv.innerHTML += "+";
 }
 
+function addCheckmateToMoveDiv(doubleCheck = false) {
+  let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
+  let divText = moveDiv.innerHTML;
+  if (!doubleCheck) {divText = divText.slice(0, -1) + '#';}
+  else {divText = divText.slice(0, -2) + '#';}  
+  moveDiv.innerHTML = divText;
+}
 
 // converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
 // 4 white => 7
@@ -1715,10 +1722,13 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     moveHistory[0][3].push("+");
-    addCheckToMoveDiv("+");
+    // adding two "+" to moveBox as a symbol for double check
+    addCheckToMoveDiv();
+    addCheckToMoveDiv();
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
+      addCheckmateToMoveDiv(true);
       endGame(0);
     }
   }
@@ -1731,10 +1741,12 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     moveHistory[0][3].push("+");
-    addCheckToMoveDiv("+");
+    // adding "+" to move box as a symbol for check
+    addCheckToMoveDiv();
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
+      addCheckmateToMoveDiv();
       endGame(0);
     }
   }
