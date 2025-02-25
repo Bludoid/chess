@@ -79,8 +79,10 @@ body {
 #infobox {
   background-color: yellow;
   font-size: 25px;
-  width: 260px;
+  width: 310px;
   height: 150px;
+  overflow: scroll;
+  overflow-x: hidden;
 }
 
 /* sideways view (board on left and boxes on the right) */
@@ -92,8 +94,8 @@ body {
 #moveBox {
   /* margin-left: 50px; */
   margin-top: 55px;
-  height: 300px;
-  width: 250px;
+  height: 340px;
+  width: 300px;
   background-color: lightsalmon;
   padding-right: 10px;
   font-size: 25px;
@@ -117,9 +119,9 @@ body {
 
 /* style for buttons */
 button {
-  font-size: 25px;
+  font-size: 24px;
   border-style: solid blue;
-  border-width: 3.5px;
+  border-width: 4.5px;
   border-radius: 4px;
   cursor: pointer;
   background-color: lightgrey;
@@ -182,7 +184,7 @@ button:active {
   width: 60px;
   border: 3px solid blue;
   display: inline-block;
-  margin-left: 5px;
+  margin-left: 2px;
   margin-bottom: 5px;
   border-radius: 4px;
   vertical-align: top;
@@ -191,6 +193,7 @@ button:active {
 .moveDivTemplate {
   cursor: pointer;
   background-color: lightgoldenrodyellow;
+  width: 100px;
 }
 
 .numberDivTemplate {

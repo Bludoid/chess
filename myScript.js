@@ -19,19 +19,15 @@ let moveBox = document.getElementById("moveLogger");
 // array at index 0 dedicated to information about moves 
 // moveHistory[0][0] index of move displayed currently on the board
 // moveHistory[0][1] number of moves already made (max move index)
-// |-> array set to default = [0, 0] (showing move number zero and zero moves made)
-// moveHistory[0][2] (added later on) - html element -> div - chess square -> last move highlighted on the board
+// moveHistory[0][2] html element -> div - chess square -> last move highlighted on the board
+// moveHistory[0][3] - if needed special feature of the currently made move (en passant, promotion, ...)
+// |-> array set to default = [0, 0, undefined, []] 
 
-// not used yet:
-// moveHistory[0][3] - if needed special feature of the move currently made move (en passant, promotion, ...)
 
 // moveHistory[moveIndex][0] - html element - last square to hightlight for the specific move
+// moveHistory[moveIndex][1] - array of piece shortcuts and empty pieces - snapshot of the saved move
 
-// example of moveHistory array beginning:
-// [6, 9, div#23.whiteSquare.lastMove], // 6-currently displayed move, 9-moves saved overall, div-currently shown last move
-// [div#37.whiteSquare, 'rb', 'nb', 'bb', 'qb', 'kb'...] // move no 1 of white player, div - square to highlight, situation on the board after move
-
-let moveHistory = [[0, 0]];
+let moveHistory = [[0, 0, undefined, []]];
 
 // flags for en passant logic
 let activateEnPassant = false;
@@ -1370,7 +1366,11 @@ function endGame(finishType) {
 
 // outputs message for players to the infobox
 function outputToInfobox(infoMessage) {
-  infobox.innerHTML = infoMessage;
+  infobox.innerHTML += infoMessage;
+  infobox.innerHTML += "<br>" + "- - - - - - - - - - - - - - - - -";
+  const breakElement = document.createElement("br");
+  infobox.appendChild(breakElement);
+  breakElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 // outputs the move history into the "moveBox"
@@ -1462,6 +1462,12 @@ function addImage(moveDiv, imageShortcut) {
   //newPiece.className = pieceName;
   moveDiv.appendChild(imgElement);
 }
+
+function addCheckToMoveDiv() {
+  let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
+  moveDiv.innerHTML += "+";
+}
+
 
 // converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
 // 4 white => 7
@@ -1708,6 +1714,8 @@ function switchMove() {
   if (attackerSquares.length > 1) {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
+    moveHistory[0][3].push("+");
+    addCheckToMoveDiv("+");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
@@ -1722,6 +1730,8 @@ function switchMove() {
   else if (attackerSquares.length) {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
+    moveHistory[0][3].push("+");
+    addCheckToMoveDiv("+");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
