@@ -1354,6 +1354,7 @@ function endGame(finishType) {
   toggleClicking();
   let typeOfGameEnd = ["checkmate", "draw", "insuficient material draw", "stalemate", "rezignation of a player"];
   console.log("Game ended by " + typeOfGameEnd[finishType] + ".");
+  outputToInfobox("Game ended by " + typeOfGameEnd[finishType] + ".");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1366,8 +1367,11 @@ function endGame(finishType) {
 
 // outputs message for players to the infobox
 function outputToInfobox(infoMessage) {
-  infobox.innerHTML += infoMessage;
-  infobox.innerHTML += "<br>" + "- - - - - - - - - - - - - - - - -";
+  infobox.innerHTML += infoMessage + "<br>";
+}
+
+function endOfMoveInfoBox() {
+  infobox.innerHTML += "- - - - - - - - - - - - - - - - -";
   const breakElement = document.createElement("br");
   infobox.appendChild(breakElement);
   breakElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1626,6 +1630,7 @@ function executeMove(oldSquare, newSquare) {
   clearSquare(oldSquare);
   removePiece(oldSquare);
   
+  outputToInfobox("<strong> MOVE: </strong>" + moveNumber + " - " + (whiteMove? " white" : " black") + " player");
   // inform the players about the move made
   outputToInfobox(pieceToString(newSquare) + " moved to " + getCoordinatesOfSquare(newSquare.id))
 
@@ -1741,7 +1746,7 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     moveHistory[0][3].push("+");
-    // adding "+" to move box as a symbol for check
+    // adding "+" to move box as a symbol for check 
     addCheckToMoveDiv();
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
@@ -1761,6 +1766,7 @@ function switchMove() {
       endGame(2);
     }
   }
+  endOfMoveInfoBox();
 }
 
 // builds the html representation of the board (squares)
