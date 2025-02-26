@@ -196,6 +196,7 @@ function unhighlightSquare(square) {
 
 // taking a piece
 function takePiece(takingPieceSquare, takenPieceSquare) {
+  moveHistory[0][3].push("x");
   removePiece(takenPieceSquare);
   executeMove(takingPieceSquare, takenPieceSquare);
 }
@@ -1370,8 +1371,9 @@ function outputToInfobox(infoMessage) {
   infobox.innerHTML += infoMessage + "<br>";
 }
 
+// underlining the info about a move and setting focus (scroll) to it
 function endOfMoveInfoBox() {
-  infobox.innerHTML += "- - - - - - - - - - - - - - - - -";
+  infobox.innerHTML += "= = = = = = = = = = = = =";
   const breakElement = document.createElement("br");
   infobox.appendChild(breakElement);
   breakElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1467,17 +1469,33 @@ function addImage(moveDiv, imageShortcut) {
   moveDiv.appendChild(imgElement);
 }
 
+// adds check: "+" to a move in the move history log
 function addCheckToMoveDiv() {
   let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
   moveDiv.innerHTML += "+";
 }
 
+// adds checkmate: replaces "+" by "#" to a move in the move history log
 function addCheckmateToMoveDiv(doubleCheck = false) {
   let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
   let divText = moveDiv.innerHTML;
   if (!doubleCheck) {divText = divText.slice(0, -1) + '#';}
   else {divText = divText.slice(0, -2) + '#';}  
   moveDiv.innerHTML = divText;
+}
+
+// adds a take info: "x" added to the move in the move history log
+function addTakeToMoveDiv() {
+  let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
+  let divText = moveDiv.innerHTML;
+  let bracketIndex = divText.indexOf(">");
+  moveDiv.innerHTML = moveDiv.innerHTML.slice(0, bracketIndex + 1) + "x" + moveDiv.innerHTML.slice(bracketIndex + 1);
+}
+
+// adds en passant info: "e.p." added to the move in the move history log
+function addEnPassantToMoveDiv() {
+  let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
+  moveDiv.innerHTML += " e.p.";
 }
 
 // converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
@@ -1633,7 +1651,6 @@ function executeMove(oldSquare, newSquare) {
   outputToInfobox("<strong> MOVE: </strong>" + moveNumber + " - " + (whiteMove? " white" : " black") + " player");
   // inform the players about the move made
   outputToInfobox(pieceToString(newSquare) + " moved to " + getCoordinatesOfSquare(newSquare.id))
-
   // log a move in the move history box
   outputToMoveBox(newSquare);
 
@@ -1647,6 +1664,7 @@ function executeMove(oldSquare, newSquare) {
 
   // a piece that previously stepped in en passant is being taken en passant
   if (enPassantExecutionStarted) {
+    moveHistory[0][3].push("e");
     removePiece(document.getElementById(pawnInEnPassant[0]));
   }
 
@@ -1726,7 +1744,6 @@ function switchMove() {
   if (attackerSquares.length > 1) {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
-    moveHistory[0][3].push("+");
     // adding two "+" to moveBox as a symbol for double check
     addCheckToMoveDiv();
     addCheckToMoveDiv();
@@ -1745,7 +1762,6 @@ function switchMove() {
   else if (attackerSquares.length) {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
-    moveHistory[0][3].push("+");
     // adding "+" to move box as a symbol for check 
     addCheckToMoveDiv();
     whiteMove ? whiteInCheck = true : blackInCheck = true;
@@ -1766,7 +1782,21 @@ function switchMove() {
       endGame(2);
     }
   }
+  // info about a move being a take (moveBox and infobox)
+  if (moveHistory[0][3].includes("x")) {
+    addTakeToMoveDiv();
+    outputToInfobox("(opponent's piece taken)")  
+  }
+  // info about en passant ("x" and "e.p.") and infobox message)
+  else if (moveHistory[0][3].includes("e")) {
+    addTakeToMoveDiv();
+    addEnPassantToMoveDiv()
+    outputToInfobox("(pawn taken en passant)")  
+  }
+  // ending the move by underlining the info in the infobox and setting focus to it
   endOfMoveInfoBox();
+  // reset additional info about the move
+  moveHistory[0][3] = [];
 }
 
 // builds the html representation of the board (squares)
