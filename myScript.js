@@ -3,7 +3,7 @@
 ///////////////////////////////////////////
 
 let whiteMove = true;         // true => white's move, false => black's move
-let gameOver = false;         // when true => the game is over by any reason (checkmate, draw, stalemate, resigne..)
+let gameOver = undefined;         // when true => the game is over by any reason (checkmate, draw, stalemate, resigne..)
 
 // counting the number of moves in this way: 1 for white player, 1 for black, 2 for white, 2 for black ...
 // (incremented after the black player has moved)
@@ -1351,7 +1351,7 @@ function getPiecesArray() {
 
 function endGame(finishType) {
 // 0 - checkmate, 1 - draw, 2 - insuficient material, 3 - stalemate, 4 - rezignation
-  gameOver = true;
+  // gameOver = true;
   toggleClicking();
   let typeOfGameEnd = ["checkmate", "draw", "insuficient material draw", "stalemate", "rezignation of a player"];
   console.log("Game ended by " + typeOfGameEnd[finishType] + ".");
@@ -1469,10 +1469,23 @@ function addImage(moveDiv, imageShortcut) {
   moveDiv.appendChild(imgElement);
 }
 
-// adds check: "+" to a move in the move history log
-function addCheckToMoveDiv() {
+function addMoveFeature() {
+  if (moveHistory[0][3].includes("x")) {
+    addTakeToMoveDiv();
+    outputToInfobox("(opponent's piece taken)")  
+  }
+  // info about en passant ("x" and "e.p.") and infobox message)
+  else if (moveHistory[0][3].includes("e")) {
+    addTakeToMoveDiv();
+    addInfoToMoveDiv(" e.p.")
+    outputToInfobox("(pawn taken en passant)")  
+  }
+}
+
+// adds passed info to a move in the move history log ("+", "++", "e.p.", ...)
+function addInfoToMoveDiv(moveInfo) {
   let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
-  moveDiv.innerHTML += "+";
+  moveDiv.innerHTML += moveInfo;
 }
 
 // adds checkmate: replaces "+" by "#" to a move in the move history log
@@ -1490,12 +1503,6 @@ function addTakeToMoveDiv() {
   let divText = moveDiv.innerHTML;
   let bracketIndex = divText.indexOf(">");
   moveDiv.innerHTML = moveDiv.innerHTML.slice(0, bracketIndex + 1) + "x" + moveDiv.innerHTML.slice(bracketIndex + 1);
-}
-
-// adds en passant info: "e.p." added to the move in the move history log
-function addEnPassantToMoveDiv() {
-  let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
-  moveDiv.innerHTML += " e.p.";
 }
 
 // converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
@@ -1537,12 +1544,12 @@ function showMove(moveIndex) {
     || moveIndex == 1 && moveHistory[0][1] == 0) {return;}
   // else if player wants to view other than last move and the last move was the displayed move (until now)
   else if (moveIndex != moveHistory[0][1] && moveHistory[0][0] == moveHistory[0][1]) {
-    if (!gameOver) {toggleClicking();}
+    if (gameOver == undefined) {toggleClicking();}
     document.getElementById("currentButton").classList.toggle("redBackground");
   }
   // else if player wants to view the last move made and it was not currently displayed move (until now)
   else if (moveIndex == moveHistory[0][1] && moveHistory[0][0] != moveHistory[0][1]) {
-    if (!gameOver) {toggleClicking();}
+    if (gameOver == undefined) {toggleClicking();}
     document.getElementById("currentButton").classList.toggle("redBackground");
   }
 
@@ -1745,13 +1752,13 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     // adding two "+" to moveBox as a symbol for double check
-    addCheckToMoveDiv();
-    addCheckToMoveDiv();
+    addInfoMoveDiv("++");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
       addCheckmateToMoveDiv(true);
-      endGame(0);
+      gameOver = 0;
+      // endGame(0);
     }
   }
   // when it's a single check, player has to be able to do one of three things:
@@ -1763,12 +1770,13 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     // adding "+" to move box as a symbol for check 
-    addCheckToMoveDiv();
+    addInfoToMoveDiv("+");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
       addCheckmateToMoveDiv();
-      endGame(0);
+      gameOver = 0;
+      // endGame(0);
     }
   }
   else {
@@ -1776,27 +1784,35 @@ function switchMove() {
     console.log("checking for a stalemate");
     if (isStalemate()) {
       console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");
-      endGame(3);
+      gameOver = 3;
+      // endGame(3);
     }
     else if (isInsuficientDraw()) {
-      endGame(2);
+      gameOver = 2;
+      // endGame(2);
     }
   }
   // info about a move being a take (moveBox and infobox)
-  if (moveHistory[0][3].includes("x")) {
-    addTakeToMoveDiv();
-    outputToInfobox("(opponent's piece taken)")  
-  }
-  // info about en passant ("x" and "e.p.") and infobox message)
-  else if (moveHistory[0][3].includes("e")) {
-    addTakeToMoveDiv();
-    addEnPassantToMoveDiv()
-    outputToInfobox("(pawn taken en passant)")  
-  }
+  addMoveFeature();
+  // following if-else will be in addMoveFeature() function...
+  // if (moveHistory[0][3].includes("x")) {
+  //   addTakeToMoveDiv();
+  //   outputToInfobox("(opponent's piece taken)")  
+  // }
+  // // info about en passant ("x" and "e.p.") and infobox message)
+  // else if (moveHistory[0][3].includes("e")) {
+  //   addTakeToMoveDiv();
+  //   addInfoToMoveDiv(" e.p.")
+  //   outputToInfobox("(pawn taken en passant)")  
+  // }
   // ending the move by underlining the info in the infobox and setting focus to it
   endOfMoveInfoBox();
   // reset additional info about the move
   moveHistory[0][3] = [];
+  if (gameOver != undefined) {
+    endGame(gameOver);
+    endOfMoveInfoBox();
+  }
 }
 
 // builds the html representation of the board (squares)
