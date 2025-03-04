@@ -271,7 +271,6 @@ function isValidMove(square) {
     case "k": 
       if (isKingMove(square)) {
         returnValue = true;
-        //kingBackupID = whiteMove? whiteKingID : blackKingID;
         whiteMove? whiteKingID = square.id : blackKingID = square.id;
       }
       break;
@@ -429,6 +428,7 @@ function isKingMove(square) {
       // using arrow function and "num" to get around !isSquareCheck (would try to negate the function reference itself)
       if ([58, 59, 60].every(isEmptySquare) && !isPathChecked([58, 59, 60])) {
         rookCastling(57, 60, "rw");
+        moveHistory[0][3].push("0-0-0");
         return true;
       }
     }
@@ -436,6 +436,7 @@ function isKingMove(square) {
       console.log("white king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if ([62, 63].every(isEmptySquare) && !isPathChecked([62, 63])) {
         rookCastling(64, 62, "rw");
+        moveHistory[0][3].push("0-0");
         return true;
       }
     }
@@ -445,6 +446,7 @@ function isKingMove(square) {
       console.log("black king wants to casle long!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if ([2, 3, 4].every(isEmptySquare) && !isPathChecked([2, 3, 4])) {
         rookCastling(1, 4, "rb");
+        moveHistory[0][3].push("0-0-0");
         return true;
       }
     }
@@ -452,6 +454,7 @@ function isKingMove(square) {
       console.log("black king wants to casle short!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if ([6, 7].every(isEmptySquare) && !isPathChecked([6, 7])) {
         rookCastling(8, 6, "rb");
+        moveHistory[0][3].push("0-0");
         return true;
       }
     }    
@@ -1356,6 +1359,7 @@ function endGame(finishType) {
   let typeOfGameEnd = ["checkmate", "draw", "insuficient material draw", "stalemate", "rezignation of a player"];
   console.log("Game ended by " + typeOfGameEnd[finishType] + ".");
   outputToInfobox("Game ended by " + typeOfGameEnd[finishType] + ".");
+  outputToInfobox("<strong> >>> " + getPlayerColorString(false) + " won <<< </strong>")
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1472,14 +1476,27 @@ function addImage(moveDiv, imageShortcut) {
 function addMoveFeature() {
   if (moveHistory[0][3].includes("x")) {
     addTakeToMoveDiv();
-    outputToInfobox("(opponent's piece taken)")  
+    outputToInfobox("(" + getPlayerColorString() + " piece taken)");  
   }
-  // info about en passant ("x" and "e.p.") and infobox message)
   else if (moveHistory[0][3].includes("e")) {
     addTakeToMoveDiv();
     addInfoToMoveDiv(" e.p.")
     outputToInfobox("(pawn taken en passant)")  
   }
+  else if (moveHistory[0][3].includes("0-0")) {
+    addInfoToMoveDiv(" 0-0")
+    outputToInfobox("(short castling)")  
+  }
+  else if (moveHistory[0][3].includes("0-0-0")) {
+    addInfoToMoveDiv(" 0-0-0")
+    outputToInfobox("(long castling)")  
+  }
+  if (moveHistory[0][3].includes("p")) {
+    // add promotion to move box (image of promoted piece???)
+    outputToInfobox("(pawn promoted)")  
+  }
+  if (moveHistory[0][3].includes("+")) {outputToInfobox("(player in check)");}
+  else if (moveHistory[0][3].includes("++")) {outputToInfobox("(player in doublecheck)");}
 }
 
 // adds passed info to a move in the move history log ("+", "++", "e.p.", ...)
@@ -1504,6 +1521,13 @@ function addTakeToMoveDiv() {
   let bracketIndex = divText.indexOf(">");
   moveDiv.innerHTML = moveDiv.innerHTML.slice(0, bracketIndex + 1) + "x" + moveDiv.innerHTML.slice(bracketIndex + 1);
 }
+
+function getPlayerColorString(normalLogic = true) {
+  if (normalLogic) {return (whiteMove? "white" : "black");}
+  else {return whiteMove? "black" : "white";}
+}
+
+
 
 // converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
 // 4 white => 7
@@ -1596,7 +1620,6 @@ function saveMove() {
 // save board information about each move
 function takeMoveSnapshot() {
   let oneMove = [];
-  // aditional info can be: what kind of piece moved to which square, en passant?, castling?...
   oneMove.push([]);
   for (let i = 1; i < 65; i++) {
     oneMove.push(boardArray[i][0] + boardArray[i][1]);
@@ -1655,7 +1678,7 @@ function executeMove(oldSquare, newSquare) {
   clearSquare(oldSquare);
   removePiece(oldSquare);
   
-  outputToInfobox("<strong> MOVE: </strong>" + moveNumber + " - " + (whiteMove? " white" : " black") + " player");
+  outputToInfobox("<strong> MOVE: </strong>" + moveNumber + " - " + getPlayerColorString() + " player");
   // inform the players about the move made
   outputToInfobox(pieceToString(newSquare) + " moved to " + getCoordinatesOfSquare(newSquare.id))
   // log a move in the move history box
@@ -1752,7 +1775,8 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     // adding two "+" to moveBox as a symbol for double check
-    addInfoMoveDiv("++");
+    addInfoToMoveDiv("++");
+    moveHistory[0][3].push("++");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
@@ -1771,6 +1795,7 @@ function switchMove() {
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     // adding "+" to move box as a symbol for check 
     addInfoToMoveDiv("+");
+    moveHistory[0][3].push("+");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
@@ -1808,11 +1833,11 @@ function switchMove() {
   // ending the move by underlining the info in the infobox and setting focus to it
   endOfMoveInfoBox();
   // reset additional info about the move
-  moveHistory[0][3] = [];
   if (gameOver != undefined) {
     endGame(gameOver);
     endOfMoveInfoBox();
   }
+  moveHistory[0][3] = [];
 }
 
 // builds the html representation of the board (squares)
