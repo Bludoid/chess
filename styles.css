@@ -68,7 +68,7 @@ body {
   margin-left: 50px;
   margin-top: 20px;
   padding-top: 20px;
-  padding-left: 20px;
+  padding-left: 15px;
   /* width: 250px; */
   /* height: 80px; */
   border: grey solid 5px;
@@ -78,9 +78,9 @@ body {
 /* specifying style of div = console for informing player about moves */
 #infobox {
   background-color: yellow;
-  font-size: 25px;
+  font-size: 22px;
   width: 310px;
-  height: 150px;
+  height: 250px;
   overflow: scroll;
   overflow-x: hidden;
 }
@@ -98,12 +98,12 @@ body {
   width: 300px;
   background-color: lightsalmon;
   padding-right: 10px;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 /* div for showing the moves and scrolling */
 #moveLogger {
-  font-size: 20px;
+  /* font-size: 20px; */
   /* overflow: auto; (would replace the two lines below)*/
   overflow: scroll;
   overflow-x: hidden;
@@ -114,7 +114,7 @@ body {
 /* specifying style for div for buttons (resign, draw offer, flip board) */
 #gameButtonsDiv {
   background-color: rgb(38, 255, 0);
-  padding: 20px;
+  padding: 10px;
 }
 
 /* style for buttons */
@@ -191,28 +191,30 @@ button:active {
 }
 
 .moveDivTemplate {
+  display: inline-flex; /* keeps it inline while using flexbox */
+  align-items: center; /* vertically centers items */
   cursor: pointer;
   background-color: lightgoldenrodyellow;
-  width: 100px;
+  width: 105px;
 }
 
 .numberDivTemplate {
   text-align: center; /* Center horizontally */
   line-height: 40px; /* Set same as height, to center vertically */
   width: 30px;
-  margin-right: 5px;
+  margin-right: 2px;
   border-color: green;
   background-color: greenyellow;
-  font-size: 20px;
 }
 
 .moveDivTemplate img {
   padding-top: 5px;
   width: 30px;
   height: 30px;
-  vertical-align: middle;
+  /* vertical-align: middle; */
   /* making the image "see through" for clicks so DIV under it can be clicked */
   pointer-events: none;
+  margin-bottom: 4px;
 }
 
 /* highlight currently displayed move in the move history */

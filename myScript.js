@@ -1359,7 +1359,7 @@ function endGame(finishType) {
   let typeOfGameEnd = ["checkmate", "draw", "insuficient material draw", "stalemate", "rezignation of a player"];
   console.log("Game ended by " + typeOfGameEnd[finishType] + ".");
   outputToInfobox("Game ended by " + typeOfGameEnd[finishType] + ".");
-  outputToInfobox("<strong> >>> " + getPlayerColorString(false) + " won <<< </strong>")
+  endOfMoveInfoBox();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1495,8 +1495,14 @@ function addMoveFeature() {
     // add promotion to move box (image of promoted piece???)
     outputToInfobox("(pawn promoted)")  
   }
-  if (moveHistory[0][3].includes("+")) {outputToInfobox("(player in check)");}
-  else if (moveHistory[0][3].includes("++")) {outputToInfobox("(player in doublecheck)");}
+  if (moveHistory[0][3].includes("+")) {outputToInfobox("(" + getPlayerColorString() + " in check)");}
+  else if (moveHistory[0][3].includes("++")) {outputToInfobox("(" + getPlayerColorString() + " in double check)");}
+  if (gameOver != undefined) {
+    if (gameOver == "0") {outputToInfobox("<strong>This is checkmate!</strong>");}
+    else if (gameOver == 3 || gameOver == 2) {addInfoToMoveDiv(" ½–½");}
+  }
+  // else if "s" else if "i" (add info about stalemate and insuficient material to the moveDiv -> both ½–½)
+
 }
 
 // adds passed info to a move in the move history log ("+", "++", "e.p.", ...)
@@ -1678,7 +1684,7 @@ function executeMove(oldSquare, newSquare) {
   clearSquare(oldSquare);
   removePiece(oldSquare);
   
-  outputToInfobox("<strong> MOVE: </strong>" + moveNumber + " - " + getPlayerColorString() + " player");
+  outputToInfobox("<strong> MOVE: " + moveNumber + " - " + getPlayerColorString() + "'s move </strong>");
   // inform the players about the move made
   outputToInfobox(pieceToString(newSquare) + " moved to " + getCoordinatesOfSquare(newSquare.id))
   // log a move in the move history box
@@ -1780,6 +1786,7 @@ function switchMove() {
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
+      moveHistory[0][3].push("#");
       addCheckmateToMoveDiv(true);
       gameOver = 0;
       // endGame(0);
@@ -1799,6 +1806,7 @@ function switchMove() {
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
+      moveHistory[0][3].push("#");
       addCheckmateToMoveDiv();
       gameOver = 0;
       // endGame(0);
@@ -1810,10 +1818,12 @@ function switchMove() {
     if (isStalemate()) {
       console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");
       gameOver = 3;
+      // moveHistory[0][3].push("s");
       // endGame(3);
     }
     else if (isInsuficientDraw()) {
       gameOver = 2;
+      // moveHistory[0][3].push("i");
       // endGame(2);
     }
   }
@@ -1835,6 +1845,10 @@ function switchMove() {
   // reset additional info about the move
   if (gameOver != undefined) {
     endGame(gameOver);
+    // endOfMoveInfoBox();
+  }
+  if (moveHistory[0][3].includes("#")) {
+    outputToInfobox("<strong> >>> " + getPlayerColorString(false) + " won <<< </strong>");
     endOfMoveInfoBox();
   }
   moveHistory[0][3] = [];
