@@ -68,7 +68,7 @@ body {
   margin-left: 50px;
   margin-top: 20px;
   padding-top: 20px;
-  padding-left: 15px;
+  padding-left: 10px;
   /* width: 250px; */
   /* height: 80px; */
   border: grey solid 5px;
@@ -79,7 +79,7 @@ body {
 #infobox {
   background-color: yellow;
   font-size: 22px;
-  width: 330px;
+  width: 340px;
   height: 250px;
   overflow: scroll;
   overflow-x: hidden;
@@ -95,7 +95,7 @@ body {
   /* margin-left: 50px; */
   margin-top: 20px;
   height: 280px;
-  width: 320px;
+  width: 330px;
   background-color: lightsalmon;
   padding-right: 10px;
   font-size: 20px;
@@ -195,7 +195,7 @@ button:active {
   align-items: center; /* vertically centers items */
   cursor: pointer;
   background-color: lightgoldenrodyellow;
-  width: 110px;
+  width: 120px;
 }
 
 .numberDivTemplate {
@@ -220,7 +220,11 @@ button:active {
 /* highlight currently displayed move in the move history */
 /* it's either the last move made or a move the player chose to be diplayed */
 .displayedMove {
-  background-color: rgb(161, 40, 189);
+  background-color:rgb(205, 198, 115);
+  border-color: yellow;
+  /* background-color: lightgreen; */
+  /* background-color: brown; */
+  /* color: white; */
 }
 
 .redBackground {

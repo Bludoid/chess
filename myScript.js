@@ -1382,7 +1382,7 @@ function outputToInfobox(infoMessage) {
 
 // underlining the info about a move and setting focus (scroll) to it
 function endOfMoveInfoBox() {
-  infobox.innerHTML += "= = = = = = = = = = = = =";
+  infobox.innerHTML += "= = = = = = = = = = = = = = = =";
   const breakElement = document.createElement("br");
   infobox.appendChild(breakElement);
   breakElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1463,7 +1463,7 @@ function addMoveDiv(newSquareID, numbering = false) {
   else {
     moveDiv.className = "moveDivTemplate";
     addImage(moveDiv, getPieceShortcut(newSquareID));
-    moveDiv.innerHTML += " " + getCoordinatesOfSquare(newSquareID);
+    moveDiv.innerHTML += getCoordinatesOfSquare(newSquareID);
     moveDiv.id = "move" + getMoveHistoryIndex();
   }
   moveBox.appendChild(moveDiv);
@@ -1499,11 +1499,18 @@ function addMoveFeature() {
   }
   if (moveHistory[0][3].includes("p")) {
     // add promotion to move box (image of promoted piece???)
-    outputToInfobox("("+ getPlayerColorString(false) + " pawn promoted)");
-    addPromotedImage(moveHistory[0][3][moveHistory[0][3].indexOf("p") + 1]);
+    let promotedPiece = moveHistory[0][3][moveHistory[0][3].indexOf("p") + 1];
+    outputToInfobox("("+ getPlayerColorString(false) + " pawn promoted to " + getPieceName(promotedPiece[0]) + ")");
+    addPromotedImage(promotedPiece);
   }
-  if (moveHistory[0][3].includes("+")) {outputToInfobox("(" + getPlayerColorString() + " in check)");}
-  else if (moveHistory[0][3].includes("++")) {outputToInfobox("(" + getPlayerColorString() + " in double check)");}
+  if (moveHistory[0][3].includes("+")) {
+    addInfoToMoveDiv("+");
+    outputToInfobox("(" + getPlayerColorString() + " in check)");
+  }
+  else if (moveHistory[0][3].includes("++")) {
+    addInfoToMoveDiv("++");
+    outputToInfobox("(" + getPlayerColorString() + " in double check)");
+  }
   if (gameOver != undefined) {
     if (gameOver == "0") {outputToInfobox("<strong>This is checkmate!</strong>");}
     else if (gameOver == 3 || gameOver == 2) {addInfoToMoveDiv(" ½–½");}
@@ -1546,7 +1553,17 @@ function getPlayerColorString(normalLogic = true) {
   else {return whiteMove? "black" : "white";}
 }
 
+function getPieceName(shortcut) {
+  switch(shortcut) {
+    case "q": return "queen";
+    case "b": return "bishop";
+    case "r": return "rook";
+    case "n": return "knight";
+    case "p": return "pawn";
+    case "k": return "king";
 
+  }
+}
 
 // converts a move number (moveNumber) and players turn (whiteMove) to index in the history of moves array
 // 4 white => 7
@@ -1794,13 +1811,13 @@ function switchMove() {
     // double check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from squares: " + attackerSquares);
     // adding two "+" to moveBox as a symbol for double check
-    addInfoToMoveDiv("++");
+    // addInfoToMoveDiv("++");
     moveHistory[0][3].push("++");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (!canKingMove()) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
       moveHistory[0][3].push("#");
-      addCheckmateToMoveDiv(true);
+      // addCheckmateToMoveDiv(true);
       gameOver = 0;
       // endGame(0);
     }
@@ -1814,13 +1831,14 @@ function switchMove() {
     // single check
     console.log(kingsColor + " king is being checked on square: " + squareOfInterest + " from square: " + attackerSquares);
     // adding "+" to move box as a symbol for check 
-    addInfoToMoveDiv("+");
+    // addInfoToMoveDiv("+");
     moveHistory[0][3].push("+");
     whiteMove ? whiteInCheck = true : blackInCheck = true;
     if (isCheckmate(attackerSquares[0])) {
       console.log(">=>=>=>=> " + kingsColor + " player has been checkmated. <=<=<=<=<");
       moveHistory[0][3].push("#");
-      addCheckmateToMoveDiv();
+      
+      // addCheckmateToMoveDiv();
       gameOver = 0;
       // endGame(0);
     }
@@ -1862,6 +1880,8 @@ function switchMove() {
   }
   if (moveHistory[0][3].includes("#")) {
     outputToInfobox("<strong> >>> " + getPlayerColorString(false) + " won <<< </strong>");
+    if (moveHistory[0][3].includes("++")) {addCheckmateToMoveDiv(true);}
+    else {addCheckmateToMoveDiv();}
     endOfMoveInfoBox();
   }
   moveHistory[0][3] = [];
