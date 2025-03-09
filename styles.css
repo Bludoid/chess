@@ -79,7 +79,7 @@ body {
 #infobox {
   background-color: yellow;
   font-size: 22px;
-  width: 310px;
+  width: 330px;
   height: 250px;
   overflow: scroll;
   overflow-x: hidden;
@@ -93,9 +93,9 @@ body {
 /* specifying style of div for move history and its navigation */
 #moveBox {
   /* margin-left: 50px; */
-  margin-top: 55px;
-  height: 290px;
-  width: 300px;
+  margin-top: 20px;
+  height: 280px;
+  width: 320px;
   background-color: lightsalmon;
   padding-right: 10px;
   font-size: 20px;
@@ -195,7 +195,7 @@ button:active {
   align-items: center; /* vertically centers items */
   cursor: pointer;
   background-color: lightgoldenrodyellow;
-  width: 105px;
+  width: 110px;
 }
 
 .numberDivTemplate {
@@ -229,4 +229,8 @@ button:active {
 
 .lastMove {
   background-Color: lightGreen;
+}
+
+span {
+  font-size: 26px;
 }

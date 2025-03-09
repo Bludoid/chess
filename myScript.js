@@ -196,7 +196,7 @@ function unhighlightSquare(square) {
 
 // taking a piece
 function takePiece(takingPieceSquare, takenPieceSquare) {
-  moveHistory[0][3].push("x");
+  moveHistory[0][3].push("×");
   removePiece(takenPieceSquare);
   executeMove(takingPieceSquare, takenPieceSquare);
 }
@@ -777,6 +777,11 @@ function choosePromotion(chosenPiece, squareID) {
     promotionInfobox.classList.toggle("hideInfo");
   }, 500);
   
+  // saving info about promotion to moveHistory[0][3] for use of informing player
+  moveHistory[0][3].push("p");
+  moveHistory[0][3].push(chosenPiece);
+  console.log(moveHistory[0][3]);
+
   promotionSquare.classList.toggle("promotionFocus");
   switchMove();
   toggleClicking(); 
@@ -1474,26 +1479,28 @@ function addImage(moveDiv, imageShortcut) {
 }
 
 function addMoveFeature() {
-  if (moveHistory[0][3].includes("x")) {
+  console.log("adding info: " + moveHistory[0][3]);
+  if (moveHistory[0][3].includes("×")) {
     addTakeToMoveDiv();
     outputToInfobox("(" + getPlayerColorString() + " piece taken)");  
   }
   else if (moveHistory[0][3].includes("e")) {
     addTakeToMoveDiv();
-    addInfoToMoveDiv(" e.p.")
-    outputToInfobox("(pawn taken en passant)")  
+    addInfoToMoveDiv(" e.p.");
+    outputToInfobox("(pawn taken en passant)");  
   }
   else if (moveHistory[0][3].includes("0-0")) {
     addInfoToMoveDiv(" 0-0")
-    outputToInfobox("(short castling)")  
+    outputToInfobox("(short castling)");
   }
   else if (moveHistory[0][3].includes("0-0-0")) {
     addInfoToMoveDiv(" 0-0-0")
-    outputToInfobox("(long castling)")  
+    outputToInfobox("(long castling)")  ;
   }
   if (moveHistory[0][3].includes("p")) {
     // add promotion to move box (image of promoted piece???)
-    outputToInfobox("(pawn promoted)")  
+    outputToInfobox("("+ getPlayerColorString(false) + " pawn promoted)");
+    addPromotedImage(moveHistory[0][3][moveHistory[0][3].indexOf("p") + 1]);
   }
   if (moveHistory[0][3].includes("+")) {outputToInfobox("(" + getPlayerColorString() + " in check)");}
   else if (moveHistory[0][3].includes("++")) {outputToInfobox("(" + getPlayerColorString() + " in double check)");}
@@ -1520,12 +1527,18 @@ function addCheckmateToMoveDiv(doubleCheck = false) {
   moveDiv.innerHTML = divText;
 }
 
-// adds a take info: "x" added to the move in the move history log
+// adds a take info: "×" added to the move in the move history log
 function addTakeToMoveDiv() {
   let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
   let divText = moveDiv.innerHTML;
   let bracketIndex = divText.indexOf(">");
-  moveDiv.innerHTML = moveDiv.innerHTML.slice(0, bracketIndex + 1) + "x" + moveDiv.innerHTML.slice(bracketIndex + 1);
+  moveDiv.innerHTML = moveDiv.innerHTML.slice(0, bracketIndex + 1) + "×" + moveDiv.innerHTML.slice(bracketIndex + 1);
+}
+
+function addPromotedImage(pieceShortcut) {
+  let moveDiv = document.getElementById("move" + (getMoveHistoryIndex()-1));
+  addImage(moveDiv, pieceShortcut);
+  //moveDiv.innerHTML += moveInfo;
 }
 
 function getPlayerColorString(normalLogic = true) {
@@ -1830,11 +1843,11 @@ function switchMove() {
   // info about a move being a take (moveBox and infobox)
   addMoveFeature();
   // following if-else will be in addMoveFeature() function...
-  // if (moveHistory[0][3].includes("x")) {
+  // if (moveHistory[0][3].includes("×")) {
   //   addTakeToMoveDiv();
   //   outputToInfobox("(opponent's piece taken)")  
   // }
-  // // info about en passant ("x" and "e.p.") and infobox message)
+  // // info about en passant ("×" and "e.p.") and infobox message)
   // else if (moveHistory[0][3].includes("e")) {
   //   addTakeToMoveDiv();
   //   addInfoToMoveDiv(" e.p.")
