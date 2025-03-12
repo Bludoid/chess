@@ -182,7 +182,7 @@ button:active {
 .moveDivTemplate, .numberDivTemplate {
   height: 40px;
   width: 60px;
-  border: 3px solid blue;
+  border: 3px solid lightseagreen;
   display: inline-block;
   margin-left: 2px;
   margin-bottom: 5px;
@@ -211,7 +211,6 @@ button:active {
   padding-top: 5px;
   width: 30px;
   height: 30px;
-  /* vertical-align: middle; */
   /* making the image "see through" for clicks so DIV under it can be clicked */
   pointer-events: none;
   margin-bottom: 4px;

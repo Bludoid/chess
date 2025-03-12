@@ -20,7 +20,7 @@ let moveBox = document.getElementById("moveLogger");
 // moveHistory[0][0] index of move displayed currently on the board
 // moveHistory[0][1] number of moves already made (max move index)
 // moveHistory[0][2] html element -> div - chess square -> last move highlighted on the board
-// moveHistory[0][3] - if needed special feature of the currently made move (en passant, promotion, ...)
+// moveHistory[0][3] - special features of the currently made move (en passant, promotion, ...)
 // |-> array set to default = [0, 0, undefined, []] 
 
 
@@ -197,6 +197,8 @@ function unhighlightSquare(square) {
 // taking a piece
 function takePiece(takingPieceSquare, takenPieceSquare) {
   moveHistory[0][3].push("×");
+  moveHistory[0][3].push(boardArrayBackup[takenPieceSquare.id][0] + boardArrayBackup[takenPieceSquare.id][1]);
+  //moveHistory[0][3].push(takenPieceSquare.innerHTML);
   removePiece(takenPieceSquare);
   executeMove(takingPieceSquare, takenPieceSquare);
 }
@@ -1419,29 +1421,7 @@ function pieceToString(square) {
     default: recognizedPiece = "error";  
   }
   
-  // figure out what piece it is
-  switch (pieceShortcut) {
-    case "p": 
-      recognizedPiece += "pawn";
-      break;
-    case "r": 
-      recognizedPiece += "rook";
-      break;
-    case "n": 
-      recognizedPiece += "knight";
-      break;
-    case "b": 
-      recognizedPiece += "bishop";
-      break;
-    case "q": 
-      recognizedPiece += "queen";
-      break;
-    case "k": 
-      recognizedPiece += "king";
-      break;
-    default: recognizedPiece = "error"; 
-  }
-
+  recognizedPiece += getPieceName(pieceShortcut);
   return recognizedPiece;
 }
 
@@ -1482,7 +1462,8 @@ function addMoveFeature() {
   console.log("adding info: " + moveHistory[0][3]);
   if (moveHistory[0][3].includes("×")) {
     addTakeToMoveDiv();
-    outputToInfobox("(" + getPlayerColorString() + " piece taken)");  
+    outputToInfobox("(" + getPlayerColorString() + " " 
+    + getPieceName(moveHistory[0][3][moveHistory[0][3].indexOf("×") + 1][0]) + " taken)");  
   }
   else if (moveHistory[0][3].includes("e")) {
     addTakeToMoveDiv();
@@ -1498,7 +1479,6 @@ function addMoveFeature() {
     outputToInfobox("(long castling)")  ;
   }
   if (moveHistory[0][3].includes("p")) {
-    // add promotion to move box (image of promoted piece???)
     let promotedPiece = moveHistory[0][3][moveHistory[0][3].indexOf("p") + 1];
     outputToInfobox("("+ getPlayerColorString(false) + " pawn promoted to " + getPieceName(promotedPiece[0]) + ")");
     addPromotedImage(promotedPiece);
@@ -1561,7 +1541,7 @@ function getPieceName(shortcut) {
     case "n": return "knight";
     case "p": return "pawn";
     case "k": return "king";
-
+    default: return "error";
   }
 }
 
@@ -1849,34 +1829,17 @@ function switchMove() {
     if (isStalemate()) {
       console.log(">=>=>=>=> The game has ended by a stalemate. <=<=<=<=<");
       gameOver = 3;
-      // moveHistory[0][3].push("s");
-      // endGame(3);
     }
     else if (isInsuficientDraw()) {
       gameOver = 2;
-      // moveHistory[0][3].push("i");
-      // endGame(2);
     }
   }
   // info about a move being a take (moveBox and infobox)
   addMoveFeature();
-  // following if-else will be in addMoveFeature() function...
-  // if (moveHistory[0][3].includes("×")) {
-  //   addTakeToMoveDiv();
-  //   outputToInfobox("(opponent's piece taken)")  
-  // }
-  // // info about en passant ("×" and "e.p.") and infobox message)
-  // else if (moveHistory[0][3].includes("e")) {
-  //   addTakeToMoveDiv();
-  //   addInfoToMoveDiv(" e.p.")
-  //   outputToInfobox("(pawn taken en passant)")  
-  // }
   // ending the move by underlining the info in the infobox and setting focus to it
   endOfMoveInfoBox();
-  // reset additional info about the move
   if (gameOver != undefined) {
     endGame(gameOver);
-    // endOfMoveInfoBox();
   }
   if (moveHistory[0][3].includes("#")) {
     outputToInfobox("<strong> >>> " + getPlayerColorString(false) + " won <<< </strong>");
@@ -1884,6 +1847,7 @@ function switchMove() {
     else {addCheckmateToMoveDiv();}
     endOfMoveInfoBox();
   }
+  // reset additional info about the move
   moveHistory[0][3] = [];
 }
 
