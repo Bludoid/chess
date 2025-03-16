@@ -1450,12 +1450,12 @@ function addMoveDiv(newSquareID, numbering = false) {
 }
 
 // creates an img element with the image of the appropriate piece and adds it to the moveDive from addMoveDiv
-function addImage(moveDiv, imageShortcut) {
+function addImage(divForImage, imageShortcut) {
   let imgElement = document.createElement("img");
   let pathString = "img/" + imageShortcut + ".png";   // puts together the name of the image
   imgElement.src = pathString;
   //newPiece.className = pieceName;
-  moveDiv.appendChild(imgElement);
+  divForImage.appendChild(imgElement);
 }
 
 function addMoveFeature() {
@@ -1468,7 +1468,7 @@ function addMoveFeature() {
   else if (moveHistory[0][3].includes("e")) {
     addTakeToMoveDiv();
     addInfoToMoveDiv(" e.p.");
-    outputToInfobox("(pawn taken en passant)");  
+    outputToInfobox("(" + getPlayerColorString() + " pawn taken en passant)");  
   }
   else if (moveHistory[0][3].includes("0-0")) {
     addInfoToMoveDiv(" 0-0")
