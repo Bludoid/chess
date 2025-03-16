@@ -64,8 +64,10 @@ body {
 }
 
 /* template for class of boxes of different type (infobox itself, promotion, move history) */
+
+
 .infoboxTemplate {
-  margin-left: 50px;
+  margin-left: 10px;
   margin-top: 20px;
   padding-top: 20px;
   padding-left: 10px;
@@ -237,3 +239,55 @@ button:active {
 span {
   font-size: 26px;
 }
+
+
+/* gallery */
+
+#galleryContainer {
+  margin-top: 65px;
+  margin-left: 10px;
+}
+
+#gallery {
+  width: 80px;
+  height: 502px;
+  background: red;
+  border: 3px solid blue;
+  border-radius: 5px;
+}
+
+#blackGallery #whiteGallery{
+  width: 80px;
+  height: 250px;
+  padding: 0px;
+}
+
+#separator {
+  width: 80px;
+  height: 2px;
+  background: blue;
+}
+
+.imageDiv, .numberDiv {
+  width: 50px;
+  height: 50px;
+  background: yellow;
+  display: inline-block;
+  vertical-align: top;
+  border-radius: 5px;
+}
+
+.numberDiv {
+  width: 25px;
+  height: 40px;
+  font-size: 30px;
+  background: pink;
+  padding-top: 10px;
+  padding-left: 5px;
+}
+
+.imageDiv > img {
+  height: 45px;
+  width: 45px;
+}
+

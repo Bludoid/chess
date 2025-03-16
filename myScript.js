@@ -1462,8 +1462,11 @@ function addMoveFeature() {
   console.log("adding info: " + moveHistory[0][3]);
   if (moveHistory[0][3].includes("×")) {
     addTakeToMoveDiv();
-    outputToInfobox("(" + getPlayerColorString() + " " 
-    + getPieceName(moveHistory[0][3][moveHistory[0][3].indexOf("×") + 1][0]) + " taken)");  
+    let pieceNameString = moveHistory[0][3][moveHistory[0][3].indexOf("×") + 1];
+    console.log("kddddddddddddddddddddddddddddddddddd");
+    console.log(pieceNameString);
+    addPieceToGallery(pieceNameString);
+    outputToInfobox("(" + getPlayerColorString() + " " + getPieceName(pieceNameString[0]) + " taken)");  
   }
   else if (moveHistory[0][3].includes("e")) {
     addTakeToMoveDiv();
@@ -1556,6 +1559,27 @@ function getMoveHistoryIndex(moveNo = moveNumber, whiteTurn = whiteMove) {
 function getPieceShortcut(squareID) {
   return boardArray[squareID][0] + boardArray[squareID][1];
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+// LOGIC TO DISPLAY TAKEN PIECES IN THE GALLERY
+
+function addPieceToGallery(pieceShortcut) {
+  let pieceDiv = document.getElementById(pieceShortcut);
+  let digitDiv = pieceDiv.previousElementSibling;
+  if (pieceDiv.innerHTML == "") {
+    addImage(pieceDiv, pieceShortcut);
+  }
+  else if (digitDiv.innerHTML == "") {
+    digitDiv.innerHTML = 2;
+  }
+  else {
+    digitDiv.innerHTML = (Number(digitDiv.innerHTML) + 1);
+  }
+}
+ 
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 
