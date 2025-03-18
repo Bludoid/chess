@@ -3,6 +3,16 @@ body {
   background-image: linear-gradient(DarkGoldenrod, gold);
 }
 
+#container {
+  padding: 0px 20px 0px 20px;
+  margin: 10px 20px 0px 30px;
+  background-color: rgb(255, 170, 0);
+  height: 645px;
+  width: 900px;
+  border-radius: 10px;
+  border: 3px solid grey;
+}
+
 #board>div {
     height: 52px;
     width: 52px;
@@ -25,7 +35,7 @@ body {
 }
   
 #board {
-  margin: 0 0 0 100px;
+  /* margin: 0 0 0 0px; */
   width: 416px;
   border: solid brown 20px;
   background-color: grey;
@@ -47,7 +57,7 @@ body {
 }
 
 #blackBanner, #whiteBanner {
-  margin-left: 100px;
+  margin-left: 0px;
   width: 466px;
   height: 20px;
   border-radius: 10px;
@@ -73,7 +83,7 @@ body {
 
 .infoboxTemplate {
   margin-left: 10px;
-  margin-top: 20px;
+  margin-top: 10px;
   padding-top: 20px;
   padding-left: 10px;
   /* width: 250px; */
@@ -120,7 +130,7 @@ body {
 
 /* specifying style for div for buttons (resign, draw offer, flip board) */
 #gameButtonsDiv {
-  background-color: rgb(38, 255, 0);
+  background-color: rgb(74, 199, 166);
   padding: 10px;
   margin-top: 10px;
 }
@@ -153,7 +163,7 @@ button:active {
   height: 40px;
   background-color: orangered;
   font-size: 30px;
-  margin-left: 100px;
+  margin-left: 0px;
   margin-top: 10px;
   padding: 8px 0px 8px 20px;
 }
@@ -182,8 +192,9 @@ button:active {
 
 .hideInfo {
   /* does not take take any space: */
-  display: none;
-  /* does keep its space: visibility: hidden */
+  /* display: none; */
+  /* does keep its space: */
+  visibility: hidden
 }
 
 .displayFlex {
