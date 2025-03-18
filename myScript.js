@@ -782,8 +782,6 @@ function choosePromotion(chosenPiece, squareID) {
   // saving info about promotion to moveHistory[0][3] for use of informing player
   moveHistory[0][3].push("p");
   moveHistory[0][3].push(chosenPiece);
-  console.log(moveHistory[0][3]);
-
   promotionSquare.classList.toggle("promotionFocus");
   switchMove();
   toggleClicking(); 
@@ -1463,8 +1461,6 @@ function addMoveFeature() {
   if (moveHistory[0][3].includes("×")) {
     addTakeToMoveDiv();
     let pieceNameString = moveHistory[0][3][moveHistory[0][3].indexOf("×") + 1];
-    console.log("kddddddddddddddddddddddddddddddddddd");
-    console.log(pieceNameString);
     addPieceToGallery(pieceNameString);
     outputToInfobox("(" + getPlayerColorString() + " " + getPieceName(pieceNameString[0]) + " taken)");  
   }

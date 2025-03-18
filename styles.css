@@ -4,46 +4,51 @@ body {
 }
 
 #board>div {
-    height: 60px;
-    width: 60px;
+    height: 52px;
+    width: 52px;
     display: inline-block;
     border-radius: 4px;
     vertical-align: top;
   }
   
-  .whiteSquare {
-    background: chocolate;
-  }
-  
-  .blackSquare {
-    background: #444;
-  }
-    
-  #board {
-    margin: 0 0 0 100px;
-    width: 480px;
-    border: solid brown 20px;
-    background-color: grey;
-    padding: 5px;
-    border-radius: 8px;
-  }
-  
-  .highlighted {
-    background-color: yellow;
-  }
+#board>div>img {
+  height: 52px;
+  width: 52px;
+}
 
-  .promotionFocus {
-    background-color: blueviolet;
-  }
+.whiteSquare {
+  background: chocolate;
+}
 
-  .disableClicks>div {
-    pointer-events: none; /* Disable click events for all divs */
-    opacity: 0.75;   /* "dimming the chess board" */
+.blackSquare {
+  background: #444;
+}
+  
+#board {
+  margin: 0 0 0 100px;
+  width: 416px;
+  border: solid brown 20px;
+  background-color: grey;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+.highlighted {
+  background-color: yellow;
+}
+
+.promotionFocus {
+  background-color: blueviolet;
+}
+
+.disableClicks>div {
+  pointer-events: none; /* Disable click events for all divs */
+  opacity: 0.75;   /* "dimming the chess board" */
 }
 
 #blackBanner, #whiteBanner {
   margin-left: 100px;
-  width: 530px;
+  width: 466px;
   height: 20px;
   border-radius: 10px;
 }
@@ -63,8 +68,8 @@ body {
   background-color: white;
 }
 
-/* template for class of boxes of different type (infobox itself, promotion, move history) */
 
+/* template for class of boxes of different type (infobox itself, promotion, move history) */
 
 .infoboxTemplate {
   margin-left: 10px;
@@ -73,39 +78,27 @@ body {
   padding-left: 10px;
   /* width: 250px; */
   /* height: 80px; */
-  border: grey solid 5px;
+  border: grey solid 3px;
   border-radius: 10px;
-}
-
-/* specifying style of div = console for informing player about moves */
-#infobox {
-  background-color: yellow;
-  font-size: 22px;
-  width: 340px;
-  height: 250px;
-  overflow: scroll;
-  overflow-x: hidden;
+  font-size: 20px;
 }
 
 /* sideways view (board on left and boxes on the right) */
 .container {
-  display: flex; /* Enables flexbox */
+  display: flex; /* enables flexbox */
 }
 
 /* specifying style of div for move history and its navigation */
 #moveBox {
-  /* margin-left: 50px; */
   margin-top: 20px;
-  height: 280px;
+  height: 220px;
   width: 330px;
   background-color: lightsalmon;
   padding-right: 10px;
-  font-size: 20px;
 }
 
 /* div for showing the moves and scrolling */
 #moveLogger {
-  /* font-size: 20px; */
   /* overflow: auto; (would replace the two lines below)*/
   overflow: scroll;
   overflow-x: hidden;
@@ -113,20 +106,34 @@ body {
   padding-right: 10px;
 }
 
+/* specifying style of div => console for informing player about moves */
+#infobox {
+  background-color: yellow;
+  width: 340px;
+  height: 220px;
+  overflow: scroll;
+  overflow-x: hidden;
+  margin-top: 10px;
+  font-size: 19px;
+  padding-left: 15px;
+}
+
 /* specifying style for div for buttons (resign, draw offer, flip board) */
 #gameButtonsDiv {
   background-color: rgb(38, 255, 0);
   padding: 10px;
+  margin-top: 10px;
 }
 
 /* style for buttons */
 button {
-  font-size: 24px;
+  font-size: 20px;
   border-style: solid blue;
   border-width: 4.5px;
   border-radius: 4px;
   cursor: pointer;
   background-color: lightgrey;
+  margin-right: 10px;
 }
 
 /* when hovered over */
@@ -143,9 +150,12 @@ button:active {
 
 /* box showing pieces the used can chose from to promote */
 #promotionInfo {
+  height: 40px;
   background-color: orangered;
   font-size: 30px;
-  margin-left: 100px; 
+  margin-left: 100px;
+  margin-top: 10px;
+  padding: 8px 0px 8px 20px;
 }
 
 #promotionInfo>span {
@@ -153,9 +163,11 @@ button:active {
 }
 
 #promotionInfo>img {
- border: 2px solid blue;
- border-radius: 4px; 
- margin-right: 5px;
+  height: 40px;
+  width: 40px;
+  border: 2px solid blue;
+  border-radius: 4px; 
+  margin-right: 10px;
 }
 
 #promotionInfo>img:hover{
@@ -182,12 +194,12 @@ button:active {
 
 /* template for divs to display (log) moves */
 .moveDivTemplate, .numberDivTemplate {
-  height: 40px;
+  height: 32px;
   width: 60px;
   border: 3px solid lightseagreen;
   display: inline-block;
   margin-left: 2px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   border-radius: 4px;
   vertical-align: top;
 }
@@ -198,21 +210,23 @@ button:active {
   cursor: pointer;
   background-color: lightgoldenrodyellow;
   width: 120px;
+  font-size: 18px;
 }
 
 .numberDivTemplate {
   text-align: center; /* Center horizontally */
-  line-height: 40px; /* Set same as height, to center vertically */
+  line-height: 32px; /* Set same as height, to center vertically */
   width: 30px;
   margin-right: 2px;
   border-color: green;
   background-color: greenyellow;
 }
 
+/* image of a piece that moved and that the player promoted to */
 .moveDivTemplate img {
   padding-top: 5px;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   /* making the image "see through" for clicks so DIV under it can be clicked */
   pointer-events: none;
   margin-bottom: 4px;
@@ -237,22 +251,23 @@ button:active {
 }
 
 span {
-  font-size: 26px;
+  font-size: 21px;
+  margin-bottom: 10px;
 }
 
 
 /* gallery */
 
 #galleryContainer {
-  margin-top: 65px;
+  margin-top: 70px;
   margin-left: 10px;
 }
 
 #gallery {
-  width: 80px;
-  height: 502px;
-  background: red;
-  border: 3px solid blue;
+  width: 52px;
+  height: 433px;
+  background: orangered;
+  border: 3px solid grey;
   border-radius: 5px;
 }
 
@@ -263,31 +278,36 @@ span {
 }
 
 #separator {
-  width: 80px;
-  height: 2px;
-  background: blue;
+  width: 52px;
+  height: 3px;
+  background: grey;
 }
 
 .imageDiv, .numberDiv {
-  width: 50px;
-  height: 50px;
-  background: yellow;
+  width: 35px;
+  height: 35px;
+  /* background: yellow; */
   display: inline-block;
   vertical-align: top;
   border-radius: 5px;
 }
 
 .numberDiv {
-  width: 25px;
-  height: 40px;
-  font-size: 30px;
-  background: pink;
-  padding-top: 10px;
-  padding-left: 5px;
+  width: 14px;
+  height: 29px;
+  font-size: 25px;
+  /* background: pink; */
+  padding-top: 6px;
+  padding-left: 3px;
 }
 
 .imageDiv > img {
-  height: 45px;
-  width: 45px;
+  height: 35px;
+  width: 35px;
 }
 
+#blackScore, #whiteScore {
+  height: 40px;
+  width: 52px;
+  background: darkslategrey;
+}
