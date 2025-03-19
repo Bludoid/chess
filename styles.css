@@ -5,9 +5,9 @@ body {
 
 #container {
   padding: 0px 20px 0px 20px;
-  margin: 10px 20px 0px 30px;
+  margin: 10px 20px 0px 10px;
   background-color: rgb(255, 170, 0);
-  height: 645px;
+  height: 640px;
   width: 900px;
   border-radius: 10px;
   border: 3px solid grey;
@@ -69,12 +69,12 @@ body {
 
 #blackBanner {
   margin-top: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   background-color: black;
 }
 
 #whiteBanner {
-  margin-top: 15px;
+  margin-top: 12px;
   background-color: white;
 }
 
@@ -101,7 +101,7 @@ body {
 /* specifying style of div for move history and its navigation */
 #moveBox {
   margin-top: 20px;
-  height: 220px;
+  height: 240px;
   width: 330px;
   background-color: lightsalmon;
   padding-right: 10px;
@@ -120,7 +120,7 @@ body {
 #infobox {
   background-color: yellow;
   width: 340px;
-  height: 220px;
+  height: 230px;
   overflow: scroll;
   overflow-x: hidden;
   margin-top: 10px;
@@ -318,7 +318,19 @@ span {
 }
 
 #blackScore, #whiteScore {
-  height: 40px;
+  padding-top: 4px;
+  height: 36px;
   width: 52px;
-  background: darkslategrey;
+  background: grey;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#blackScore {
+  color: black;
+}
+
+#whiteScore {
+  color: white;
 }
