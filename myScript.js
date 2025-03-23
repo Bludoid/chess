@@ -49,6 +49,11 @@ let chosenSquare = null;
 // A for long, H for short castling
 let abilityToCastle = { whiteA: true, whiteH: true, blackA: true, blackH: true };
 
+// game score, shows the value of pieces on the board and the balance power balance
+// +8 means white is 8 points up, -8 means black is 8 points up 
+let gameScore = 0; 
+
+
 // board array backup for simulation of move
 let boardArrayBackup;
 
@@ -198,7 +203,6 @@ function unhighlightSquare(square) {
 function takePiece(takingPieceSquare, takenPieceSquare) {
   moveHistory[0][3].push("×");
   moveHistory[0][3].push(boardArrayBackup[takenPieceSquare.id][0] + boardArrayBackup[takenPieceSquare.id][1]);
-  //moveHistory[0][3].push(takenPieceSquare.innerHTML);
   removePiece(takenPieceSquare);
   executeMove(takingPieceSquare, takenPieceSquare);
 }
@@ -1461,6 +1465,7 @@ function addMoveFeature() {
   if (moveHistory[0][3].includes("×")) {
     addTakeToMoveDiv();
     let pieceNameString = moveHistory[0][3][moveHistory[0][3].indexOf("×") + 1];
+    manageScore(moveHistory[0][3][moveHistory[0][3].indexOf("×") + 1]);
     addPieceToGallery(pieceNameString);
     outputToInfobox("(" + getPlayerColorString() + " " + getPieceName(pieceNameString[0]) + " taken)");  
   }
@@ -1468,6 +1473,9 @@ function addMoveFeature() {
     addTakeToMoveDiv();
     addInfoToMoveDiv(" e.p.");
     outputToInfobox("(" + getPlayerColorString() + " pawn taken en passant)");  
+    let pawnTaken = "p" + (whiteMove? "w" : "b");
+    manageScore(pawnTaken);
+    addPieceToGallery(pawnTaken);
   }
   else if (moveHistory[0][3].includes("0-0")) {
     addInfoToMoveDiv(" 0-0")
@@ -1481,6 +1489,7 @@ function addMoveFeature() {
     let promotedPiece = moveHistory[0][3][moveHistory[0][3].indexOf("p") + 1];
     outputToInfobox("("+ getPlayerColorString(false) + " pawn promoted to " + getPieceName(promotedPiece[0]) + ")");
     addPromotedImage(promotedPiece);
+    manageScore(promotedPiece, true);
   }
   if (moveHistory[0][3].includes("+")) {
     addInfoToMoveDiv("+");
@@ -1575,7 +1584,57 @@ function addPieceToGallery(pieceShortcut) {
   }
 }
  
+/////////////////////////////////////////////////////////////////////////////////////
 
+// LOGIC FOR SHOWING THE SCORE IN THE GALLERY
+
+function manageScore(pieceShortcut, promotionScore = false) {
+  promotionScore == false?   updateScore(pieceShortcut) :
+    updateScorePromotion(pieceShortcut);
+  displayScore();
+}
+
+function displayScore() {
+  let whiteScoreDiv = document.getElementById("whiteScore");
+  let blackScoreDiv = document.getElementById("blackScore");
+  let galleryDiv = document.getElementById("gallery");
+  if(gameScore > 0) {
+    whiteScoreDiv.innerHTML = "+" + gameScore;
+    blackScoreDiv.innerHTML = "";
+    galleryDiv.style = "border-color: white";
+  }
+  else if(gameScore < 0) {
+    let blackScoreDiv = document.getElementById("blackScore");
+    blackScoreDiv.innerHTML = "+" + Math.abs(gameScore);
+    whiteScoreDiv.innerHTML = "";
+    galleryDiv.style = "border-color: black";
+  }
+  else if(gameScore == 0) {
+    blackScoreDiv.innerHTML = "0";
+    whiteScoreDiv.innerHTML = "0";
+    galleryDiv.style = "border-color: grey";
+  }
+}
+
+function updateScore(pieceShortcut) {
+  let valueOfPiece = Number(getPieceValue(pieceShortcut[0]));
+  return pieceShortcut[1] == "b"? gameScore += valueOfPiece : gameScore -= valueOfPiece;
+}
+
+function updateScorePromotion(pieceShortcut) {
+  let valueOfPiece = Number(getPieceValue(pieceShortcut[0])) - 1;
+  return pieceShortcut[1] == "w"? gameScore += valueOfPiece : gameScore -= valueOfPiece;
+}
+
+function getPieceValue(pieceType){
+  switch(pieceType) {
+    case "p": return 1;
+    case "n": return 3;
+    case "b": return 3;
+    case "r": return 5;
+    case "q": return 9;
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 

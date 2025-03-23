@@ -112,7 +112,7 @@ body {
   /* overflow: auto; (would replace the two lines below)*/
   overflow: scroll;
   overflow-x: hidden;
-  height: 150px;
+  height: 168px;
   padding-right: 10px;
 }
 
@@ -282,7 +282,7 @@ span {
   border-radius: 5px;
 }
 
-#blackGallery #whiteGallery{
+#blacksGallery #whitesGallery{
   width: 80px;
   height: 250px;
   padding: 0px;
@@ -329,8 +329,10 @@ span {
 
 #blackScore {
   color: black;
+  border-radius: 2px 2px 0px 0px ;
 }
 
 #whiteScore {
   color: white;
+  border-radius: 0px 0px 2px 2px;
 }
