@@ -1649,8 +1649,8 @@ function showPreviousMove() {
 
 function showNextMove() {
   if (moveHistory[0][0] < moveHistory[0][1]) {
-    scrollOnDiv(document.getElementById("move" + (moveHistory[0][0] + 1)));
-    showMove(moveHistory[0][0] + 1);
+    scrollOnDiv(document.getElementById("move" + (Number(moveHistory[0][0]) + 1)));
+    showMove(Number(moveHistory[0][0]) + 1);
   }
 }
 
@@ -1724,7 +1724,6 @@ function takeMoveSnapshot() {
 
 // automatically scroll to a div showing the move information about the displayed move
 function scrollOnDiv(divToFocus) {
-  // let thisDiv = document.getElementById(divID)
   divToFocus.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
