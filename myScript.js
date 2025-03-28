@@ -2,7 +2,7 @@
 //   chess board in HTML/CSS/JavaScript  //
 ///////////////////////////////////////////
 
-let whiteMove = true;         // true ==> white's move, false => black's move
+let whiteMove = true;         // true => white's move, false => black's move
 let gameOver = undefined;         // when true => the game is over by any reason (checkmate, draw, stalemate, resigne..)
 
 // counting the number of moves in this way: 1 for white player, 1 for black, 2 for white, 2 for black ...
